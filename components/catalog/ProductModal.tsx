@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Minus, Plus, FileCheck2, ShieldCheck, Truck, Snowflake } from "lucide-react";
+import { X, Minus, Plus, FileCheck2, ShieldCheck, Truck, Snowflake, type LucideIcon } from "lucide-react";
 import { money, productStorageNote } from "@/lib/products";
 import { useQuickView } from "@/components/quickview/QuickViewContext";
 import { useCart } from "@/components/cart/CartContext";
@@ -164,7 +164,7 @@ function Spec({
   label,
   value,
 }: {
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+    icon: LucideIcon;
   label: string;
   value: string;
 }) {
