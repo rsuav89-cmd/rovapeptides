@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --header-h: 76px;
+  --notice-h: 40px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper text-ink-2 font-sans antialiased;
+    text-rendering: optimizeLegibility;
+    /* obsidian base with a faint copper aura — clinical luxury, not flat black */
+    background-image:
+      radial-gradient(115% 80% at 100% -5%, rgba(183, 110, 89, 0.14) 0%, transparent 55%),
+      radial-gradient(90% 60% at 0% 0%, rgba(183, 110, 89, 0.06) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: #b76e59;
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid #b76e59;
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  /* Syncopate headings — uppercase, geometric, luxury */
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  /* Kicker / eyebrow — copper, spaced */
+  .kicker {
+    @apply font-sans text-label font-semibold uppercase text-signal-ink;
+  }
+
+  .hairline {
+    @apply h-px w-full bg-line;
+  }
+
+  /* Data tag (mg / concentration / batch) — obsidian chip w/ copper-tinted border */
+  .data-tag {
+    @apply inline-flex items-center gap-1.5 rounded-md border border-line-strong bg-paper-3/70
+           px-2 py-1 font-sans text-[0.68rem] font-medium uppercase tracking-wider text-ink-2;
+  }
+
+  /* PRIMARY CTA — deeper copper fill so white text hits WCAG AA (4.81:1).
+     Hover keeps the fill (constant contrast) and adds a copper glow. */
+  .btn-primary,
+  .btn-signal {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full bg-brand-cta px-6 py-3
+           font-sans font-semibold uppercase tracking-wide text-white
+           transition-[transform,box-shadow] duration-160 ease-out-expo
+           will-change-transform hover:shadow-copper active:scale-[0.97];
+  }
+
+  /* SECONDARY — outlined on black, copper on hover */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-line-strong
+           bg-transparent px-6 py-3 font-sans font-semibold uppercase tracking-wide text-ink
+           transition-[transform,border-color,background-color,color] duration-160 ease-out-expo
+           will-change-transform hover:border-brand hover:text-brand active:scale-[0.97];
+  }
+}
+
+/* Motion QA: honor reduced-motion everywhere */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
