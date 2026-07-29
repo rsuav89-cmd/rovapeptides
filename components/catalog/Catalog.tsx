@@ -9,7 +9,7 @@ type Tab = (typeof CATEGORY_TABS)[number];
 
 function matches(tab: Tab, p: (typeof products)[number]): boolean {
   if (tab === "All") return true;
-  if (tab === "New Arrivals") return Boolean(p.isNew) || p.categories.includes("New Arrivals");
+    if (tab === "New Arrivals") return Boolean(p.isNew);
   return p.categories.includes(tab as Category);
 }
 
