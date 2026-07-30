@@ -69,7 +69,7 @@ export function Header() {
           {/* Right: utility actions */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             <a
-              href="#coa"
+                          href="/coas"
               className="hidden items-center gap-2 rounded-full border border-line-strong px-4 py-2 text-sm font-medium transition-[transform,border-color,background-color] duration-160 ease-out-expo hover:border-ink hover:bg-white/[0.03] active:scale-95 md:inline-flex"
             >
               <FileCheck2 className="h-4 w-4 text-signal-ink" strokeWidth={2} />
