@@ -4,12 +4,12 @@ import { useState } from "react";
 import { Check, Plus, Eye } from "lucide-react";
 import { money, type Product } from "@/lib/products";
 import { useCart } from "@/components/cart/CartContext";
-import { useQuickView } from "@/components/quickview/QuickViewContext";
+import { useRouter } from "next/navigation";
 import { ProductImage } from "@/components/ProductImage";
 
 export function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
-  const { open } = useQuickView();
+    const router = useRouter();
   const [added, setAdded] = useState(false);
 
   function quickAdd(e: React.MouseEvent) {
@@ -21,7 +21,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <article
-      onClick={() => open(product)}
+          onClick={() => router.push(`/shop/${product.id}`)}
       className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl2 border border-line bg-paper-2 transition-[transform,box-shadow,border-color] duration-280 ease-out-expo will-change-transform hover:-translate-y-1 hover:border-line-strong hover:shadow-lift"
     >
       {/* IMAGE — real render (product.photo) with SVG fallback; fixed aspect = no layout shift */}
@@ -42,13 +42,13 @@ export function ProductCard({ product }: { product: Product }) {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            open(product);
+                    router.push(`/shop/${product.id}`);
           }}
-          aria-label={`Quick view ${product.name}`}
+              aria-label={`View details for ${product.name}`}
           className="absolute bottom-3 left-1/2 flex -translate-x-1/2 translate-y-2 items-center gap-1.5 rounded-full border border-line-strong bg-paper/90 px-3 py-1.5 text-xs font-medium opacity-0 backdrop-blur transition-[opacity,transform] duration-220 ease-out-expo will-change-transform focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
         >
           <Eye className="h-3.5 w-3.5" strokeWidth={2} />
-          Quick view
+                  View details
         </button>
       </div>
 
