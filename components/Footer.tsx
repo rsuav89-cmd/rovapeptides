@@ -5,33 +5,34 @@ import { site } from "@/lib/site";
 
 const columns: { title: string; links: { label: string; href: string }[] }[] = [
   {
-    title: "Shop",
-    links: [
-      { label: "All Peptides", href: "#catalog" },
-      { label: "Research Peptides", href: "#catalog" },
-      { label: "Skin & Beauty", href: "#catalog" },
-      { label: "Longevity", href: "#catalog" },
-    ],
+        title: "Shop",
+        links: [
+          { label: "All Peptides", href: "/shop" },
+          { label: "Research Peptides", href: "/shop" },
+          { label: "Skin & Beauty", href: "/shop" },
+          { label: "Longevity", href: "/shop" },
+              ],
   },
   {
-    title: "Testing",
-    links: [
-      { label: "COA Lookup", href: "#coa" },
-      { label: "Quality & Assurance", href: "#quality" },
-      { label: "Third-Party Labs", href: "#quality" },
-      { label: "Purity Standards", href: "#quality" },
-    ],
+        title: "Testing",
+        links: [
+          { label: "COA Lookup", href: "/coas" },
+          { label: "Quality & Assurance", href: "/#quality" },
+          { label: "Third-Party Labs", href: "/#quality" },
+          { label: "Purity Standards", href: "/#quality" },
+              ],
   },
   {
-    title: "Company",
-    links: [
-      { label: "Shipping & Returns", href: "#" },
-      { label: "FAQ", href: "#" },
-      { label: "Contact", href: "#" },
-      { label: "Wholesale", href: "#" },
-    ],
+        title: "Company",
+        links: [
+          { label: "About Us", href: "/about" },
+          { label: "Shipping & Returns", href: "/shipping" },
+          { label: "FAQ", href: "/faq" },
+          { label: "Contact", href: "/contact" },
+          { label: "Wholesale", href: "/wholesale" },
+              ],
   },
-];
+  ];
 
 const badges = [
   { icon: Lock, label: "SSL Secured" },
@@ -122,7 +123,10 @@ export function Footer() {
           <p className="font-mono text-[0.62rem] uppercase tracking-widest text-white/45">
             {site.compliance}
           </p>
-        </div>
+          <div className="flex items-center gap-4">
+          <a href="/privacy" className="text-xs text-white/55 transition-colors hover:text-white">Privacy Policy</a>
+            <a href="/terms" className="text-xs text-white/55 transition-colors hover:text-white"></a>
+          </div>
       </div>
     </footer>
   );
