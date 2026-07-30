@@ -182,12 +182,13 @@ export function CartDrawer() {
                   <p className="font-display text-lg font-semibold">Your cart is empty</p>
                   <p className="mt-1 text-sm text-muted">Browse the catalog to add research compounds.</p>
                 </div>
-                <a href="#catalog" onClick={close} className="btn-primary">
+                <a href="/shop" onClick={close} className="btn-primary">
                   Shop the Catalog
                 </a>
               </div>
             ) : (
-              <ul className="flex-1 overflow-y-auto px-5 py-4">
+              <div className="flex-1 overflow-y-auto">
+                <ul className="px-5 py-4">
                 <AnimatePresence initial={false}>
                   {lines.map((line) => (
                     <motion.li
@@ -319,6 +320,7 @@ export function CartDrawer() {
                 </div>
               </div>
             )}
+              </div>
 
             {/* footer */}
             {count > 0 && (
