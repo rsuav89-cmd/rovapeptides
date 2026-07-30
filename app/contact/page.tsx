@@ -3,7 +3,6 @@ import { Mail, Clock, MapPin } from "lucide-react";
 import { NoticeBar } from "@/components/NoticeBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ContactForm } from "@/components/contact/ContactForm";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -17,7 +16,7 @@ export default function ContactPage() {
     <>
       <NoticeBar />
       <Header />
-      <main className="mx-auto grid max-w-[1080px] gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_1.1fr]">
+      <main className="mx-auto max-w-[640px] px-5 py-16 sm:px-8">
         <div>
           <span className="kicker inline-flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />
@@ -54,10 +53,6 @@ export default function ContactPage() {
               </div>
             </li>
           </ul>
-        </div>
-
-        <div className="rounded-xl2 border border-line bg-paper-2 p-6 sm:p-8">
-          <ContactForm />
         </div>
       </main>
       <Footer />
