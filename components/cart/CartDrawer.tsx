@@ -4,11 +4,26 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Trash2, Lock, Check } from "lucide-react";
 import { site } from "@/lib/site";
+import { WC_CHECKOUT_URL } from "@/lib/wc";
 import { money, shippingInsurance, getRecommended } from "@/lib/products";
 import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 
-const WC_CHECKOUT_BASE = "https://palevioletred-koala-953741.hostingersite.com";
+type ResolvedItem = {
+  id: number;
+  qty: number;
+  variationId?: number;
+  attribute?: { name: string; value: string };
+};
+
+type CheckoutApiResponse = {
+  resolved?: ResolvedItem[];
+  error?: string;
+  message?: string;
+  requestedCount?: number;
+  resolvedCount?: number;
+  unresolvedSkus?: string[];
+};
 
 export function CartDrawer() {
   const {
@@ -26,7 +41,7 @@ export function CartDrawer() {
     setInsurance,
   } = useCart();
   const [checkingOut, setCheckingOut] = useState(false);
-  const [checkoutError, setCheckoutError] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   const threshold = site.freeShippingThreshold;
   const remaining = Math.max(0, threshold - subtotal);
@@ -39,7 +54,7 @@ export function CartDrawer() {
   );
 
   async function handleCheckout() {
-    setCheckoutError(false);
+    setCheckoutError(null);
     setCheckingOut(true);
     try {
       const items = lines.map((l) => ({ sku: l.product.batch, qty: l.qty }));
@@ -47,31 +62,34 @@ export function CartDrawer() {
       if (insuranceOption) {
         items.push({ sku: insuranceOption.batch, qty: 1 });
       }
+
       const res = await fetch("/api/wc-checkout-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items }),
       });
-      const { resolved } = (await res.json()) as {
-        resolved: {
-          id: number;
-          qty: number;
-          variationId?: number;
-          attribute?: { name: string; value: string };
-        }[];
-      };
 
-      if (!resolved || resolved.length === 0) {
-        window.location.href = `${WC_CHECKOUT_BASE}/checkout/`;
+      const data = (await res.json()) as CheckoutApiResponse;
+      const { resolved, message, requestedCount, resolvedCount, unresolvedSkus } = data;
+
+      const countMismatch =
+        requestedCount != null &&
+        resolvedCount != null &&
+        requestedCount !== resolvedCount;
+
+      if (!res.ok || data.error || countMismatch || !resolved?.length) {
+        const detail =
+          unresolvedSkus?.length
+            ? ` Unmatched SKUs: ${unresolvedSkus.join(", ")}.`
+            : "";
+        setCheckoutError(
+          (message ?? "Couldn't prepare checkout — please try again or contact support.") + detail
+        );
+        setCheckingOut(false);
         return;
       }
 
-      const toUrl = (item: {
-        id: number;
-        qty: number;
-        variationId?: number;
-        attribute?: { name: string; value: string };
-      }) => {
+      const toUrl = (item: ResolvedItem) => {
         const params = new URLSearchParams();
         params.set("add-to-cart", String(item.id));
         params.set("quantity", String(item.qty));
@@ -82,7 +100,7 @@ export function CartDrawer() {
           const key = `attribute_${item.attribute.name.toLowerCase().replace(/\s+/g, "-")}`;
           params.set(key, item.attribute.value);
         }
-        return `${WC_CHECKOUT_BASE}/checkout/?${params.toString()}`;
+        return `${WC_CHECKOUT_URL}?${params.toString()}`;
       };
 
       for (const item of resolved.slice(0, -1)) {
@@ -96,7 +114,7 @@ export function CartDrawer() {
       window.location.href = toUrl(resolved[resolved.length - 1]);
     } catch {
       setCheckingOut(false);
-      setCheckoutError(true);
+      setCheckoutError("Couldn't reach checkout — please try again.");
     }
   }
 
@@ -129,7 +147,6 @@ export function CartDrawer() {
             variants={{ open: { x: 0 }, closed: { x: "100%" } }}
             transition={{ type: "spring", stiffness: 520, damping: 44, mass: 0.8 }}
           >
-            {/* header */}
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <div className="flex items-center gap-2.5">
                 <ShoppingBag className="h-5 w-5" strokeWidth={2} />
@@ -147,7 +164,6 @@ export function CartDrawer() {
               </button>
             </div>
 
-            {/* free-shipping progress */}
             {count > 0 && (
               <div className="border-b border-line px-5 py-3.5">
                 <p className="flex items-center gap-1.5 text-[0.8rem] text-ink-2">
@@ -172,7 +188,6 @@ export function CartDrawer() {
               </div>
             )}
 
-            {/* items / empty */}
             {count === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
                 <div className="grid h-16 w-16 place-items-center rounded-full bg-paper-2">
@@ -189,140 +204,135 @@ export function CartDrawer() {
             ) : (
               <div className="flex-1 overflow-y-auto">
                 <ul className="px-5 py-4">
-                <AnimatePresence initial={false}>
-                  {lines.map((line) => (
-                    <motion.li
-                      key={line.product.id}
-                      layout
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <div className="flex gap-3 py-3">
-                        <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg border border-line bg-gradient-to-br from-paper-2 to-paper">
-                          <ProductImage
-                            product={line.product}
-                            className="absolute inset-0 h-full w-full object-cover"
-                          />
-                        </div>
-
-                        <div className="flex flex-1 flex-col">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <p className="font-display text-sm font-semibold leading-tight">
-                                {line.product.name}
-                              </p>
-                              <p className="font-mono text-[0.62rem] uppercase tracking-wider text-muted">
-                                {line.product.mass} · {line.product.batch}
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => remove(line.product.id)}
-                              aria-label={`Remove ${line.product.name}`}
-                              className="grid h-7 w-7 place-items-center rounded-full text-muted transition-[color,transform] duration-160 hover:text-ink active:scale-90"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-                            </button>
-                          </div>
-
-                          <div className="mt-auto flex items-center justify-between pt-2">
-                            <div className="flex items-center rounded-full border border-line-strong">
-                              <button
-                                onClick={() => setQty(line.product.id, line.qty - 1)}
-                                aria-label="Decrease quantity"
-                                className="grid h-8 w-8 place-items-center rounded-full transition-transform duration-160 hover:bg-white/[0.04] active:scale-90"
-                              >
-                                <Minus className="h-3.5 w-3.5" strokeWidth={2.2} />
-                              </button>
-                              <span className="w-7 text-center font-mono text-xs tabular-nums">
-                                {line.qty}
-                              </span>
-                              <button
-                                onClick={() => setQty(line.product.id, line.qty + 1)}
-                                aria-label="Increase quantity"
-                                className="grid h-8 w-8 place-items-center rounded-full transition-transform duration-160 hover:bg-white/[0.04] active:scale-90"
-                              >
-                                <Plus className="h-3.5 w-3.5" strokeWidth={2.2} />
-                              </button>
-                            </div>
-                            <span className="font-mono text-sm font-semibold tabular-nums">
-                              {money(line.product.price * line.qty)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="hairline" />
-                    </motion.li>
-                  ))}
-                </AnimatePresence>
-              </ul>
-            
-            {/* frequently bought together */}
-            {count > 0 && recommended.length > 0 && (
-              <div className="border-t border-line px-5 py-4">
-                <p className="font-mono text-[0.65rem] uppercase tracking-widest text-muted">
-                  Frequently Bought Together
-                </p>
-                <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
-                  {recommended.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => add(p, 1)}
-                      className="flex w-32 shrink-0 flex-col items-start rounded-lg border border-line bg-paper p-2.5 text-left transition-colors duration-160 hover:border-line-strong"
-                    >
-                      <div className="relative h-16 w-full overflow-hidden rounded-md bg-paper-2">
-                        <ProductImage product={p} className="absolute inset-0 h-full w-full object-cover" />
-                      </div>
-                      <p className="mt-2 line-clamp-1 text-xs font-semibold text-ink">{p.name}</p>
-                      <p className="mt-0.5 font-mono text-[0.62rem] text-muted">{money(p.price)}</p>
-                      <span className="mt-1.5 inline-flex items-center gap-1 text-[0.65rem] font-medium text-brand-cta">
-                        <Plus className="h-3 w-3" strokeWidth={2.4} />
-                        Add
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* shipping protection */}
-            {count > 0 && (
-              <div className="border-t border-line px-5 py-4">
-                <p className="font-mono text-[0.65rem] uppercase tracking-widest text-muted">
-                  Shipping Protection
-                </p>
-                <div className="mt-3 space-y-2">
-                  {shippingInsurance.map((opt) => {
-                    const selected = insuranceId === opt.id;
-                    return (
-                      <button
-                        key={opt.id}
-                        onClick={() => setInsurance(selected ? null : opt.id)}
-                        className={[
-                          "flex w-full items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 text-left transition-colors duration-160",
-                          selected ? "border-brand-cta bg-brand-cta/5" : "border-line-strong hover:border-ink-2",
-                        ].join(" ")}
+                  <AnimatePresence initial={false}>
+                    {lines.map((line) => (
+                      <motion.li
+                        key={line.product.id}
+                        layout
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden"
                       >
-                        <span>
-                          <span className="block text-sm font-medium text-ink">{opt.name}</span>
-                          <span className="block text-xs text-muted">{opt.description}</span>
-                        </span>
-                        <span className="flex items-center gap-2">
-                          <span className="font-mono text-sm font-semibold tabular-nums">{money(opt.price)}</span>
-                          {selected && <Check className="h-4 w-4 text-brand-cta" strokeWidth={2.4} />}
-                        </span>
-                      </button>
-                    );
-                  })}
+                        <div className="flex gap-3 py-3">
+                          <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg border border-line bg-gradient-to-br from-paper-2 to-paper">
+                            <ProductImage
+                              product={line.product}
+                              className="absolute inset-0 h-full w-full object-cover"
+                            />
+                          </div>
+
+                          <div className="flex flex-1 flex-col">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <p className="font-display text-sm font-semibold leading-tight">
+                                  {line.product.name}
+                                </p>
+                                <p className="font-mono text-[0.62rem] uppercase tracking-wider text-muted">
+                                  {line.product.mass} · {line.product.batch}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => remove(line.product.id)}
+                                aria-label={`Remove ${line.product.name}`}
+                                className="grid h-7 w-7 place-items-center rounded-full text-muted transition-[color,transform] duration-160 hover:text-ink active:scale-90"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
+                              </button>
+                            </div>
+
+                            <div className="mt-auto flex items-center justify-between pt-2">
+                              <div className="flex items-center rounded-full border border-line-strong">
+                                <button
+                                  onClick={() => setQty(line.product.id, line.qty - 1)}
+                                  aria-label="Decrease quantity"
+                                  className="grid h-8 w-8 place-items-center rounded-full transition-transform duration-160 hover:bg-white/[0.04] active:scale-90"
+                                >
+                                  <Minus className="h-3.5 w-3.5" strokeWidth={2.2} />
+                                </button>
+                                <span className="w-7 text-center font-mono text-xs tabular-nums">
+                                  {line.qty}
+                                </span>
+                                <button
+                                  onClick={() => setQty(line.product.id, line.qty + 1)}
+                                  aria-label="Increase quantity"
+                                  className="grid h-8 w-8 place-items-center rounded-full transition-transform duration-160 hover:bg-white/[0.04] active:scale-90"
+                                >
+                                  <Plus className="h-3.5 w-3.5" strokeWidth={2.2} />
+                                </button>
+                              </div>
+                              <span className="font-mono text-sm font-semibold tabular-nums">
+                                {money(line.product.price * line.qty)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="hairline" />
+                      </motion.li>
+                    ))}
+                  </AnimatePresence>
+                </ul>
+
+                {recommended.length > 0 && (
+                  <div className="border-t border-line px-5 py-4">
+                    <p className="font-mono text-[0.65rem] uppercase tracking-widest text-muted">
+                      Frequently Bought Together
+                    </p>
+                    <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
+                      {recommended.map((p) => (
+                        <button
+                          key={p.id}
+                          onClick={() => add(p, 1)}
+                          className="flex w-32 shrink-0 flex-col items-start rounded-lg border border-line bg-paper p-2.5 text-left transition-colors duration-160 hover:border-line-strong"
+                        >
+                          <div className="relative h-16 w-full overflow-hidden rounded-md bg-paper-2">
+                            <ProductImage product={p} className="absolute inset-0 h-full w-full object-cover" />
+                          </div>
+                          <p className="mt-2 line-clamp-1 text-xs font-semibold text-ink">{p.name}</p>
+                          <p className="mt-0.5 font-mono text-[0.62rem] text-muted">{money(p.price)}</p>
+                          <span className="mt-1.5 inline-flex items-center gap-1 text-[0.65rem] font-medium text-brand-cta">
+                            <Plus className="h-3 w-3" strokeWidth={2.4} />
+                            Add
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="border-t border-line px-5 py-4">
+                  <p className="font-mono text-[0.65rem] uppercase tracking-widest text-muted">
+                    Shipping Protection
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {shippingInsurance.map((opt) => {
+                      const selected = insuranceId === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => setInsurance(selected ? null : opt.id)}
+                          className={[
+                            "flex w-full items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 text-left transition-colors duration-160",
+                            selected ? "border-brand-cta bg-brand-cta/5" : "border-line-strong hover:border-ink-2",
+                          ].join(" ")}
+                        >
+                          <span>
+                            <span className="block text-sm font-medium text-ink">{opt.name}</span>
+                            <span className="block text-xs text-muted">{opt.description}</span>
+                          </span>
+                          <span className="flex items-center gap-2">
+                            <span className="font-mono text-sm font-semibold tabular-nums">{money(opt.price)}</span>
+                            {selected && <Check className="h-4 w-4 text-brand-cta" strokeWidth={2.4} />}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
-              </div>
-                        )}
 
-            {/* footer */}
             {count > 0 && (
               <div className="border-t border-line px-5 py-4">
                 <div className="flex items-center justify-between">
@@ -351,8 +361,8 @@ export function CartDrawer() {
                 </button>
 
                 {checkoutError && (
-                  <p className="mt-2 text-center text-xs text-muted">
-                    Couldn&apos;t reach checkout — please try again.
+                  <p className="mt-2 text-center text-xs text-gold" role="alert">
+                    {checkoutError}
                   </p>
                 )}
 

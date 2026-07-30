@@ -67,6 +67,7 @@ export function MobileNav({
                   >
                     <a
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={onClose}
                       className="flex items-center justify-between rounded-xl px-3 py-3 font-display text-2xl tracking-tight transition-colors duration-160 hover:bg-white/[0.04]"
                     >
@@ -88,6 +89,7 @@ export function MobileNav({
                   <li key={item.label}>
                     <a
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={onClose}
                       className="block rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-ink"
                     >

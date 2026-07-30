@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, Search, ShoppingBag, FileCheck2 } from "lucide-react";
-import { primaryNav } from "@/lib/site";
+import { Menu, Search, ShoppingBag, FileCheck2, User } from "lucide-react";
+import { headerUtilityLinks, primaryNav } from "@/lib/site";
 import { useCart } from "@/components/cart/CartContext";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
+import { SearchOverlay } from "./SearchOverlay";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { count, open, lastAddedId } = useCart();
 
-  // Scroll-aware chrome. Only background/blur/border/shadow + logo scale change —
-  // header height is fixed, so there is zero cumulative layout shift.
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -32,7 +32,6 @@ export function Header() {
         ].join(" ")}
       >
         <div className="mx-auto flex h-full max-w-[1280px] items-center justify-between gap-4 px-5 sm:px-8">
-          {/* Left: brand + primary nav (asymmetric — nav hugs the logo, actions push right) */}
           <div className="flex items-center gap-9">
             <span
               className={[
@@ -49,6 +48,7 @@ export function Header() {
                   <li key={item.label}>
                     <a
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       className="group relative inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[0.9rem] text-ink-2 transition-colors duration-160 hover:text-ink"
                     >
                       {item.label}
@@ -57,7 +57,6 @@ export function Header() {
                           {item.badge}
                         </span>
                       )}
-                      {/* underline grows from left — transform scaleX, no reflow */}
                       <span className="pointer-events-none absolute inset-x-3.5 -bottom-0.5 h-px origin-left scale-x-0 bg-brand-cta transition-transform duration-220 ease-out-expo group-hover:scale-x-100" />
                     </a>
                   </li>
@@ -66,24 +65,38 @@ export function Header() {
             </nav>
           </div>
 
-          {/* Right: utility actions */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             <a
-                          href="/coas"
+              href="/coas"
               className="hidden items-center gap-2 rounded-full border border-line-strong px-4 py-2 text-sm font-medium transition-[transform,border-color,background-color] duration-160 ease-out-expo hover:border-ink hover:bg-white/[0.03] active:scale-95 md:inline-flex"
             >
               <FileCheck2 className="h-4 w-4 text-signal-ink" strokeWidth={2} />
               View COAs
             </a>
 
+            {headerUtilityLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-ink-2 transition-colors hover:text-ink lg:inline-flex"
+              >
+                {link.label === "Account" && <User className="h-4 w-4" strokeWidth={2} />}
+                {link.label}
+              </a>
+            ))}
+
             <button
-              aria-label="Search"
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search products"
               className="grid h-10 w-10 place-items-center rounded-full transition-[transform,background-color] duration-160 ease-out-expo hover:bg-white/[0.05] active:scale-90"
             >
               <Search className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.9} />
             </button>
 
             <button
+              type="button"
               onClick={open}
               aria-label={`Cart, ${count} items`}
               className="relative grid h-10 w-10 place-items-center rounded-full transition-[transform,background-color] duration-160 ease-out-expo hover:bg-white/[0.05] active:scale-90"
@@ -103,6 +116,7 @@ export function Header() {
             </button>
 
             <button
+              type="button"
               aria-label="Open menu"
               onClick={() => setMenuOpen(true)}
               className="grid h-10 w-10 place-items-center rounded-full transition-transform duration-160 ease-out-expo hover:bg-white/[0.05] active:scale-90 lg:hidden"
@@ -114,6 +128,7 @@ export function Header() {
       </header>
 
       <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

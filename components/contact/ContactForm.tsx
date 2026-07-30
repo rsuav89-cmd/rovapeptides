@@ -24,6 +24,7 @@ ${message}`;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      <input type="text" name="b_honeypot" style={{ display: "none" }} />
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block">
           <span className="text-sm font-medium text-ink">Name</span>

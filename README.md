@@ -25,7 +25,7 @@ npm run build && npm start
 | `next` 14.2    | App Router, `next/font`, image optimization, routing for future pages |
 | `react` 18     | UI |
 | `tailwindcss` 3.4 | Design tokens + utility styling |
-| `framer-motion` 11 | Spring-physics for the mobile nav drawer, cart drawer (M3), modals (M3) |
+| `framer-motion` 11 | Spring-physics for the mobile nav drawer, cart drawer (M3), and COA overlay |
 | `lucide-react` | Consistent line-icon set |
 
 ## Project structure
@@ -76,7 +76,7 @@ Drop images into `public/products/` using the filenames in `lib/products.ts` (e.
 
 - [x] **M1** — scaffold, design system, notice bar, header, mobile nav drawer, hero foundation
 - [x] **M2** — rotating featured showcase + filterable catalog grid + cart context (quick-add + badge)
-- [x] **M3** — quick-view modal (qty + COA link) + slide-in cart drawer (shipping bar, checkout) + real-photo wiring layer
+- [x] **M3** — product detail pages (qty + COA link) + slide-in cart drawer (shipping bar, checkout) + real-photo wiring layer
 - [x] **M4** — trust/quality section (99%+ / USA / 24h) + interactive COA viewer w/ certificate modal
 - [x] **M5** — footer: compliance band, quick links, merchant/security badges, newsletter signup (validated)
 - [x] **M6** — motion + contrast audit (see `AUDIT.md`): WCAG AA verified, all transitions ≤300ms, zero CLS

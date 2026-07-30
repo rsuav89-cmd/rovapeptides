@@ -174,7 +174,7 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
           />
 
           <motion.div
-            className="relative z-10 flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-xl2 border border-line bg-paper-2 shadow-lift sm:rounded-xl2"
+            className="relative z-10 flex max-h-[calc(100dvh-0.75rem)] w-full max-w-2xl flex-col overflow-hidden rounded-t-xl2 border border-line bg-paper-2 shadow-lift sm:max-h-[92vh] sm:rounded-xl2"
             variants={{
               open: { opacity: 1, scale: 1, y: 0 },
               closed: { opacity: 0, scale: 0.96, y: 24 },
@@ -182,7 +182,7 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
             transition={{ type: "spring", stiffness: 540, damping: 40, mass: 0.8 }}
           >
             {/* doc header */}
-            <div className="flex items-start justify-between gap-4 border-b border-line bg-paper-2/40 px-6 py-5">
+            <div className="sticky top-0 z-20 flex items-start justify-between gap-4 border-b border-line bg-paper-2 px-4 py-4 sm:px-6 sm:py-5">
               <div>
                 <Logo />
                 <p className="mt-3 font-display text-lg font-semibold leading-tight text-ink">
@@ -200,9 +200,10 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
                 <button
                   onClick={onClose}
                   aria-label="Close"
-                  className="grid h-9 w-9 place-items-center rounded-full border border-line-strong transition-transform duration-160 ease-out-expo active:scale-90"
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-line-strong px-3 text-xs font-semibold text-ink transition-[transform,border-color] duration-160 ease-out-expo active:scale-90 sm:h-9 sm:w-9 sm:px-0"
                 >
                   <X className="h-4 w-4" strokeWidth={2} />
+                  <span className="sm:hidden">Close</span>
                 </button>
               </div>
             </div>
@@ -216,32 +217,34 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
             </div>
 
             {/* results table */}
-            <div className="overflow-y-auto px-6 py-4">
-              <table className="w-full border-collapse text-left text-sm">
-                <thead>
-                  <tr className="border-b border-line-strong">
-                    <th className="py-2 pr-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Analyte</th>
-                    <th className="py-2 px-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Method</th>
-                    <th className="py-2 px-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Spec</th>
-                    <th className="py-2 pl-2 text-right font-mono text-[0.62rem] uppercase tracking-widest text-muted">Result</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {coa.rows.map((r) => (
-                    <tr key={r.analyte} className="border-b border-line last:border-0">
-                      <td className="py-2.5 pr-2 font-medium text-ink">{r.analyte}</td>
-                      <td className="py-2.5 px-2 text-ink-2">{r.method}</td>
-                      <td className="py-2.5 px-2 font-mono text-xs text-muted">{r.spec}</td>
-                      <td className="py-2.5 pl-2 text-right">
-                        <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-signal-ink">
-                          {r.result}
-                          <Check className="h-3.5 w-3.5" strokeWidth={3} />
-                        </span>
-                      </td>
+            <div className="overflow-y-auto px-4 py-4 sm:px-6">
+              <div className="overflow-x-auto">
+                <table className="min-w-[560px] w-full border-collapse text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-line-strong">
+                      <th className="py-2 pr-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Analyte</th>
+                      <th className="px-2 py-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Method</th>
+                      <th className="px-2 py-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Spec</th>
+                      <th className="py-2 pl-2 text-right font-mono text-[0.62rem] uppercase tracking-widest text-muted">Result</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {coa.rows.map((r) => (
+                      <tr key={r.analyte} className="border-b border-line last:border-0">
+                        <td className="py-2.5 pr-2 font-medium text-ink">{r.analyte}</td>
+                        <td className="px-2 py-2.5 text-ink-2">{r.method}</td>
+                        <td className="px-2 py-2.5 font-mono text-xs text-muted">{r.spec}</td>
+                        <td className="py-2.5 pl-2 text-right">
+                          <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-signal-ink">
+                            {r.result}
+                            <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* footer */}

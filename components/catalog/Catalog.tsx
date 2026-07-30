@@ -1,20 +1,29 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CATEGORY_TABS, products, type Category } from "@/lib/products";
 import { ProductCard } from "./ProductCard";
 
 type Tab = (typeof CATEGORY_TABS)[number];
 
+function toTab(category?: string): Tab {
+  return CATEGORY_TABS.includes(category as Tab) ? (category as Tab) : "All";
+}
+
 function matches(tab: Tab, p: (typeof products)[number]): boolean {
   if (tab === "All") return true;
-    if (tab === "New Arrivals") return Boolean(p.isNew);
+  if (tab === "New Arrivals") return Boolean(p.isNew);
   return p.categories.includes(tab as Category);
 }
 
 export function Catalog() {
   const [tab, setTab] = useState<Tab>("All");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setTab(toTab(params.get("category") ?? undefined));
+  }, []);
 
   const filtered = useMemo(() => products.filter((p) => matches(tab, p)), [tab]);
 
