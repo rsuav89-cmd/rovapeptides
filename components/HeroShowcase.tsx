@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Check } from "lucide-react";
 import { money, products } from "@/lib/products";
 import { useCart } from "@/components/cart/CartContext";
-import { useQuickView } from "@/components/quickview/QuickViewContext";
+import { useRouter } from "next/navigation";
 import { ProductImage } from "@/components/ProductImage";
 
 const featured = products.filter((p) => p.featured);
@@ -14,7 +14,7 @@ export function HeroShowcase() {
   const [i, setI] = useState(0);
   const [added, setAdded] = useState(false);
   const { add } = useCart();
-  const { open } = useQuickView();
+    const router = useRouter();
   const p = featured[i] ?? products[0];
 
   function quickAdd(e: React.MouseEvent) {
@@ -27,7 +27,7 @@ export function HeroShowcase() {
   return (
     <div className="animate-fade-up [animation-delay:120ms]">
       <div
-        onClick={() => open(p)}
+                onClick={() => router.push(`/shop/${p.id}`)}
         className="group relative aspect-[4/5] cursor-pointer overflow-hidden rounded-xl2 border border-line bg-gradient-to-br from-paper-2 to-black shadow-lift"
       >
         <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(60%_50%_at_70%_20%,rgba(183,110,89,0.35),transparent_60%)]" />
