@@ -25,7 +25,7 @@ export function ProductImage({
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
-      alt={`${product.name} research peptide — ${product.mass}`}
+              alt={`${product.name} (${product.subtitle}) research peptide — ${product.mass}, ${product.purity} purity, batch ${product.batch}`}
       loading={loading}
       onError={() => {
         if (src !== product.image) setSrc(product.image);
