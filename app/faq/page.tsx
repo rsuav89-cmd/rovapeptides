@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { NoticeBar } from "@/components/NoticeBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { FaqAccordion } from "@/components/faq/FaqAccordion";
-import { faqCategories } from "@/lib/faq";
 
 export const metadata: Metadata = {
   title: "FAQ — RovaPeptides",
@@ -27,7 +25,24 @@ export default function FaqPage() {
         </p>
 
         <div className="mt-12">
-          <FaqAccordion categories={faqCategories} />
+          <div className="space-y-8">
+          <div>
+          <h2 className="text-lg font-semibold text-ink">Are RovaPeptides products safe to use?</h2>
+          <p className="mt-2 text-ink-2">All RovaPeptides products are sold strictly for laboratory and in-vitro research use. They are not for human consumption, and nothing on this site is medical or dosing guidance.</p>
+          </div>
+            <div>
+            <h2 className="text-lg font-semibold text-ink">How should I store and reconstitute peptides?</h2>
+            <p className="mt-2 text-ink-2">Store lyophilized powder at -20°C, protected from light, until ready for use in a laboratory setting. Reconstitute with bacteriostatic water shortly before use.</p>
+            </div>
+            <div>
+            <h2 className="text-lg font-semibold text-ink">How do I place an order and what payments do you accept?</h2>
+            <p className="mt-2 text-ink-2">Add items to your cart from the shop page and check out securely online. We accept major credit cards, and bulk research orders can request invoicing by contacting support.</p>
+            </div>
+            <div>
+            <h2 className="text-lg font-semibold text-ink">How is my order shipped and packaged?</h2>
+            <p className="mt-2 text-ink-2">Orders ship discreetly within 24 hours of purchase, with cold-chain packaging used where appropriate to protect product integrity in transit.</p>
+            </div>
+        </div>
         </div>
       </main>
       <Footer />
