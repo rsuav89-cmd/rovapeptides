@@ -1,29 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Trash2, Lock, Check } from "lucide-react";
 import { site } from "@/lib/site";
-import { WC_CHECKOUT_URL } from "@/lib/wc";
 import { money, shippingInsurance, getRecommended } from "@/lib/products";
 import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
-
-type ResolvedItem = {
-  id: number;
-  qty: number;
-  variationId?: number;
-  attribute?: { name: string; value: string };
-};
-
-type CheckoutApiResponse = {
-  resolved?: ResolvedItem[];
-  error?: string;
-  message?: string;
-  requestedCount?: number;
-  resolvedCount?: number;
-  unresolvedSkus?: string[];
-};
 
 export function CartDrawer() {
   const {
@@ -40,8 +24,7 @@ export function CartDrawer() {
     insuranceTotal,
     setInsurance,
   } = useCart();
-  const [checkingOut, setCheckingOut] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const router = useRouter();
 
   const threshold = site.freeShippingThreshold;
   const remaining = Math.max(0, threshold - subtotal);
@@ -53,69 +36,9 @@ export function CartDrawer() {
     [lines]
   );
 
-  async function handleCheckout() {
-    setCheckoutError(null);
-    setCheckingOut(true);
-    try {
-      const items = lines.map((l) => ({ sku: l.product.batch, qty: l.qty }));
-      const insuranceOption = shippingInsurance.find((o) => o.id === insuranceId);
-      if (insuranceOption) {
-        items.push({ sku: insuranceOption.batch, qty: 1 });
-      }
-
-      const res = await fetch("/api/wc-checkout-url", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
-      });
-
-      const data = (await res.json()) as CheckoutApiResponse;
-      const { resolved, message, requestedCount, resolvedCount, unresolvedSkus } = data;
-
-      const countMismatch =
-        requestedCount != null &&
-        resolvedCount != null &&
-        requestedCount !== resolvedCount;
-
-      if (!res.ok || data.error || countMismatch || !resolved?.length) {
-        const detail =
-          unresolvedSkus?.length
-            ? ` Unmatched SKUs: ${unresolvedSkus.join(", ")}.`
-            : "";
-        setCheckoutError(
-          (message ?? "Couldn't prepare checkout — please try again or contact support.") + detail
-        );
-        setCheckingOut(false);
-        return;
-      }
-
-      const toUrl = (item: ResolvedItem) => {
-        const params = new URLSearchParams();
-        params.set("add-to-cart", String(item.id));
-        params.set("quantity", String(item.qty));
-        if (item.variationId) {
-          params.set("variation_id", String(item.variationId));
-        }
-        if (item.attribute) {
-          const key = `attribute_${item.attribute.name.toLowerCase().replace(/\s+/g, "-")}`;
-          params.set(key, item.attribute.value);
-        }
-        return `${WC_CHECKOUT_URL}?${params.toString()}`;
-      };
-
-      for (const item of resolved.slice(0, -1)) {
-        try {
-          await fetch(toUrl(item), { mode: "no-cors", credentials: "include" });
-        } catch {
-          // best-effort — continue even if one line fails to add
-        }
-      }
-
-      window.location.href = toUrl(resolved[resolved.length - 1]);
-    } catch {
-      setCheckingOut(false);
-      setCheckoutError("Couldn't reach checkout — please try again.");
-    }
+  function goToCheckout() {
+    close();
+    router.push("/checkout");
   }
 
   useEffect(() => {
@@ -351,20 +274,10 @@ export function CartDrawer() {
                 </div>
                 <p className="mt-1 text-xs text-muted">Shipping &amp; taxes calculated at checkout.</p>
 
-                <button
-                  onClick={handleCheckout}
-                  disabled={checkingOut}
-                  className="btn-signal mt-4 w-full disabled:opacity-60"
-                >
+                <button onClick={goToCheckout} className="btn-signal mt-4 w-full">
                   <Lock className="h-4 w-4" strokeWidth={2.2} />
-                  {checkingOut ? "Redirecting…" : "Proceed to Checkout"}
+                  Proceed to Checkout
                 </button>
-
-                {checkoutError && (
-                  <p className="mt-2 text-center text-xs text-gold" role="alert">
-                    {checkoutError}
-                  </p>
-                )}
 
                 <p className="mt-3 text-center font-mono text-[0.6rem] uppercase tracking-widest text-muted">
                   {site.compliance}
