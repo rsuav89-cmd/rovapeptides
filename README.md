@@ -87,7 +87,7 @@ Drop images into `public/products/` using the filenames in `lib/products.ts` (e.
 SVG placeholder if the file isn't there. To use your real bottle renders, drop files into `public/products/`
 named to match the `photo` fields in `lib/products.ts`:
 
-`bpc-157.jpg` · `tb-500.jpg` · `ghk-cu.jpg` · `semaglutide.jpg` · `tirzepatide.jpg` ·
+`bpc-157.jpg` · `tb-500.jpg` · `ghk-cu.jpg` · `
 `ipamorelin.jpg` · `cjc-ipamorelin.jpg` · `bpc-tb-blend.jpg` · `pt-141.jpg` · `glow-blend.jpg`
 
 (Prefer `.webp`/`.png`? Just update the extension in each product's `photo` field.)
