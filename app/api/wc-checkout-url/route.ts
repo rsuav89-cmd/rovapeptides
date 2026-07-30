@@ -2,6 +2,15 @@ import { NextResponse } from "next/server";
 
 type CheckoutItem = { sku: string; qty: number };
 
+type ResolvedItem = {
+  id: number;
+  qty: number;
+  variationId?: number;
+  attribute?: { name: string; value: string };
+};
+
+const VARIABLE_PARENT_IDS = [33, 42, 36, 48];
+
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as { items?: CheckoutItem[] };
@@ -16,22 +25,52 @@ export async function POST(req: Request) {
   }
 
   const auth = Buffer.from(`${key}:${secret}`).toString("base64");
-    const resolved: { id: number; qty: number }[] = [];
+    const resolved: ResolvedItem[] = [];
 
   for (const item of items) {
     if (!item?.sku || !item.qty) continue;
+    let matched = false;
+
     try {
       const res = await fetch(
         `${base}/products?sku=${encodeURIComponent(item.sku)}`,
         { headers: { Authorization: `Basic ${auth}` }, cache: "no-store" }
         );
-      if (!res.ok) continue;
-      const data = (await res.json()) as { id?: number }[];
-      if (Array.isArray(data) && data[0]?.id) {
-        resolved.push({ id: data[0].id, qty: item.qty });
+      if (res.ok) {
+        const data = (await res.json()) as { id?: number }[];
+        if (Array.isArray(data) && data[0]?.id) {
+          resolved.push({ id: data[0].id, qty: item.qty });
+          matched = true;
+        }
       }
-    } catch {
-      continue;
+    } catch {}
+
+    if (!matched) {
+      for (const parentId of VARIABLE_PARENT_IDS) {
+        try {
+          const res = await fetch(
+            `${base}/products/${parentId}/variations?sku=${encodeURIComponent(item.sku)}`,
+            { headers: { Authorization: `Basic ${auth}` }, cache: "no-store" }
+            );
+          if (!res.ok) continue;
+          const data = (await res.json()) as {
+            id?: number;
+            attributes?: { name: string; option: string }[];
+          }[];
+          const variation = Array.isArray(data) ? data[0] : undefined;
+          if (variation?.id) {
+            const attr = variation.attributes?.[0];
+            resolved.push({
+              id: parentId,
+              qty: item.qty,
+              variationId: variation.id,
+              attribute: attr ? { name: attr.name, value: attr.option } : undefined,
+            });
+            matched = true;
+            break;
+          }
+        } catch {}
+      }
     }
   }
 
