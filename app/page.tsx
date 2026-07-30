@@ -5,6 +5,7 @@ import { HeroShowcase } from "@/components/HeroShowcase";
 import { Catalog } from "@/components/catalog/Catalog";
 import { TrustQuality } from "@/components/TrustQuality";
 import { CoaViewer } from "@/components/CoaViewer";
+import { FaqPreview } from "@/components/faq/FaqPreview";
 import { Footer } from "@/components/Footer";
 import { site } from "@/lib/site";
 
@@ -35,11 +36,11 @@ export default function Home() {
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                              <a href="/shop" className="btn-signal">
+                <a href="/shop" className="btn-signal">
                   Shop All Peptides
                   <ArrowUpRight className="h-4 w-4" strokeWidth={2.2} />
                 </a>
-                              <a href="/coas" className="btn-ghost">
+                <a href="/coas" className="btn-ghost">
                   <FileCheck2 className="h-4 w-4 text-signal-ink" strokeWidth={2} />
                   View Testing / COAs
                 </a>
@@ -71,6 +72,9 @@ export default function Home() {
 
         {/* COA VIEWER — M4 */}
         <CoaViewer />
+
+        {/* FAQ PREVIEW */}
+        <FaqPreview />
       </main>
 
       {/* FOOTER — M5 */}
