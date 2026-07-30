@@ -258,8 +258,7 @@ export function CartDrawer() {
                   ))}
                 </AnimatePresence>
               </ul>
-            )}
-
+            
             {/* frequently bought together */}
             {count > 0 && recommended.length > 0 && (
               <div className="border-t border-line px-5 py-4">
@@ -321,6 +320,7 @@ export function CartDrawer() {
               </div>
             )}
               </div>
+                        )}
 
             {/* footer */}
             {count > 0 && (
