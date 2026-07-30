@@ -99,7 +99,7 @@ export function MobileNav({
             </nav>
 
             <div className="border-t border-line px-5 py-5">
-                        <a href="/shop" onClick={onClose} className="btn-signal w-full"></a>
+                        <a href="/shop" onClick={onClose} className="btn-signal w-full">
                 Shop All Peptides
               </a>
               <p className="mt-3 text-center font-mono text-[0.62rem] uppercase tracking-widest text-muted">
