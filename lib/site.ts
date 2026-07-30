@@ -16,6 +16,7 @@ export type NavItem = {
 };
 
 export const primaryNav: NavItem[] = [
+  { label: "Shop", href: "/shop" },
   { label: "All Peptides", href: "#catalog" },
   { label: "Research Peptides", href: "#catalog" },
   { label: "Longevity", href: "#catalog" },
