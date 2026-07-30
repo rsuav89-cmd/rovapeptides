@@ -253,4 +253,5 @@ return (
   </AnimatePresence>
   );
 }
-</></></AnimatePresence>
+);
+}
