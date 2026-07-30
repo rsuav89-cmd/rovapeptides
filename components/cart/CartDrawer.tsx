@@ -31,26 +31,47 @@ async function handleCheckout() {
       body: JSON.stringify({ items }),
     });
     const { resolved } = (await res.json()) as {
-      resolved: { id: number; qty: number }[];
+      resolved: {
+        id: number;
+        qty: number;
+        variationId?: number;
+        attribute?: { name: string; value: string };
+      }[];
     };
 
-  if (!resolved || resolved.length === 0) {
-    window.location.href = `${WC_CHECKOUT_BASE}/checkout/`;
-    return;
-  }
-
-  const toUrl = (item: { id: number; qty: number }) =>
-    `${WC_CHECKOUT_BASE}/checkout/?add-to-cart=${item.id}&quantity=${item.qty}`;
-
-  for (const item of resolved.slice(0, -1)) {
-    try {
-      await fetch(toUrl(item), { mode: "no-cors", credentials: "include" });
-    } catch {
-      // best-effort — continue even if one line fails to add
+    if (!resolved || resolved.length === 0) {
+      window.location.href = `${WC_CHECKOUT_BASE}/checkout/`;
+      return;
     }
-  }
 
-  window.location.href = toUrl(resolved[resolved.length - 1]);
+    const toUrl = (item: {
+      id: number;
+      qty: number;
+      variationId?: number;
+      attribute?: { name: string; value: string };
+    }) => {
+      const params = new URLSearchParams();
+      params.set("add-to-cart", String(item.id));
+      params.set("quantity", String(item.qty));
+      if (item.variationId) {
+        params.set("variation_id", String(item.variationId));
+      }
+      if (item.attribute) {
+        const key = `attribute_${item.attribute.name.toLowerCase().replace(/\s+/g, "-")}`;
+        params.set(key, item.attribute.value);
+      }
+      return `${WC_CHECKOUT_BASE}/checkout/?${params.toString()}`;
+    };
+
+    for (const item of resolved.slice(0, -1)) {
+      try {
+        await fetch(toUrl(item), { mode: "no-cors", credentials: "include" });
+      } catch {
+        // best-effort — continue even if one line fails to add
+      }
+    }
+
+    window.location.href = toUrl(resolved[resolved.length - 1]);
   } catch {
     setCheckingOut(false);
     setCheckoutError(true);
