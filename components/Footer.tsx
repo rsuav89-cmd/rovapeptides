@@ -108,9 +108,6 @@ export function Footer() {
               {b.label}
             </span>
           ))}
-          <span className="ml-auto font-mono text-[0.62rem] uppercase tracking-widest text-white/40">
-            Encrypted · High-Risk Merchant Compliant
-          </span>
         </div>
       </div>
 
