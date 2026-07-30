@@ -232,3 +232,36 @@ export function money(n: number): string {
     minimumFractionDigits: 0,
   }).format(n);
 }
+
+
+export type InsuranceOption = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  batch: string;
+};
+
+export const shippingInsurance: InsuranceOption[] = [
+  {
+    id: "shipping-protection",
+    name: "Shipping Protection",
+    description: "Covers your order against loss or damage in transit.",
+    price: 4.99,
+    batch: "RV-INS-STD",
+  },
+  {
+    id: "priority-handling",
+    name: "Priority Handling",
+    description: "Moves your order to the front of the packing queue for faster dispatch.",
+    price: 9.99,
+    batch: "RV-INS-PRI",
+  },
+  ];
+
+export function getRecommended(excludeIds: string[] = [], count = 4): Product[] {
+  const pool = products.filter((p) => !excludeIds.includes(p.id));
+  const featured = pool.filter((p) => p.featured);
+  const rest = pool.filter((p) => !p.featured);
+  return [...featured, ...rest].slice(0, count);
+}
