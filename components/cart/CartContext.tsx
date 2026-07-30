@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import type { Product } from "@/lib/products";
+import { shippingInsurance } from "@/lib/products";
 
 export type CartLine = { product: Product; qty: number };
 
@@ -17,9 +18,13 @@ type CartCtx = {
   subtotal: number;
   isOpen: boolean;
   lastAddedId: string | null;
+  insuranceId: string | null;
+  insuranceTotal: number;
+  total: number;
   add: (p: Product, qty?: number) => void;
   remove: (id: string) => void;
   setQty: (id: string, qty: number) => void;
+  setInsurance: (id: string | null) => void;
   open: () => void;
   close: () => void;
 };
@@ -36,6 +41,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [lastAddedId, setLastAddedId] = useState<string | null>(null);
+  const [insuranceId, setInsuranceId] = useState<string | null>(null);
 
   const add = useCallback((p: Product, qty = 1) => {
     setLines((prev) => {
@@ -64,6 +70,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
+  const setInsurance = useCallback((id: string | null) => {
+    setInsuranceId(id);
+  }, []);
+
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
 
@@ -72,10 +82,45 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     () => lines.reduce((a, l) => a + l.qty * l.product.price, 0),
     [lines]
   );
+  const insuranceTotal = useMemo(() => {
+    const opt = shippingInsurance.find((o) => o.id === insuranceId);
+    return opt ? opt.price : 0;
+  }, [insuranceId]);
+  const total = useMemo(() => subtotal + insuranceTotal, [subtotal, insuranceTotal]);
 
   const value = useMemo(
-    () => ({ lines, count, subtotal, isOpen, lastAddedId, add, remove, setQty, open, close }),
-    [lines, count, subtotal, isOpen, lastAddedId, add, remove, setQty, open, close]
+    () => ({
+      lines,
+      count,
+      subtotal,
+      isOpen,
+      lastAddedId,
+      insuranceId,
+      insuranceTotal,
+      total,
+      add,
+      remove,
+      setQty,
+      setInsurance,
+      open,
+      close,
+    }),
+    [
+      lines,
+      count,
+      subtotal,
+      isOpen,
+      lastAddedId,
+      insuranceId,
+      insuranceTotal,
+      total,
+      add,
+      remove,
+      setQty,
+      setInsurance,
+      open,
+      close,
+    ]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
