@@ -26,6 +26,7 @@ type CartCtx = {
   remove: (id: string) => void;
   setQty: (id: string, qty: number) => void;
   setInsurance: (id: string | null) => void;
+  clear: () => void;
   open: () => void;
   close: () => void;
 };
@@ -151,6 +152,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setInsuranceId(id);
   }, []);
 
+  const clear = useCallback(() => {
+    setLines([]);
+    setInsuranceId(null);
+  }, []);
+
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
 
@@ -179,6 +185,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       remove,
       setQty,
       setInsurance,
+      clear,
       open,
       close,
     }),
@@ -195,6 +202,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       remove,
       setQty,
       setInsurance,
+      clear,
       open,
       close,
     ]
