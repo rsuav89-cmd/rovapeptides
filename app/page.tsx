@@ -35,11 +35,11 @@ export default function Home() {
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                <a href="#catalog" className="btn-signal">
+                              <a href="/shop" className="btn-signal">
                   Shop All Peptides
                   <ArrowUpRight className="h-4 w-4" strokeWidth={2.2} />
                 </a>
-                <a href="#coa" className="btn-ghost">
+                              <a href="/coas" className="btn-ghost">
                   <FileCheck2 className="h-4 w-4 text-signal-ink" strokeWidth={2} />
                   View Testing / COAs
                 </a>
