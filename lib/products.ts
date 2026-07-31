@@ -30,6 +30,10 @@ export const CATEGORY_TABS: ("All" | Category | "New Arrivals")[] = [
 const img = (slug: string) => `/products/${slug}.jpg`;
 
 export const products: Product[] = [
+  // ─────────────────────────────────────────────────────────────────────────
+  // EXISTING 13 — unchanged code. The 12 marked "image refresh" below simply
+  // get a new JPEG dropped over the same slug file; no object edits needed.
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: "bpc-157-5mg",
     name: "BPC-157",
@@ -56,7 +60,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 99,
     batch: "RV-TES-2418",
-    image: img("tesamorelin"),
+    image: img("tesamorelin"), // image refresh: 32_ROVA_Tesamorelin_10-mg
     photo: img("tesamorelin"),
     featured: true,
   },
@@ -71,7 +75,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 129,
     batch: "RV-SS3-2440",
-    image: img("ss-31"),
+    image: img("ss-31"), // image refresh: 31_ROVA_SS-31_10-mg
     photo: img("ss-31"),
     isNew: true,
   },
@@ -86,7 +90,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 64,
     batch: "RV-SEL-2407",
-    image: img("selank"),
+    image: img("selank"), // image refresh: 28_ROVA_Selank_10-mg
     photo: img("selank"),
   },
   {
@@ -100,7 +104,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 109,
     batch: "RV-CER-2447",
-    image: img("cerebrolysin"),
+    image: img("cerebrolysin"), // image refresh: 10_ROVA_Cerebrolysin_60-mg
     photo: img("cerebrolysin"),
     isNew: true,
   },
@@ -115,7 +119,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 119,
     batch: "RV-NAD-2451",
-    image: img("nad-plus"),
+    image: img("nad-plus"), // image refresh: 22_ROVA_NADplus_1-000-mg
     photo: img("nad-plus"),
     featured: true,
     isNew: true,
@@ -131,7 +135,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 69,
     batch: "RV-EPI-2429",
-    image: img("epithalon"),
+    image: img("epithalon"), // image refresh: 12_ROVA_Epithalon_50-mg
     photo: img("epithalon"),
     isNew: true,
   },
@@ -146,7 +150,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 189,
     batch: "RV-FOX-2456",
-    image: img("foxo4-dri"),
+    image: img("foxo4-dri"), // image refresh: 13_ROVA_FOXO4-DRI_10-mg
     photo: img("foxo4-dri"),
     isNew: true,
   },
@@ -161,7 +165,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 89,
     batch: "RV-GLU-2412",
-    image: img("glutathione"),
+    image: img("glutathione"), // image refresh: 16_ROVA_Glutathione_1-500-mg
     photo: img("glutathione"),
   },
   {
@@ -175,7 +179,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 72,
     batch: "RV-GHK-2402",
-    image: img("ghk-cu"),
+    image: img("ghk-cu"), // image refresh: 14_ROVA_GHK-Cu_100-mg
     photo: img("ghk-cu"),
     featured: true,
   },
@@ -190,7 +194,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 58,
     batch: "RV-SN8-2433",
-    image: img("snap-8"),
+    image: img("snap-8"), // image refresh: 30_ROVA_Snap-8_10-mg
     photo: img("snap-8"),
   },
   {
@@ -204,7 +208,7 @@ export const products: Product[] = [
     purity: "99%",
     price: 34,
     batch: "RV-B12-2405",
-    image: img("vitamin-b12"),
+    image: img("vitamin-b12"), // image refresh: 06_ROVA_B-12_10-mg
     photo: img("vitamin-b12"),
   },
   {
@@ -218,8 +222,450 @@ export const products: Product[] = [
     purity: "USP",
     price: 12,
     batch: "RV-BAC-2400",
-    image: img("bac-water"),
+    image: img("bac-water"), // image refresh: 39_ROVA_Bacteriostatic-Water_10-mL
     photo: img("bac-water"),
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // NEW 27 — from ROVA_Product_Images_Manifest.txt. Slugs → /products/<slug>.jpg.
+  // Optimize each source PNG to that JPEG path before shipping.
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // 01 — 5-Amino-1MQ_10-mg
+  {
+    id: "5-amino-1mq-10mg",
+    name: "5-Amino-1MQ",
+    subtitle: "NNMT Inhibitor",
+    description:
+      "A small-molecule NNMT inhibitor investigated in metabolic and adipose-tissue research models. High-purity lyophilized research material.",
+    categories: ["Longevity"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-AMQ-2601",
+    image: img("5-amino-1mq-10mg"),
+    photo: img("5-amino-1mq-10mg"),
+    isNew: true,
+  },
+  // 02 — 5-Amino-1MQ_50-mg
+  {
+    id: "5-amino-1mq-50mg",
+    name: "5-Amino-1MQ",
+    subtitle: "NNMT Inhibitor",
+    description:
+      "A small-molecule NNMT inhibitor investigated in metabolic and adipose-tissue research models. High-purity lyophilized research material.",
+    categories: ["Longevity"],
+    mass: "50 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-AMQ-2602",
+    image: img("5-amino-1mq-50mg"),
+    photo: img("5-amino-1mq-50mg"),
+    isNew: true,
+  },
+  // 03 — Adamax_10-mg
+  {
+    id: "adamax-10mg",
+    name: "Adamax",
+    subtitle: "Nootropic Research Peptide",
+    description:
+      "A synthetic nootropic peptide analog studied in neuroplasticity and cognitive research models.",
+    categories: ["Research Peptides"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-ADX-2603",
+    image: img("adamax"),
+    photo: img("adamax"),
+    isNew: true,
+  },
+  // 04 — AOD-9604_5-mg
+  {
+    id: "aod-9604-5mg",
+    name: "AOD-9604",
+    subtitle: "GH Fragment 176–191",
+    description:
+      "A modified fragment of the growth-hormone peptide studied in lipid-metabolism and adipose research models.",
+    categories: ["Research Peptides", "Longevity"],
+    mass: "5 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-AOD-2604",
+    image: img("aod-9604"),
+    photo: img("aod-9604"),
+    isNew: true,
+  },
+  // 05 — ARA-290_10-mg
+  {
+    id: "ara-290-10mg",
+    name: "ARA-290",
+    subtitle: "Cibinetide · Tissue Repair",
+    description:
+      "An erythropoietin-derived peptide (cibinetide) investigated in tissue-repair and neuropathic research models.",
+    categories: ["Research Peptides"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-ARA-2605",
+    image: img("ara-290"),
+    photo: img("ara-290"),
+    isNew: true,
+  },
+  // 07 — BPC-157 + TB-500_5-mg + 5-mg
+  {
+    id: "bpc-157-tb-500-combo",
+    name: "BPC-157 + TB-500",
+    subtitle: "Recovery Blend",
+    description:
+      "A combined blend of two of the most widely studied recovery peptides, supplied for tissue- and cellular-repair research.",
+    categories: ["Research Peptides"],
+    mass: "5 mg + 5 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-BTB-2607",
+    image: img("bpc-157-tb-500"),
+    photo: img("bpc-157-tb-500"),
+    featured: true,
+    isNew: true,
+  },
+  // 08 — Cagrilintide_10-mg
+  {
+    id: "cagrilintide-10mg",
+    name: "Cagrilintide",
+    subtitle: "Amylin Analog",
+    description:
+      "A long-acting amylin analog studied in metabolic and appetite-signaling research models.",
+    categories: ["Research Peptides"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-CAG-2608",
+    image: img("cagrilintide"),
+    photo: img("cagrilintide"),
+    isNew: true,
+  },
+  // 09 — Cardiogen_20-mg
+  {
+    id: "cardiogen-20mg",
+    name: "Cardiogen",
+    subtitle: "Cardiac Bioregulator",
+    description:
+      "A cardiac peptide bioregulator investigated in cardiovascular and cellular-aging research models.",
+    categories: ["Longevity"],
+    mass: "20 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-CDG-2609",
+    image: img("cardiogen"),
+    photo: img("cardiogen"),
+    isNew: true,
+  },
+  // 11 — CJC-1295 Without DAC + Ipamorelin_5-mg + 5-mg
+  {
+    id: "cjc-1295-ipamorelin-combo",
+    name: "CJC-1295 No-DAC + Ipamorelin",
+    subtitle: "GHRH + GHRP Blend",
+    description:
+      "A paired growth-hormone-releasing-hormone analog and secretagogue blend studied in endocrine-signaling research.",
+    categories: ["Research Peptides"],
+    mass: "5 mg + 5 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-CJI-2611",
+    image: img("cjc-1295-ipamorelin"),
+    photo: img("cjc-1295-ipamorelin"),
+    isNew: true,
+  },
+  // 15 — GLOW_70-mg
+  {
+    id: "glow-70mg",
+    name: "GLOW",
+    subtitle: "Skin & Recovery Blend",
+    description:
+      "A tri-peptide beauty blend (GHK-Cu, BPC-157, TB-500) investigated in skin, collagen, and recovery research models.",
+    categories: ["Skin & Beauty"],
+    mass: "70 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-GLW-2615",
+    image: img("glow"),
+    photo: img("glow"),
+    featured: true,
+    isNew: true,
+  },
+  // 17 — KLOW_80-mg
+  {
+    id: "klow-80mg",
+    name: "KLOW",
+    subtitle: "Advanced Skin Blend",
+    description:
+      "A four-component peptide blend (GHK-Cu, BPC-157, TB-500, KPV) studied in skin, repair, and inflammatory-signaling research.",
+    categories: ["Skin & Beauty"],
+    mass: "80 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-KLW-2617",
+    image: img("klow"),
+    photo: img("klow"),
+    isNew: true,
+  },
+  // 18 — MOTS-c_10-mg
+  {
+    id: "mots-c-10mg",
+    name: "MOTS-c",
+    subtitle: "Mitochondrial Peptide",
+    description:
+      "A mitochondrial-derived peptide investigated in metabolic-regulation and cellular-energy research models.",
+    categories: ["Longevity"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-MTS-2618",
+    image: img("mots-c-10mg"),
+    photo: img("mots-c-10mg"),
+    featured: true,
+    isNew: true,
+  },
+  // 19 — MOTS-c_20-mg
+  {
+    id: "mots-c-20mg",
+    name: "MOTS-c",
+    subtitle: "Mitochondrial Peptide",
+    description:
+      "A mitochondrial-derived peptide investigated in metabolic-regulation and cellular-energy research models.",
+    categories: ["Longevity"],
+    mass: "20 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-MTS-2619",
+    image: img("mots-c-20mg"),
+    photo: img("mots-c-20mg"),
+    isNew: true,
+  },
+  // 20 — MT-1_10-mg
+  {
+    id: "mt-1-10mg",
+    name: "MT-1",
+    subtitle: "Melanotan I · Melanocortin",
+    description:
+      "A synthetic analog of alpha-melanocyte-stimulating hormone studied in melanogenesis and pigmentation research models.",
+    categories: ["Skin & Beauty"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-MT1-2620",
+    image: img("mt-1"),
+    photo: img("mt-1"),
+    isNew: true,
+  },
+  // 21 — MT-2_10-mg
+  {
+    id: "mt-2-10mg",
+    name: "MT-2",
+    subtitle: "Melanotan II · Melanocortin",
+    description:
+      "A synthetic melanocortin analog investigated in pigmentation and melanogenesis research models.",
+    categories: ["Skin & Beauty"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-MT2-2621",
+    image: img("mt-2"),
+    photo: img("mt-2"),
+    isNew: true,
+  },
+  // 23 — PT-141_10-mg
+  {
+    id: "pt-141-10mg",
+    name: "PT-141",
+    subtitle: "Bremelanotide",
+    description:
+      "A melanocortin-receptor-agonist peptide (bremelanotide) studied in neuroendocrine-signaling research models.",
+    categories: ["Research Peptides"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-PT1-2623",
+    image: img("pt-141"),
+    photo: img("pt-141"),
+    isNew: true,
+  },
+  // 24 — Retatrutide_10-mg
+  {
+    id: "retatrutide-10mg",
+    name: "Retatrutide",
+    subtitle: "Triple-Agonist · Metabolic",
+    description:
+      "A triple-agonist peptide (GIP/GLP-1/glucagon) studied in metabolic and energy-balance research models.",
+    categories: ["Research Peptides"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-RET-2624",
+    image: img("retatrutide-10mg"),
+    photo: img("retatrutide-10mg"),
+    featured: true,
+    isNew: true,
+  },
+  // 25 — Retatrutide_20-mg
+  {
+    id: "retatrutide-20mg",
+    name: "Retatrutide",
+    subtitle: "Triple-Agonist · Metabolic",
+    description:
+      "A triple-agonist peptide (GIP/GLP-1/glucagon) studied in metabolic and energy-balance research models.",
+    categories: ["Research Peptides"],
+    mass: "20 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-RET-2625",
+    image: img("retatrutide-20mg"),
+    photo: img("retatrutide-20mg"),
+    isNew: true,
+  },
+  // 26 — Retatrutide_30-mg
+  {
+    id: "retatrutide-30mg",
+    name: "Retatrutide",
+    subtitle: "Triple-Agonist · Metabolic",
+    description:
+      "A triple-agonist peptide (GIP/GLP-1/glucagon) studied in metabolic and energy-balance research models.",
+    categories: ["Research Peptides"],
+    mass: "30 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-RET-2626",
+    image: img("retatrutide-30mg"),
+    photo: img("retatrutide-30mg"),
+    isNew: true,
+  },
+  // 27 — Selank_5-mg  (variant; existing selank = 10 mg)
+  {
+    id: "selank-5mg",
+    name: "Selank",
+    subtitle: "Anxiolytic Research Peptide",
+    description:
+      "A synthetic heptapeptide studied in neuropeptide and behavioral research models. Lyophilized powder for laboratory use.",
+    categories: ["Research Peptides"],
+    mass: "5 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-SEL-2627",
+    image: img("selank-5mg"),
+    photo: img("selank-5mg"),
+    isNew: true,
+  },
+  // 29 — Semax_10-mg
+  {
+    id: "semax-10mg",
+    name: "Semax",
+    subtitle: "Nootropic Research Peptide",
+    description:
+      "A synthetic ACTH-fragment peptide studied in nootropic and neuroprotective research models.",
+    categories: ["Research Peptides"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-SMX-2629",
+    image: img("semax"),
+    photo: img("semax"),
+    isNew: true,
+  },
+  // 33 — Thymosin Alpha-1_10-mg
+  {
+    id: "thymosin-alpha-1-10mg",
+    name: "Thymosin Alpha-1",
+    subtitle: "Immune Research Peptide",
+    description:
+      "A thymus-derived peptide investigated in immune-modulation and cellular-signaling research models.",
+    categories: ["Research Peptides"],
+    mass: "10 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-THA-2633",
+    image: img("thymosin-alpha-1"),
+    photo: img("thymosin-alpha-1"),
+    isNew: true,
+  },
+  // 34 — Tirzepatide_30-mg
+  {
+    id: "tirzepatide-30mg",
+    name: "Tirzepatide",
+    subtitle: "Dual-Agonist · Metabolic",
+    description:
+      "A dual GIP/GLP-1 receptor-agonist peptide studied in metabolic and glucose-regulation research models.",
+    categories: ["Research Peptides"],
+    mass: "30 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-TZP-2634",
+    image: img("tirzepatide-30mg"),
+    photo: img("tirzepatide-30mg"),
+    featured: true,
+    isNew: true,
+  },
+  // 35 — Tirzepatide_60-mg
+  {
+    id: "tirzepatide-60mg",
+    name: "Tirzepatide",
+    subtitle: "Dual-Agonist · Metabolic",
+    description:
+      "A dual GIP/GLP-1 receptor-agonist peptide studied in metabolic and glucose-regulation research models.",
+    categories: ["Research Peptides"],
+    mass: "60 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-TZP-2635",
+    image: img("tirzepatide-60mg"),
+    photo: img("tirzepatide-60mg"),
+    isNew: true,
+  },
+  // 36 — VIP_5-mg
+  {
+    id: "vip-5mg",
+    name: "VIP",
+    subtitle: "Vasoactive Intestinal Peptide",
+    description:
+      "Vasoactive intestinal peptide, investigated in immune, vascular, and neuro-signaling research models.",
+    categories: ["Research Peptides"],
+    mass: "5 mg",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-VIP-2636",
+    image: img("vip"),
+    photo: img("vip"),
+    isNew: true,
+  },
+  // 37 — HCG_5-000-IU
+  {
+    id: "hcg-5000iu",
+    name: "HCG",
+    subtitle: "Gonadotropin Research Material",
+    description:
+      "Human chorionic gonadotropin, studied in endocrine- and reproductive-signaling research models. Lyophilized research material.",
+    categories: ["Research Peptides"],
+    mass: "5000 IU",
+    purity: "99%",
+    price: 0, // ← set price
+    batch: "RV-HCG-2637",
+    image: img("hcg"),
+    photo: img("hcg"),
+    isNew: true,
+  },
+  // 38 — Bacteriostatic Water_3-mL  (variant; existing bac-water = 10 mL)
+  {
+    id: "bac-water-3ml",
+    name: "Bacteriostatic Water",
+    subtitle: "0.9% Benzyl Alcohol · For Reconstitution",
+    description:
+      "Sterile water with 0.9% benzyl alcohol for laboratory reconstitution of lyophilized research materials.",
+    categories: ["Research Peptides"],
+    mass: "3 mL",
+    purity: "USP",
+    price: 0, // ← set price
+    batch: "RV-BAC-2638",
+    image: img("bac-water-3ml"),
+    photo: img("bac-water-3ml"),
   },
 ];
 
