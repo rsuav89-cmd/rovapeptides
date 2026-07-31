@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "validate:catalog": "node --experimental-strip-types scripts/validate-catalog.mjs"
   },
   "dependencies": {
     "framer-motion": "^11.3.19",

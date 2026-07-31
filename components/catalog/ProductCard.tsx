@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Check, Plus, Eye } from "lucide-react";
-import { money, type Product } from "@/lib/products";
+import { priceLabel, isPurchasable, showNewBadge, type Product } from "@/lib/products";
 import { useCart } from "@/components/cart/CartContext";
 import { useRouter } from "next/navigation";
 import { ProductImage } from "@/components/ProductImage";
@@ -12,8 +12,15 @@ export function ProductCard({ product }: { product: Product }) {
     const router = useRouter();
   const [added, setAdded] = useState(false);
 
+  const purchasable = isPurchasable(product);
+
   function quickAdd(e: React.MouseEvent) {
     e.stopPropagation();
+    // Never quick-add an unpriced SKU — route to the product page instead.
+    if (!purchasable) {
+      router.push(`/shop/${product.id}`);
+      return;
+    }
     add(product, 1);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1100);
@@ -32,7 +39,7 @@ export function ProductCard({ product }: { product: Product }) {
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-280 ease-out-expo will-change-transform group-hover:scale-[1.05]"
         />
 
-        {product.isNew && (
+        {showNewBadge(product) && (
           <span className="absolute left-3 top-3 rounded-full bg-brand-cta px-2.5 py-1 font-mono text-[0.58rem] font-bold uppercase tracking-widest text-white shadow-sm">
             New
           </span>
@@ -76,18 +83,24 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="mt-4 flex items-end justify-between pt-1">
           <div>
             <p className="font-mono text-[0.62rem] uppercase tracking-widest text-muted">Price</p>
-            <p className="font-sans text-xl font-semibold text-ink">{money(product.price)}</p>
+            <p className="font-sans text-xl font-semibold text-ink">{priceLabel(product)}</p>
           </div>
 
           <button
             onClick={quickAdd}
-            aria-label={`Add ${product.name} to cart`}
+            aria-label={purchasable ? `Add ${product.name} to cart` : `View pricing for ${product.name}`}
             className={[
               "group/btn inline-flex h-11 items-center overflow-hidden rounded-full px-3 font-semibold transition-[background-color,transform] duration-160 ease-out-expo will-change-transform active:scale-95",
-              added ? "bg-white text-brand-cta" : "bg-brand-cta text-white hover:shadow-copper",
+              !purchasable
+                ? "border border-line-strong bg-paper text-ink-2 hover:text-ink"
+                : added
+                  ? "bg-white text-brand-cta"
+                  : "bg-brand-cta text-white hover:shadow-copper",
             ].join(" ")}
           >
-            {added ? (
+            {!purchasable ? (
+              <Eye className="h-5 w-5" strokeWidth={2.4} />
+            ) : added ? (
               <Check className="h-5 w-5" strokeWidth={2.4} />
             ) : (
               <Plus className="h-5 w-5" strokeWidth={2.4} />
@@ -95,10 +108,14 @@ export function ProductCard({ product }: { product: Product }) {
             <span
               className={[
                 "max-w-0 overflow-hidden whitespace-nowrap text-sm transition-[max-width,margin] duration-220 ease-out-expo",
-                added ? "ml-1.5 max-w-[5rem]" : "group-hover/btn:ml-1.5 group-hover/btn:max-w-[5rem]",
+                !purchasable
+                  ? "group-hover/btn:ml-1.5 group-hover/btn:max-w-[6rem]"
+                  : added
+                    ? "ml-1.5 max-w-[5rem]"
+                    : "group-hover/btn:ml-1.5 group-hover/btn:max-w-[5rem]",
               ].join(" ")}
             >
-              {added ? "Added" : "Add"}
+              {!purchasable ? "Details" : added ? "Added" : "Add"}
             </span>
           </button>
         </div>

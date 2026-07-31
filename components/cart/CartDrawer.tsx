@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Trash2, Lock, Check } from "lucide-react";
 import { site } from "@/lib/site";
 import { money } from "@/lib/products";
-import { WC_CHECKOUT_URL } from "@/lib/wc";
+import { WC_CHECKOUT_URL, cartHasIneligible } from "@/lib/wc";
 import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 
@@ -21,6 +21,8 @@ export function CartDrawer() {
   // Redirect straight to the live WooCommerce checkout (WC_CHECKOUT_URL from
   // lib/wc.ts), where Zelle, Cash App, and ePayVista process live payments.
   function goToCheckout() {
+    // Final safety gate: never redirect to checkout with an ineligible line.
+    if (cartHasIneligible(lines)) return;
     setRedirecting(true);
     window.location.href = WC_CHECKOUT_URL;
   }

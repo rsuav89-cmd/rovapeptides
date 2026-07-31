@@ -88,3 +88,20 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Collection visual system (Phase: collection-first catalog) ──────────────
+   Category color stays a SMALL surface: an image-stage glow, an eyebrow, a
+   fine border. Each scope sets --c-accent / --c-glow / --c-border inline. */
+@layer components {
+  .image-stage {
+    background:
+      radial-gradient(58% 52% at 50% 40%, var(--c-glow, rgba(183, 110, 89, 0.12)), transparent 72%),
+      linear-gradient(180deg, #101016 0%, #0a0a0e 100%);
+  }
+  .collection-accent {
+    color: var(--c-accent, #b76e59);
+  }
+  .collection-border {
+    border-color: var(--c-border, rgba(255, 255, 255, 0.2));
+  }
+}

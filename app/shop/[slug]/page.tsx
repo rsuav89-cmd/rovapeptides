@@ -1,72 +1,92 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { NoticeBar } from "@/components/NoticeBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ProductDetail } from "@/components/catalog/ProductDetail";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { FamilyDetail } from "@/components/catalog/FamilyDetail";
 import { products } from "@/lib/products";
+import { getFamily, familySlugForSku, families } from "@/lib/catalog";
+import { getCollection } from "@/lib/collections";
 import { breadcrumbJsonLd, productJsonLd } from "@/lib/jsonld";
 import { site } from "@/lib/site";
 
+// Canonical params are FAMILY slugs; legacy SKU slugs are handled at runtime.
 export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.id }));
+  return families.map((f) => ({ slug: f.slug }));
 }
+export const dynamicParams = true;
+
+const strengthKey = (s: string) => s.replace(/\s+/g, "").toLowerCase();
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const product = products.find((p) => p.id === params.slug);
-  if (!product) {
-    return { title: "Product Not Found — RovaPeptides" };
-  }
-  const url = `${site.siteUrl}/shop/${product.id}`;
+  const fam =
+    getFamily(params.slug) ??
+    (() => {
+      const sku = products.find((p) => p.id === params.slug);
+      const fs = sku ? familySlugForSku(sku.id) : undefined;
+      return fs ? getFamily(fs) : undefined;
+    })();
+  if (!fam) return { title: "Product Not Found — RovaPeptides" };
+  const url = `${site.siteUrl}/shop/${fam.slug}`;
   return {
-    title: `${product.name} — RovaPeptides`,
-    description: product.description,
+    title: `${fam.name} — RovaPeptides`,
+    description: fam.description,
+    alternates: { canonical: url },
     openGraph: {
-      title: `${product.name} — RovaPeptides`,
-      description: product.description,
+      title: `${fam.name} — RovaPeptides`,
+      description: fam.description,
       url,
       type: "website",
-      images: [{ url: product.photo, alt: product.name }],
+      images: [{ url: fam.representativeImage, alt: fam.name }],
     },
-    alternates: { canonical: url },
   };
 }
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
-  const product = products.find((p) => p.id === params.slug);
-  if (!product) {
+export default function ProductPage({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams?: { strength?: string };
+}) {
+  const fam = getFamily(params.slug);
+
+  // Legacy per-SKU URL → 301 to canonical family page with the variant preselected.
+  if (!fam) {
+    const sku = products.find((p) => p.id === params.slug);
+    if (sku) {
+      const fs = familySlugForSku(sku.id);
+      if (fs) redirect(`/shop/${fs}?strength=${strengthKey(sku.mass)}`);
+    }
     notFound();
   }
 
-  const productUrl = `${site.siteUrl}/shop/${product.id}`;
+  const collection = getCollection(fam.primaryCollectionId);
+  const productUrl = `${site.siteUrl}/shop/${fam.slug}`;
   const breadcrumbLd = breadcrumbJsonLd([
     { name: "Home", url: site.siteUrl },
     { name: "Shop", url: `${site.siteUrl}/shop` },
-    { name: product.name, url: productUrl },
+    { name: collection.name, url: `${site.siteUrl}/shop/collections/${collection.slug}` },
+    { name: fam.name, url: productUrl },
   ]);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product)) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(fam.variants[0].product)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <NoticeBar />
       <Header />
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
           { label: "Shop", href: "/shop" },
-          { label: product.name },
+          { label: collection.shortName, href: `/shop/collections/${collection.slug}` },
+          { label: fam.name },
         ]}
       />
       <main>
-        <ProductDetail product={product} />
+        <FamilyDetail family={fam} initialStrength={searchParams?.strength} />
       </main>
       <Footer />
     </>

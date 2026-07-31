@@ -711,3 +711,50 @@ export function getRecommended(excludeIds: string[] = [], count = 4): Product[] 
   const rest = pool.filter((p) => !p.featured);
   return [...featured, ...rest].slice(0, count);
 }
+
+
+// ── Pricing policy (single source of truth) ──────────────────────────────────
+// A public purchasable variant may NOT display or submit a zero price unless it
+// is explicitly allow-listed. Intentionally empty: nothing is free.
+export const ALLOW_ZERO_PRICE_IDS: readonly string[] = [];
+
+export type PurchaseReason = "ok" | "pending-price" | "unavailable";
+export type PurchaseEligibility = { purchasable: boolean; reason: PurchaseReason };
+
+// SINGLE source of purchase eligibility. Card, detail, cart, and the checkout
+// gate must all consult this — never test price directly. Extend here when
+// stock / WooCommerce metadata become part of the model.
+export function getPurchaseEligibility(p: Product): PurchaseEligibility {
+  if (p.price <= 0 && !ALLOW_ZERO_PRICE_IDS.includes(p.id)) {
+    return { purchasable: false, reason: "pending-price" };
+  }
+  return { purchasable: true, reason: "ok" };
+}
+
+export function isPurchasable(p: Product): boolean {
+  return getPurchaseEligibility(p).purchasable;
+}
+
+/** Display label: real price when priced, else an approved fallback (never "$0"). */
+export function priceLabel(p: Product): string {
+  return isPurchasable(p) ? money(p.price) : "Pricing coming soon";
+}
+
+// ── NEW badge policy ─────────────────────────────────────────────────────────
+// Curated marquee launches only — NOT a blanket flag. Keeps the badge meaningful.
+export const NEW_BADGE_IDS: readonly string[] = [
+  "retatrutide-10mg",
+  "retatrutide-20mg",
+  "retatrutide-30mg",
+  "tirzepatide-30mg",
+  "tirzepatide-60mg",
+  "cagrilintide-10mg",
+  "mots-c-10mg",
+  "mots-c-20mg",
+  "glow-70mg",
+  "klow-80mg",
+];
+
+export function showNewBadge(p: Product): boolean {
+  return NEW_BADGE_IDS.includes(p.id);
+}

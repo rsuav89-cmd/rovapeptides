@@ -3,6 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { primaryNav, utilityNav, site } from "@/lib/site";
+import { collectionsInOrder } from "@/lib/collections";
+import { primaryFamilyCount } from "@/lib/catalog";
 import { Logo } from "./Logo";
 
 // Spring-physics slide-in panel. Backdrop fades (opacity), panel springs (transform).
@@ -79,6 +81,25 @@ export function MobileNav({
                       )}
                     </a>
                   </motion.li>
+                ))}
+              </ul>
+
+              <div className="my-6 hairline" />
+              <p className="px-3 pb-2 font-sans text-[0.62rem] uppercase tracking-widest text-muted">
+                Research Collections
+              </p>
+              <ul className="space-y-0.5">
+                {collectionsInOrder.map((c) => (
+                  <li key={c.id}>
+                    <a
+                      href={`/shop/collections/${c.slug}`}
+                      onClick={onClose}
+                      className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[0.95rem] text-ink-2 transition-colors hover:bg-white/[0.04] hover:text-ink"
+                    >
+                      {c.shortName}
+                      <span className="font-mono text-xs text-muted">{primaryFamilyCount(c.id)}</span>
+                    </a>
+                  </li>
                 ))}
               </ul>
 

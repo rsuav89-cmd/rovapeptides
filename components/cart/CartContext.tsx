@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import type { Product } from "@/lib/products";
-import { products, shippingInsurance } from "@/lib/products";
+import { products, shippingInsurance, isPurchasable } from "@/lib/products";
 
 export type CartLine = { product: Product; qty: number };
 
@@ -121,6 +121,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const add = useCallback((p: Product, qty = 1) => {
     const safeQty = normalizeQty(qty);
     if (!safeQty) return;
+    // Commerce invariant: never place an unpriced ($0) SKU into the cart.
+    if (!isPurchasable(p)) return;
 
     setLines((prev) => {
       const i = prev.findIndex((l) => l.product.id === p.id);

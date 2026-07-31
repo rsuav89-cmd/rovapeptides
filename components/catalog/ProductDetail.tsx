@@ -13,7 +13,7 @@ import {
   Truck,
   type LucideIcon,
 } from "lucide-react";
-import { getRecommended, money, productStorageNote, type Product } from "@/lib/products";
+import { getRecommended, money, priceLabel, isPurchasable, productStorageNote, type Product } from "@/lib/products";
 import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 
@@ -22,12 +22,16 @@ export function ProductDetail({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const recommended = getRecommended([product.id], 4);
 
+  const purchasable = isPurchasable(product);
+
   function addToCart() {
+    if (!purchasable) return; // never submit an unpriced SKU
     add(product, qty);
     openCart();
   }
 
   function addRecommended(item: Product) {
+    if (!isPurchasable(item)) return;
     add(item, 1);
     openCart();
   }
@@ -91,7 +95,7 @@ export function ProductDetail({ product }: { product: Product }) {
               </Link>
 
               <div className="mt-8 flex items-center gap-3">
-                <p className="font-sans text-2xl font-semibold text-ink">{money(product.price)}</p>
+                <p className="font-sans text-2xl font-semibold text-ink">{priceLabel(product)}</p>
               </div>
 
               <div className="mt-4 flex items-center gap-3">
@@ -113,9 +117,20 @@ export function ProductDetail({ product }: { product: Product }) {
                   </button>
                 </div>
 
-                <button onClick={addToCart} className="btn-signal flex-1">
-                  Add {qty > 1 ? `${qty} ` : ""}· {money(product.price * qty)}
-                </button>
+                {purchasable ? (
+                  <button onClick={addToCart} className="btn-signal flex-1">
+                    Add {qty > 1 ? `${qty} ` : ""}· {money(product.price * qty)}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    aria-disabled="true"
+                    className="btn-signal flex-1 cursor-not-allowed opacity-60"
+                  >
+                    Pricing coming soon
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -128,10 +143,10 @@ export function ProductDetail({ product }: { product: Product }) {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="font-mono text-[0.65rem] uppercase tracking-widest text-muted">
-                  Frequently Bought Together
+                  Related Research Products
                 </p>
                 <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
-                  Build a complete research order
+                  More from the ROVA research catalog
                 </h2>
               </div>
               <Link
@@ -171,16 +186,25 @@ export function ProductDetail({ product }: { product: Product }) {
                     <p className="mt-1 line-clamp-2 text-sm text-muted">{item.subtitle}</p>
                     <div className="mt-4 flex items-center justify-between gap-3">
                       <span className="font-sans text-lg font-semibold text-ink">
-                        {money(item.price)}
+                        {priceLabel(item)}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => addRecommended(item)}
-                        className="inline-flex h-10 items-center gap-1.5 rounded-full bg-brand-cta px-3 text-sm font-semibold text-white transition-[transform,box-shadow] duration-160 ease-out-expo hover:shadow-copper active:scale-95"
-                      >
-                        <ShoppingBag className="h-4 w-4" strokeWidth={2.2} />
-                        Add
-                      </button>
+                      {isPurchasable(item) ? (
+                        <button
+                          type="button"
+                          onClick={() => addRecommended(item)}
+                          className="inline-flex h-10 items-center gap-1.5 rounded-full bg-brand-cta px-3 text-sm font-semibold text-white transition-[transform,box-shadow] duration-160 ease-out-expo hover:shadow-copper active:scale-95"
+                        >
+                          <ShoppingBag className="h-4 w-4" strokeWidth={2.2} />
+                          Add
+                        </button>
+                      ) : (
+                        <Link
+                          href={`/shop/${item.id}`}
+                          className="inline-flex h-10 items-center gap-1.5 rounded-full border border-line-strong px-3 text-sm font-semibold text-ink-2 transition-colors hover:text-ink"
+                        >
+                          Details
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </article>

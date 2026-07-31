@@ -1,21 +1,22 @@
 import { NoticeBar } from "@/components/NoticeBar";
 import { Header } from "@/components/Header";
-import { CatalogLanding } from "@/components/catalog/CatalogLanding";
+import { Catalog } from "@/components/catalog/Catalog";
 import { Footer } from "@/components/Footer";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
 import { site } from "@/lib/site";
 
 export const metadata = {
-  title: "Research Catalog — Explore by Collection — RovaPeptides",
+  title: "All Products — RovaPeptides",
   description:
-    "Browse the RovaPeptides research catalog by collection, product family, strength, and format. For research use only.",
+    "The complete RovaPeptides research catalog. Browse every research product and view batch-specific Certificates of Analysis.",
 };
 
-export default function ShopPage() {
+export default function ShopAllPage() {
   const breadcrumbLd = breadcrumbJsonLd([
     { name: "Home", url: site.siteUrl },
     { name: "Shop", url: `${site.siteUrl}/shop` },
+    { name: "All Products", url: `${site.siteUrl}/shop/all` },
   ]);
 
   return (
@@ -26,9 +27,11 @@ export default function ShopPage() {
       />
       <NoticeBar />
       <Header />
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Shop" }]} />
+      <Breadcrumbs
+        items={[{ label: "Home", href: "/" }, { label: "Shop", href: "/shop" }, { label: "All Products" }]}
+      />
       <main>
-        <CatalogLanding />
+        <Catalog />
       </main>
       <Footer />
     </>

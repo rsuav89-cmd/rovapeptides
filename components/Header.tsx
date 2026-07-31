@@ -7,6 +7,7 @@ import { useCart } from "@/components/cart/CartContext";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
 import { SearchOverlay } from "./SearchOverlay";
+import { CollectionsMegaMenu } from "@/components/catalog/CollectionsMegaMenu";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -42,7 +43,8 @@ export function Header() {
               <Logo />
             </span>
 
-            <nav className="hidden lg:block">
+            <nav className="hidden items-center gap-1 lg:flex">
+              <CollectionsMegaMenu />
               <ul className="flex items-center gap-1">
                 {primaryNav.map((item) => (
                   <li key={item.label}>
