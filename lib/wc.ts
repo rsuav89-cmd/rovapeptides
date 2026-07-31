@@ -1,13 +1,14 @@
 import { getPurchaseEligibility, type Product } from "./products";
 
-const DEFAULT_STORE_URL = "https://www.rovapeptides.com";
+const DEFAULT_STORE_URL = "https://shop.rovapeptides.com";
 
 function normalizeStoreBase(url: string): string {
   const withoutTrailingSlash = url.replace(/\/+$/, "");
   return withoutTrailingSlash.replace(/\/checkout$/i, "");
 }
 
-/** WooCommerce store base URL — used for checkout redirects and account links. */
+/** WooCommerce store base URL — used for checkout + account links.
+ *  Safe fallback: https://shop.rovapeptides.com (→ /checkout/) when the env var is unset. */
 export const WC_STORE_BASE = normalizeStoreBase(
   process.env.NEXT_PUBLIC_WC_CHECKOUT_URL || DEFAULT_STORE_URL
 );
