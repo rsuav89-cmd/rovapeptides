@@ -5,37 +5,24 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Trash2, Lock, Check } from "lucide-react";
 import { site } from "@/lib/site";
 import { money } from "@/lib/products";
+import { WC_CHECKOUT_URL } from "@/lib/wc";
 import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 
 export function CartDrawer() {
   const { lines, subtotal, count, isOpen, close, setQty, remove } = useCart();
   const [redirecting, setRedirecting] = useState(false);
-  const [checkoutError, setCheckoutError] = useState(false);
 
   const threshold = site.freeShippingThreshold;
   const remaining = Math.max(0, threshold - subtotal);
   const pct = Math.min(100, threshold > 0 ? (subtotal / threshold) * 100 : 100);
   const unlocked = subtotal >= threshold && subtotal > 0;
 
-  // Fetch the live WooCommerce checkout URL and redirect the customer there,
-  // where Zelle, Cash App, and ePayVista process live payments.
-  async function goToCheckout() {
-    setCheckoutError(false);
+  // Redirect straight to the live WooCommerce checkout (WC_CHECKOUT_URL from
+  // lib/wc.ts), where Zelle, Cash App, and ePayVista process live payments.
+  function goToCheckout() {
     setRedirecting(true);
-    try {
-      const res = await fetch("/api/wc-checkout-url", { cache: "no-store" });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (res.ok && data.url) {
-        window.location.href = data.url;
-        return; // navigation in flight — keep the button in its "redirecting" state
-      }
-      setCheckoutError(true);
-      setRedirecting(false);
-    } catch {
-      setCheckoutError(true);
-      setRedirecting(false);
-    }
+    window.location.href = WC_CHECKOUT_URL;
   }
 
   useEffect(() => {
@@ -216,12 +203,6 @@ export function CartDrawer() {
                   <Lock className="h-4 w-4" strokeWidth={2.2} />
                   {redirecting ? "Redirecting…" : "Proceed to Checkout"}
                 </button>
-
-                {checkoutError && (
-                  <p className="mt-2 text-center text-xs text-gold">
-                    Couldn&apos;t reach checkout. Please try again in a moment.
-                  </p>
-                )}
 
                 <p className="mt-3 text-center font-mono text-[0.6rem] uppercase tracking-widest text-muted">
                   {site.compliance}
