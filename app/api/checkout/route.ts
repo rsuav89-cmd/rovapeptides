@@ -36,7 +36,7 @@ const SHOP_BASE = (
   .replace(/\/+$/, "")
   .replace(/\/checkout$/i, "");
 const HANDOFF_SECRET = process.env.HANDOFF_SECRET || "";
-const TTL_SECONDS = 300; // signed link is valid for 5 minutes
+const TTL_SECONDS = 900; // signed link is valid for 15 minutes
 
 type IncomingItem = { id?: unknown; qty?: unknown };
 type WooLine = { product_id: number; variation_id: number; qty: number };
@@ -89,9 +89,18 @@ export async function POST(req: NextRequest) {
       unmapped.push(slug);
       continue;
     }
+    // Force clean, finite integers — WooCommerce's add_to_cart silently no-ops
+    // on a non-integer or NaN product/variation id, which is what leaves the
+    // shopper on an empty /cart. variation_id 0 means "simple product".
+    const product_id = Math.trunc(Number(ref.productId));
+    const variation_id = ref.variationId != null ? Math.trunc(Number(ref.variationId)) : 0;
+    if (!Number.isInteger(product_id) || product_id <= 0) {
+      unmapped.push(slug);
+      continue;
+    }
     lines.push({
-      product_id: ref.productId,
-      variation_id: ref.variationId ?? 0,
+      product_id,
+      variation_id: Number.isInteger(variation_id) && variation_id > 0 ? variation_id : 0,
       qty,
     });
   }

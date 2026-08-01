@@ -106,9 +106,16 @@ function rova_handle_cart_handoff() {
 		wp_die( 'WooCommerce cart is unavailable.' );
 	}
 
+	// Make sure the WooCommerce customer session exists BEFORE we mutate the cart,
+	// so the session cookie is issued on this very response.
+	if ( WC()->session && ! WC()->session->has_session() ) {
+		WC()->session->set_customer_session_cookie( true );
+	}
+
 	// Start from a clean cart, then add each mapped line.
 	WC()->cart->empty_cart();
 
+	$added = 0;
 	foreach ( $payload['items'] as $item ) {
 		if ( ! is_array( $item ) ) {
 			continue;
@@ -121,15 +128,42 @@ function rova_handle_cart_handoff() {
 			continue;
 		}
 
-		if ( $variation_id > 0 ) {
-			WC()->cart->add_to_cart( $product_id, $qty, $variation_id );
-		} else {
-			WC()->cart->add_to_cart( $product_id, $qty );
+		$key = ( $variation_id > 0 )
+			? WC()->cart->add_to_cart( $product_id, $qty, $variation_id )
+			: WC()->cart->add_to_cart( $product_id, $qty );
+
+		if ( $key ) {
+			$added++;
 		}
 	}
 
-	// Off to WooCommerce checkout (first-party session cookie is now set).
-	wp_safe_redirect( wc_get_checkout_url() );
+	// If nothing landed in the cart, the checkout page would just bounce back to
+	// /cart. Surface the real problem instead of silently redirecting.
+	if ( $added === 0 || WC()->cart->is_empty() ) {
+		status_header( 400 );
+		wp_die( 'Cart could not be built from the handoff payload (no valid, purchasable products were added). Check the product/variation IDs.' );
+	}
+
+	// ── SESSION PERSISTENCE (the fix for "lands on empty /cart") ──────────────
+	// The cart lives in the WooCommerce session. When we build it in one request
+	// and immediately redirect, the session must be written AND its cookie sent
+	// on THIS response, or the follow-up /checkout/ request reads an empty cart
+	// and WooCommerce bounces it to /cart. Force all three, in order.
+	WC()->cart->calculate_totals();
+	WC()->cart->set_session();                 // write cart into the session object
+	if ( WC()->session ) {
+		WC()->session->set_customer_session_cookie( true ); // ensure the session cookie is issued
+		WC()->session->save_data();            // flush session to storage now, not on shutdown
+	}
+	WC()->cart->maybe_set_cart_cookies();      // set woocommerce_items_in_cart / hash cookies
+
+	// Off to WooCommerce checkout. Prefer wc_get_checkout_url(); fall back to an
+	// explicit /checkout/ permalink so we never land on /cart with a full cart.
+	$checkout_url = wc_get_checkout_url();
+	if ( empty( $checkout_url ) || false !== stripos( $checkout_url, '/cart' ) ) {
+		$checkout_url = home_url( '/checkout/' );
+	}
+	wp_safe_redirect( $checkout_url, 303 );
 	exit;
 }
 // Priority 5: run before the theme's 404 template loads. WooCommerce's cart/
