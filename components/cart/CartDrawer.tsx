@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Trash2, Lock, Check } from "lucide-react";
 import { site } from "@/lib/site";
 import { money } from "@/lib/products";
-import { WC_CHECKOUT_URL, cartHasIneligible } from "@/lib/wc";
 import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 
@@ -18,13 +17,29 @@ export function CartDrawer() {
   const pct = Math.min(100, threshold > 0 ? (subtotal / threshold) * 100 : 100);
   const unlocked = subtotal >= threshold && subtotal > 0;
 
-  // Redirect straight to the live WooCommerce checkout (WC_CHECKOUT_URL from
-  // lib/wc.ts), where Zelle, Cash App, and ePayVista process live payments.
+  // Hand the cart off to WooCommerce. We submit a top-level form POST to
+  // /api/checkout (NOT fetch) so the browser follows the route's 302 across to
+  // shop.rovapeptides.com/rova-handoff, which rebuilds the WooCommerce cart
+  // server-side (HMAC-verified) and redirects on to checkout. A top-level
+  // navigation means no CORS and a first-party WooCommerce session cookie.
   function goToCheckout() {
-    // Final safety gate: never redirect to checkout with an ineligible line.
-    if (cartHasIneligible(lines)) return;
+    if (redirecting || lines.length === 0) return;
     setRedirecting(true);
-    window.location.href = WC_CHECKOUT_URL;
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/api/checkout";
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "items";
+    input.value = JSON.stringify(
+      lines.map((l) => ({ id: l.product.id, qty: l.qty })),
+    );
+
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
   }
 
   useEffect(() => {
