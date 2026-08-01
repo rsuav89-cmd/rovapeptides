@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Syncopate, Montserrat } from "next/font/google";
 import { Providers } from "@/components/Providers";
+import { StructuredData } from "@/components/StructuredData";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -26,12 +27,38 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#000000",
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.siteUrl),
   title,
   description,
+  applicationName: site.name,
+  authors: [{ name: site.name, url: site.siteUrl }],
+  creator: site.name,
+  publisher: site.name,
+  keywords: [
+    "research peptides",
+    "peptides for research",
+    "certificate of analysis",
+    "HPLC verified peptides",
+    "research grade peptides",
+    "RovaPeptides",
+  ],
+  referrer: "strict-origin-when-cross-origin",
+  formatDetection: { telephone: false, email: false, address: false },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
     title,
     description,
@@ -55,6 +82,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} overflow-x-hidden`}>
       <body id="top" className="overflow-x-hidden">
+        <StructuredData />
         <Providers>{children}</Providers>
       </body>
     </html>
