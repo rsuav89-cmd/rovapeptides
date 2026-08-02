@@ -103,7 +103,7 @@ export function CoaViewer() {
           <button
             onClick={() => lookup(sampleBatches[0])}
             aria-label="Open a sample certificate"
-            className="group relative hidden overflow-hidden rounded-xl2 border border-line bg-gradient-to-br from-paper-2 to-black p-8 text-left shadow-lift lg:block"
+            className="group relative hidden overflow-hidden rounded-xl2 border border-line bg-gradient-to-br from-graphite to-paper p-8 text-left shadow-lift lg:block"
           >
             <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(50%_50%_at_80%_10%,rgba(183,110,89,0.3),transparent_60%)]" />
             <div className="relative">
