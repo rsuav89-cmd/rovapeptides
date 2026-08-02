@@ -38,6 +38,14 @@ const SHOP_BASE = (
 const HANDOFF_SECRET = process.env.HANDOFF_SECRET || "";
 const TTL_SECONDS = 900; // signed link is valid for 15 minutes
 
+// Payload bounds. A handoff URL is a signed GET, so an unbounded cart becomes an
+// unbounded query string; these caps keep it well inside every proxy's limit and
+// stop a crafted POST from generating a huge signed link.
+const MAX_LINES = 40;
+const MAX_QTY_PER_LINE = 99;
+
+const NO_STORE = { "Cache-Control": "no-store" } as const;
+
 type IncomingItem = { id?: unknown; qty?: unknown };
 type WooLine = { product_id: number; variation_id: number; qty: number };
 
@@ -71,7 +79,7 @@ export async function POST(req: NextRequest) {
   if (!HANDOFF_SECRET) {
     return NextResponse.json(
       { error: "HANDOFF_SECRET is missing" },
-      { status: 500 },
+      { status: 500, headers: NO_STORE },
     );
   }
 
@@ -80,10 +88,10 @@ export async function POST(req: NextRequest) {
   const lines: WooLine[] = [];
   const unmapped: string[] = [];
 
-  for (const item of incoming) {
+  for (const item of incoming.slice(0, MAX_LINES)) {
     const slug = String(item?.id ?? "").trim();
     if (!slug) continue;
-    const qty = Math.max(1, Math.floor(Number(item?.qty) || 1));
+    const qty = Math.min(MAX_QTY_PER_LINE, Math.max(1, Math.floor(Number(item?.qty) || 1)));
     const ref = wooRef(slug);
     if (!ref) {
       unmapped.push(slug);
@@ -108,7 +116,7 @@ export async function POST(req: NextRequest) {
   if (lines.length === 0) {
     return NextResponse.json(
       { error: "No purchasable items in cart.", unmapped },
-      { status: 400 },
+      { status: 400, headers: NO_STORE },
     );
   }
 
@@ -124,14 +132,23 @@ export async function POST(req: NextRequest) {
   // Always hand off to /rova-handoff on the shop; the mu-plugin rebuilds the
   // cart and forwards to /checkout/. A form POST makes the browser follow this
   // 303 as a top-level GET — no CORS, first-party WooCommerce session. Never /cart.
-  console.log("[CHECKOUT_REDIRECT]", redirectUrl);
-  return NextResponse.redirect(redirectUrl, 303);
+  // Log the shape, never the signature: `sig` is a valid HMAC over `data`, so a
+  // logged handoff URL is a replayable checkout link for the whole TTL window.
+  console.log("[CHECKOUT_REDIRECT]", {
+    lines: lines.length,
+    units: lines.reduce((n, l) => n + l.qty, 0),
+    exp,
+  });
+
+  const res = NextResponse.redirect(redirectUrl, 303);
+  res.headers.set("Cache-Control", "no-store");
+  return res;
 }
 
 // Optional: a bare GET is not a valid entry point; nudge callers to POST.
 export async function GET() {
   return NextResponse.json(
     { error: "Use POST with cart items to begin checkout." },
-    { status: 405 },
+    { status: 405, headers: NO_STORE },
   );
 }

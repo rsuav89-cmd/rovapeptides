@@ -5,8 +5,16 @@ import { Menu, Search, ShoppingBag, FileCheck2, User } from "lucide-react";
 import { headerUtilityLinks, primaryNav } from "@/lib/site";
 import { useCart } from "@/components/cart/CartContext";
 import { Logo } from "./Logo";
-import { MobileNav } from "./MobileNav";
-import { SearchOverlay } from "./SearchOverlay";
+import dynamic from "next/dynamic";
+
+// Overlays only exist after a tap — never ship them in the header chunk.
+const MobileNav = dynamic(() => import("./MobileNav").then((m) => m.MobileNav), {
+  ssr: false,
+});
+const SearchOverlay = dynamic(
+  () => import("./SearchOverlay").then((m) => m.SearchOverlay),
+  { ssr: false }
+);
 import { CollectionsMegaMenu } from "@/components/catalog/CollectionsMegaMenu";
 
 export function Header() {

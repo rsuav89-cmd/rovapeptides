@@ -1,23 +1,24 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { Product } from "@/lib/products";
 
-// Prefers the real render (`product.photo`, e.g. /products/bpc-157.jpg). If that file
-// isn't present yet, it falls back to the branded SVG placeholder (`product.image`).
-// Drop real renders into /public/products/ with the photo filenames and they appear
-// with zero code change and zero layout shift (the aspect box is owned by the parent).
+// Prefers the real render (`product.photo`, e.g. /products/bpc-157.jpg) and falls
+// back to the branded placeholder (`product.image`) if that file is missing.
 //
-// A native <img> is used deliberately: it keeps the onError → SVG-placeholder swap
-// simple and avoids next/image config for what are already-optimized local renders.
-// `priority` marks above-the-fold images (eager + high fetch priority); everything
-// else stays lazy with async decode so it never blocks the main thread.
+// Rendered through next/image with `fill`: every call site already places this
+// inside a `relative aspect-[4/5]` box, so geometry is unchanged while Next
+// generates AVIF/WebP variants per breakpoint. `priority` marks the LCP image
+// (preloaded, fetchpriority=high); everything else stays lazy.
+const DEFAULT_SIZES = "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 340px";
+
 export function ProductImage({
   product,
   className = "",
   loading = "lazy",
   priority = false,
-  sizes,
+  sizes = DEFAULT_SIZES,
 }: {
   product: Product;
   className?: string;
@@ -26,20 +27,19 @@ export function ProductImage({
   sizes?: string;
 }) {
   const [src, setSrc] = useState(product.photo);
+  const eager = priority || loading === "eager";
 
   // reset when the product changes (e.g. modal / showcase reuse)
   useEffect(() => setSrc(product.photo), [product.photo]);
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <Image
       src={src}
       alt={`${product.name} (${product.subtitle}) research peptide — ${product.mass}, ${product.purity} purity, batch ${product.batch}`}
-      loading={priority ? "eager" : loading}
-      // fetchPriority is a valid DOM attribute; cast avoids older React type gaps.
-      {...({ fetchpriority: priority ? "high" : "auto" } as Record<string, string>)}
-      decoding="async"
-      {...(sizes ? { sizes } : {})}
+      fill
+      sizes={sizes}
+      priority={eager}
+      {...(eager ? {} : { loading: "lazy" as const })}
       onError={() => {
         if (src !== product.image) setSrc(product.image);
       }}

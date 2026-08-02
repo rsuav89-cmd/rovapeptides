@@ -133,7 +133,7 @@ export const collections: Collection[] = [
     shortDescription:
       "Peptides investigated in neuropeptide, neuroprotective, and cognitive research models.",
     longDescription:
-      "This collection organizes research materials studied in neuropeptide and cognitive laboratory models, including nootropic peptides and neurotrophic complexes. Supplied for laboratory research use only.",
+      "This collection organizes research materials studied in neuropeptide and cognitive laboratory models, including ACTH-fragment analogs and neurotrophic peptide complexes. Supplied for laboratory research use only.",
     displayOrder: 4,
     seoTitle: "Brain & Mood Research Peptides — RovaPeptides",
     seoDescription:
@@ -150,8 +150,8 @@ export const collections: Collection[] = [
   {
     id: "hormone-sexual-health",
     slug: "hormone-sexual-health",
-    name: "Hormone & Sexual Health Research",
-    shortName: "Hormone & Sexual Health",
+    name: "Hormone & Neuroendocrine Research",
+    shortName: "Hormone & Endocrine",
     eyebrow: "Research Collection",
     shortDescription:
       "Compounds studied in endocrine-, growth-hormone-axis, and neuroendocrine research models.",
@@ -196,7 +196,7 @@ export const collections: Collection[] = [
   {
     id: "skin-hair-antioxidant",
     slug: "skin-hair-antioxidant",
-    name: "Skin, Hair & Antioxidant Support",
+    name: "Skin, Hair & Antioxidant Research",
     shortName: "Skin & Antioxidant",
     eyebrow: "Research Collection",
     shortDescription:

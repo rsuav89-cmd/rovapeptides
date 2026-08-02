@@ -8,7 +8,7 @@ import { FamilyDetail } from "@/components/catalog/FamilyDetail";
 import { products } from "@/lib/products";
 import { getFamily, familySlugForSku, families } from "@/lib/catalog";
 import { getCollection } from "@/lib/collections";
-import { breadcrumbJsonLd, productJsonLd } from "@/lib/jsonld";
+import { breadcrumbJsonLd, productGroupJsonLd, productJsonLd } from "@/lib/jsonld";
 import { DEFAULT_FORM, DEFAULT_STORAGE, TESTING_METHOD, getProductDetail } from "@/lib/product-details";
 import { site } from "@/lib/site";
 
@@ -72,22 +72,36 @@ export default function ProductPage({
     { name: fam.name, url: productUrl },
   ]);
 
+  const schemaOpts = {
+    url: productUrl,
+    description: getProductDetail(fam.id)?.overview ?? fam.description,
+    specs: [
+      { name: "Format", value: getProductDetail(fam.id)?.form ?? DEFAULT_FORM },
+      { name: "Purity", value: `${fam.variants[0].product.purity} minimum, third-party verified` },
+      { name: "Testing", value: TESTING_METHOD },
+      { name: "Storage", value: DEFAULT_STORAGE },
+      {
+        name: "Intended use",
+        value: "Laboratory and in-vitro research use only. Not for human or veterinary consumption.",
+      },
+    ],
+  };
+
+  // One Product node cannot describe several strengths: multi-variant families
+  // emit a ProductGroup so the price range and every SKU are advertised.
+  const productLd =
+    fam.variants.length > 1
+      ? productGroupJsonLd(fam, schemaOpts)
+      : {
+          ...productJsonLd(fam.variants[0].product, schemaOpts),
+          hasCertification: {
+            "@id": `${site.siteUrl}/coas/${fam.variants[0].product.batch}#coa`,
+          },
+        };
+
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(fam.variants[0].product, {
-              url: `${site.siteUrl}/shop/${fam.slug}`,
-              description: getProductDetail(fam.id)?.overview ?? fam.description,
-              specs: [
-                { name: "Format", value: getProductDetail(fam.id)?.form ?? DEFAULT_FORM },
-                { name: "Purity", value: `${fam.variants[0].product.purity} minimum, third-party verified` },
-                { name: "Testing", value: TESTING_METHOD },
-                { name: "Storage", value: DEFAULT_STORAGE },
-                {
-                  name: "Intended use",
-                  value: "Laboratory and in-vitro research use only. Not for human or veterinary consumption.",
-                },
-              ],
-            })) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <NoticeBar />
       <Header />

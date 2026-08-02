@@ -7,7 +7,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CollectionView } from "@/components/catalog/CollectionView";
 import { collections, getCollectionBySlug } from "@/lib/collections";
 import { familiesInCollection, primaryFamilyCount } from "@/lib/catalog";
-import { breadcrumbJsonLd } from "@/lib/jsonld";
+import { breadcrumbJsonLd, collectionPageJsonLd } from "@/lib/jsonld";
 import { site } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -41,6 +41,19 @@ export default function CollectionPage({ params }: { params: { slug: string } })
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            collectionPageJsonLd({
+              url: `${site.siteUrl}/shop/collections/${c.slug}`,
+              name: c.name,
+              description: c.seoDescription,
+              families: families.map((f) => ({ name: f.name, slug: f.slug })),
+            })
+          ),
+        }}
+      />
       <NoticeBar />
       <Header />
       <Breadcrumbs

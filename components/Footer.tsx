@@ -1,7 +1,7 @@
 import { Lock, ShieldCheck, Truck, BadgeCheck, FlaskConical } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { NewsletterForm } from "@/components/NewsletterForm";
-import { site } from "@/lib/site";
+import { site, paymentMethods } from "@/lib/site";
 
 const columns: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [
   {
@@ -42,12 +42,7 @@ const badges = [
   { icon: BadgeCheck, label: "Verified Merchant" },
 ];
 
-const paymentMethods = [
-  { label: "Visa", className: "bg-white/10 text-white font-bold italic tracking-tight" },
-  { label: "Mastercard", className: "bg-white/10 text-white font-semibold" },
-  { label: "Cash App", className: "bg-[#00D632]/20 text-[#00D632] font-bold" },
-  { label: "Zelle", className: "bg-[#6D1ED4]/20 text-[#B794F4] font-semibold" },
-];
+
 
 export function Footer() {
   return (

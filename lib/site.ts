@@ -11,6 +11,14 @@ export const site = {
   siteUrl: "https://rovapeptides.com",
 };
 
+/** Accepted payment methods — rendered in the footer and at the checkout step. */
+export const paymentMethods = [
+  { label: "Visa", className: "bg-white/10 text-white font-bold italic tracking-tight" },
+  { label: "Mastercard", className: "bg-white/10 text-white font-semibold" },
+  { label: "Cash App", className: "bg-[#00D632]/20 text-[#00D632] font-bold" },
+  { label: "Zelle", className: "bg-[#6D1ED4]/20 text-[#B794F4] font-semibold" },
+];
+
 export type NavItem = {
   label: string;
   href: string;

@@ -3,19 +3,29 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Trash2, Lock, Check } from "lucide-react";
-import { site } from "@/lib/site";
-import { money } from "@/lib/products";
+import { paymentMethods, site } from "@/lib/site";
+import { money, getRecommended, isPurchasable } from "@/lib/products";
+import { cartHasIneligible, WC_STORE_BASE } from "@/lib/wc";
 import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 
 export function CartDrawer() {
-  const { lines, subtotal, count, isOpen, close, setQty, remove } = useCart();
+  const { lines, subtotal, count, isOpen, close, setQty, remove, add } = useCart();
   const [redirecting, setRedirecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const threshold = site.freeShippingThreshold;
   const remaining = Math.max(0, threshold - subtotal);
   const pct = Math.min(100, threshold > 0 ? (subtotal / threshold) * 100 : 100);
   const unlocked = subtotal >= threshold && subtotal > 0;
+
+  const suggestions =
+    count > 0 && !unlocked
+      ? getRecommended(
+          lines.map((l) => l.product.id),
+          2
+        ).filter(isPurchasable)
+      : [];
 
   // Hand the cart off to WooCommerce. We submit a top-level form POST to
   // /api/checkout (NOT fetch) so the browser follows the route's 302 across to
@@ -24,6 +34,18 @@ export function CartDrawer() {
   // navigation means no CORS and a first-party WooCommerce session cookie.
   function goToCheckout() {
     if (redirecting || lines.length === 0) return;
+
+    // Pre-flight gate. The handoff route rejects unmapped/unpriced SKUs with a
+    // JSON 400 — but this is a top-level form POST, so that JSON would replace
+    // the page. Catch it here and keep the shopper in the drawer instead.
+    if (cartHasIneligible(lines)) {
+      setError(
+        "One or more items in your cart are not yet available for checkout. Remove them to continue."
+      );
+      return;
+    }
+
+    setError(null);
     setRedirecting(true);
 
     const form = document.createElement("form");
@@ -114,6 +136,44 @@ export function CartDrawer() {
                     style={{ transform: `scaleX(${pct / 100})`, width: "100%" }}
                   />
                 </div>
+
+                {/* Goal-gradient assist: the shortfall message is only actionable
+                    if something is one tap away from closing it. */}
+                {suggestions.length > 0 && (
+                  <div className="mt-3.5 border-t border-line pt-3">
+                    <p className="font-mono text-[0.6rem] uppercase tracking-widest text-muted">
+                      Add to reach free shipping
+                    </p>
+                    <ul className="mt-2 space-y-2">
+                      {suggestions.map((p) => (
+                        <li key={p.id} className="flex items-center gap-2.5">
+                          <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md border border-line bg-paper-2">
+                            <ProductImage
+                              product={p}
+                              sizes="40px"
+                              className="object-contain p-1"
+                            />
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-xs font-medium text-ink">
+                              {p.name}
+                            </span>
+                            <span className="block font-mono text-[0.65rem] text-muted">
+                              {p.mass} · {money(p.price)}
+                            </span>
+                          </span>
+                          <button
+                            onClick={() => add(p, 1)}
+                            aria-label={`Add ${p.name} to cart`}
+                            className="shrink-0 rounded-full border border-line-strong px-2.5 py-1 text-[0.7rem] font-semibold text-ink transition-colors duration-160 hover:border-brand hover:text-signal-ink"
+                          >
+                            + Add
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 
@@ -214,6 +274,19 @@ export function CartDrawer() {
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-muted">Shipping &amp; taxes calculated at checkout.</p>
+                <p className="mt-2 text-[0.7rem] leading-relaxed text-muted">
+                  COA match guarantee — if a vial does not match the certificate published for its
+                  batch, we replace or refund it.
+                </p>
+
+                {error && (
+                  <p
+                    role="alert"
+                    className="mt-3 rounded-lg border border-brand/40 bg-brand-cta/10 px-3 py-2 text-xs leading-relaxed text-ink"
+                  >
+                    {error}
+                  </p>
+                )}
 
                 <button
                   onClick={goToCheckout}
@@ -223,6 +296,22 @@ export function CartDrawer() {
                   <Lock className="h-4 w-4" strokeWidth={2.2} />
                   {redirecting ? "Redirecting…" : "Proceed to Checkout"}
                 </button>
+
+                {/* Destination + payment disclosure: the handoff leaves this domain,
+                    and an unannounced domain change is a top abandonment driver. */}
+                <p className="mt-2.5 text-center text-[0.7rem] leading-relaxed text-muted">
+                  Encrypted checkout on {WC_STORE_BASE.replace(/^https?:\/\//, "")}
+                </p>
+                <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
+                  {paymentMethods.map((pm) => (
+                    <span
+                      key={pm.label}
+                      className={`rounded px-1.5 py-0.5 text-[0.6rem] ${pm.className}`}
+                    >
+                      {pm.label}
+                    </span>
+                  ))}
+                </div>
 
                 <p className="mt-3 text-center font-mono text-[0.6rem] uppercase tracking-widest text-muted">
                   {site.compliance}

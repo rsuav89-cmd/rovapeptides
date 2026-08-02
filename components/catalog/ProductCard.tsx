@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Plus, Eye } from "lucide-react";
 import { priceLabel, isPurchasable, showNewBadge, type Product } from "@/lib/products";
 import { useCart } from "@/components/cart/CartContext";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ProductImage } from "@/components/ProductImage";
 
@@ -30,10 +31,14 @@ export function ProductCard({ product }: { product: Product }) {
   }
 
   return (
-    <article
-      onClick={() => router.push(`/shop/${product.id}`)}
-      className="card-light group cursor-pointer"
-    >
+    <article className="card-light group relative">
+      {/* A real anchor, not an onClick handler: keyboard-reachable, middle-clickable,
+          and it passes internal link equity to the product page. */}
+      <Link
+        href={`/shop/${product.id}`}
+        aria-label={`View ${product.name} — ${product.subtitle}`}
+        className="absolute inset-0 z-0 rounded-xl2"
+      />
       {/* IMAGE — warm light stage, real render (product.photo) with SVG fallback */}
       <div className="image-stage-light relative aspect-[4/5] overflow-hidden">
         <ProductImage
@@ -54,7 +59,7 @@ export function ProductCard({ product }: { product: Product }) {
             router.push(`/shop/${product.id}`);
           }}
           aria-label={`View details for ${product.name}`}
-          className="absolute bottom-3 left-1/2 flex -translate-x-1/2 translate-y-2 items-center gap-1.5 rounded-full border bg-ivory/90 px-3 py-1.5 text-xs font-medium text-ink-dark opacity-0 backdrop-blur transition-[opacity,transform] duration-220 ease-out-expo will-change-transform focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
+          className="absolute bottom-3 left-1/2 flex -translate-x-1/2 translate-y-2 items-center gap-1.5 rounded-full border bg-ivory/90 px-3 py-1.5 text-xs font-medium text-ink-dark backdrop-blur transition-[opacity,transform] duration-220 ease-out-expo will-change-transform focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 sm:translate-y-2 sm:opacity-0"
           style={{ borderColor: "var(--line-warm-strong)" }}
         >
           <Eye className="h-3.5 w-3.5" strokeWidth={2} />
@@ -63,7 +68,7 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* BODY */}
-      <div className="flex flex-1 flex-col p-4">
+      <div className="pointer-events-none relative z-[1] flex flex-1 flex-col p-4">
         <p className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-copper-muted">
           {product.categories[0]}
         </p>
@@ -93,7 +98,7 @@ export function ProductCard({ product }: { product: Product }) {
             onClick={quickAdd}
             aria-label={purchasable ? `Add ${product.name} to cart` : `View pricing for ${product.name}`}
             className={[
-              "group/btn inline-flex h-11 items-center overflow-hidden rounded-full px-3 font-semibold transition-[background-color,transform] duration-160 ease-out-expo will-change-transform active:scale-95",
+              "group/btn pointer-events-auto relative z-10 inline-flex h-11 items-center overflow-hidden rounded-full px-3 font-semibold transition-[background-color,transform] duration-160 ease-out-expo will-change-transform active:scale-95",
               !purchasable
                 ? "border bg-transparent text-ink-dark hover:border-copper-muted hover:text-copper-muted"
                 : added

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { families } from "@/lib/catalog";
 import { collections } from "@/lib/collections";
+import { products } from "@/lib/products";
 import { site } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -36,6 +37,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.85,
+    })),
+    // Certificate-of-analysis pages — one per batch, server-rendered.
+    ...products.map((p) => ({
+      url: `${base}/coas/${p.batch}`,
+      lastModified: now,
+      changeFrequency: "yearly" as const,
+      priority: 0.6,
     })),
     // Product-family pages (canonical). Legacy per-SKU URLs 301 → these and are
     // intentionally omitted from the sitemap.

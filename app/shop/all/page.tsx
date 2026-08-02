@@ -3,7 +3,8 @@ import { Header } from "@/components/Header";
 import { Catalog } from "@/components/catalog/Catalog";
 import { Footer } from "@/components/Footer";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { breadcrumbJsonLd } from "@/lib/jsonld";
+import { breadcrumbJsonLd, collectionPageJsonLd } from "@/lib/jsonld";
+import { families } from "@/lib/catalog";
 import { site } from "@/lib/site";
 
 export const metadata = {
@@ -25,6 +26,20 @@ export default function ShopAllPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            collectionPageJsonLd({
+              url: `${site.siteUrl}/shop/all`,
+              name: "All Research Peptides",
+              description:
+                "Every research compound in the RovaPeptides catalog, each batch third-party verified by RP-HPLC and LC-MS with a publicly retrievable Certificate of Analysis.",
+              families: families.map((f) => ({ name: f.name, slug: f.slug })),
+            })
+          ),
+        }}
       />
       <NoticeBar />
       <Header />

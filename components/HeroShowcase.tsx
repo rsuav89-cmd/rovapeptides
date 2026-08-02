@@ -50,7 +50,8 @@ export function HeroShowcase() {
           >
             <ProductImage
               product={p}
-              loading="eager"
+              priority
+              sizes="(max-width: 1024px) 90vw, 520px"
               className="h-full w-full object-cover transition-transform duration-280 ease-out-expo group-hover:scale-[1.03]"
             />
           </motion.div>

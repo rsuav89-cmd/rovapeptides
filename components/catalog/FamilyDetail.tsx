@@ -51,6 +51,7 @@ export function FamilyDetail({
   const collection = getCollection(family.primaryCollectionId);
   const detail = getProductDetail(family.id);
 
+
   const initialIdx = useMemo(() => {
     if (!initialStrength) return 0;
     const k = strengthKey(initialStrength);
@@ -62,6 +63,14 @@ export function FamilyDetail({
   const [qty, setQty] = useState(1);
   const selected = family.variants[idx];
   const eligible = getPurchaseEligibility(selected.product).purchasable;
+  // Unit economics, shown only when the strength is a clean mg figure. Purely
+  // factual — it removes the arithmetic a buyer would otherwise do by hand.
+  const perMg = (() => {
+    const m = /^([\d.]+)\s*mg$/i.exec(selected.displayStrength.trim());
+    const mg = m ? Number(m[1]) : NaN;
+    if (!Number.isFinite(mg) || mg <= 0 || !eligible) return null;
+    return `$${(selected.product.price / mg).toFixed(2)}`;
+  })();
 
   const related = familiesInCollection(family.primaryCollectionId)
     .filter((f) => f.id !== family.id)
@@ -175,8 +184,11 @@ export function FamilyDetail({
                 </div>
               )}
 
-              <div className="mt-6 flex items-center gap-3">
+              <div className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <p className="font-sans text-2xl font-semibold text-ink">{priceLabel(selected.product)}</p>
+                {perMg && (
+                  <p className="font-mono text-xs text-muted">{perMg} per mg</p>
+                )}
               </div>
 
               {/* qty + add */}
@@ -221,7 +233,7 @@ export function FamilyDetail({
               <p className="mt-1.5 text-xs leading-relaxed text-muted">
                 COA match guarantee — if the vial you receive does not match the{" "}
                 <Link
-                  href={`/coas?batch=${selected.product.batch}`}
+                  href={`/coas/${selected.product.batch}`}
                   className="underline decoration-line-strong underline-offset-2 transition-colors hover:text-ink"
                 >
                   certificate published for its batch
@@ -251,7 +263,7 @@ export function FamilyDetail({
               </div>
 
               <Link
-                href={`/coas?batch=${selected.product.batch}`}
+                href={`/coas/${selected.product.batch}`}
                 className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-signal-ink transition-colors hover:text-brand"
               >
                 <FileCheck2 className="h-4 w-4" strokeWidth={2} />
@@ -300,6 +312,12 @@ export function FamilyDetail({
             <p className="truncate font-sans text-sm font-medium text-ink">{family.name}</p>
             <p className="text-xs text-muted">
               {selected.displayStrength} · {priceLabel(selected.product)}
+              {eligible &&
+                (site.freeShippingThreshold - selected.product.price * qty > 0
+                  ? ` · ${money(
+                      site.freeShippingThreshold - selected.product.price * qty
+                    )} to free shipping`
+                  : " · Free shipping")}
             </p>
           </div>
           {eligible ? (

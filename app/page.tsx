@@ -3,9 +3,19 @@ import { NoticeBar } from "@/components/NoticeBar";
 import { Header } from "@/components/Header";
 import { HeroShowcase } from "@/components/HeroShowcase";
 import { Catalog } from "@/components/catalog/Catalog";
-import { TrustQuality } from "@/components/TrustQuality";
-import { CoaViewer } from "@/components/CoaViewer";
-import { FaqPreview } from "@/components/faq/FaqPreview";
+import dynamic from "next/dynamic";
+
+// Below-the-fold and framer-motion-heavy: server-rendered as usual, but their
+// client bundles are fetched as separate chunks instead of blocking hydration.
+const TrustQuality = dynamic(() =>
+  import("@/components/TrustQuality").then((m) => m.TrustQuality)
+);
+const CoaViewer = dynamic(() =>
+  import("@/components/CoaViewer").then((m) => m.CoaViewer)
+);
+const FaqPreview = dynamic(() =>
+  import("@/components/faq/FaqPreview").then((m) => m.FaqPreview)
+);
 import { Footer } from "@/components/Footer";
 import { site } from "@/lib/site";
 import type { Metadata } from "next";
