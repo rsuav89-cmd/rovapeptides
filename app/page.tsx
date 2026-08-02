@@ -16,15 +16,26 @@ export default function Home() {
       <Header />
 
       <main>
-        {/* HERO */}
+        {/* HERO — dark editorial brand moment that resolves into the warm catalog */}
         <section className="relative overflow-hidden">
-          <div className="mx-auto grid max-w-[1280px] items-end gap-10 px-5 pb-16 pt-14 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:pb-24 lg:pt-20">
+          {/* faint editorial column rules — framing, not decoration */}
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <div className="mx-auto h-full max-w-[1280px] px-5 sm:px-8">
+              <div className="grid h-full grid-cols-2 lg:grid-cols-4">
+                {[0, 1, 2, 3].map((i) => (
+                  <div key={i} className="border-l border-line/40 last:border-r" />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="relative mx-auto grid max-w-[1280px] items-end gap-10 px-5 pb-24 pt-14 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:pb-32 lg:pt-20">
             <div className="animate-fade-up">
               <span className="kicker inline-flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />
                 USA Laboratory Tested · 99%+ Purity
               </span>
-              <h1 className="mt-5 text-display-lg text-ink">
+              <h1 className="mt-5 text-display-xl text-ink">
                 Research peptides,
                 <br />
                 <span className="text-brand">verified to the batch.</span>
@@ -46,7 +57,7 @@ export default function Home() {
                 </a>
               </div>
 
-              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-line pt-6">
                 {[
                   { icon: ShieldCheck, label: "99.4% avg. purity" },
                   { icon: Microscope, label: "3rd-party verified" },
@@ -62,9 +73,15 @@ export default function Home() {
 
             <HeroShowcase />
           </div>
+
+          {/* tonal transition — dark hero resolves into the warm ivory catalog */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-ivory"
+          />
         </section>
 
-        {/* CATALOG — M2 */}
+        {/* CATALOG — M2 (warm ivory surface, M1) */}
         <Catalog />
 
         {/* TRUST & QUALITY — M4 */}

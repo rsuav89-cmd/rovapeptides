@@ -27,9 +27,12 @@ export function Header() {
       <header
         className={[
           "sticky top-0 z-40 h-[var(--header-h)] transition-[background-color,box-shadow,border-color] duration-280 ease-out-expo",
+          // Scrolled: a warm graphite frosted bar (readable over both dark and
+          // warm-light sections as the page scrolls beneath it). At the top it
+          // is transparent over the dark hero. White text throughout.
           scrolled
-            ? "border-b border-line bg-paper/80 shadow-card backdrop-blur-xl"
-            : "border-b border-transparent bg-paper/0",
+            ? "border-b border-line bg-graphite/85 shadow-card backdrop-blur-xl"
+            : "border-b border-transparent bg-transparent",
         ].join(" ")}
       >
         <div className="mx-auto flex h-full max-w-[1280px] items-center justify-between gap-4 px-5 sm:px-8">

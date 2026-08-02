@@ -51,8 +51,11 @@ const paymentMethods = [
 
 export function Footer() {
   return (
-    <footer className="bg-brand-deep text-white">
-      <div className="border-b border-paper/10">
+    <footer className="bg-graphite text-white">
+      {/* copper transition rule — marks the close after the warm FAQ band */}
+      <div aria-hidden className="h-px w-full bg-gradient-to-r from-transparent via-brand to-transparent" />
+
+      <div className="border-b border-line">
         <div className="mx-auto flex max-w-[1280px] items-center gap-3 px-5 py-4 sm:px-8">
           <FlaskConical className="h-5 w-5 shrink-0 text-signal" strokeWidth={1.9} />
           <p className="text-sm text-white/75">
@@ -80,7 +83,7 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
           {columns.map((col) => (
             <div key={col.title}>
-              <p className="font-mono text-[0.65rem] uppercase tracking-widest text-white/50">
+              <p className="font-mono text-[0.65rem] uppercase tracking-widest text-signal-ink/90">
                 {col.title}
               </p>
               <ul className="mt-4 space-y-2.5">
@@ -104,7 +107,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-paper/10">
+      <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-6 gap-y-3 px-5 py-5 sm:px-8">
           {badges.map((b) => (
             <span key={b.label} className="inline-flex items-center gap-2 text-xs text-white/70">
@@ -115,7 +118,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-paper/10">
+      <div className="border-t border-line">
         <div className="mx-auto max-w-[1280px] px-5 py-4 sm:px-8">
           <p className="font-mono text-[0.62rem] uppercase tracking-widest text-white/45">
             Accepted payment methods
@@ -133,7 +136,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-paper/10">
+      <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1280px] flex-col items-start justify-between gap-2 px-5 py-5 sm:flex-row sm:items-center sm:px-8">
           <p className="text-xs text-white/55">© 2026 {site.name}. All rights reserved.</p>
           <p className="font-mono text-[0.62rem] uppercase tracking-widest text-white/45">
