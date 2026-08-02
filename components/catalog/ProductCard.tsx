@@ -7,9 +7,12 @@ import { useCart } from "@/components/cart/CartContext";
 import { useRouter } from "next/navigation";
 import { ProductImage } from "@/components/ProductImage";
 
+// Light editorial product card — sits on a warm/neutral catalog surface so the
+// product photography and price read clearly. All commerce logic (routing,
+// quick-add, purchasable gating) is unchanged from the original card.
 export function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
-    const router = useRouter();
+  const router = useRouter();
   const [added, setAdded] = useState(false);
 
   const purchasable = isPurchasable(product);
@@ -28,12 +31,11 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <article
-          onClick={() => router.push(`/shop/${product.id}`)}
-      className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl2 border border-line bg-paper-2 transition-[transform,box-shadow,border-color] duration-280 ease-out-expo will-change-transform hover:-translate-y-1 hover:border-line-strong hover:shadow-lift"
+      onClick={() => router.push(`/shop/${product.id}`)}
+      className="card-light group cursor-pointer"
     >
-      {/* IMAGE — real render (product.photo) with SVG fallback; fixed aspect = no layout shift */}
-      <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-paper-2 to-paper">
-        <div className="pointer-events-none absolute inset-0 opacity-70 [background-image:radial-gradient(70%_55%_at_70%_15%,rgba(183,110,89,0.10),transparent_60%)]" />
+      {/* IMAGE — warm light stage, real render (product.photo) with SVG fallback */}
+      <div className="image-stage-light relative aspect-[4/5] overflow-hidden">
         <ProductImage
           product={product}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-280 ease-out-expo will-change-transform group-hover:scale-[1.05]"
@@ -49,41 +51,42 @@ export function ProductCard({ product }: { product: Product }) {
         <button
           onClick={(e) => {
             e.stopPropagation();
-                    router.push(`/shop/${product.id}`);
+            router.push(`/shop/${product.id}`);
           }}
-              aria-label={`View details for ${product.name}`}
-          className="absolute bottom-3 left-1/2 flex -translate-x-1/2 translate-y-2 items-center gap-1.5 rounded-full border border-line-strong bg-paper/90 px-3 py-1.5 text-xs font-medium opacity-0 backdrop-blur transition-[opacity,transform] duration-220 ease-out-expo will-change-transform focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
+          aria-label={`View details for ${product.name}`}
+          className="absolute bottom-3 left-1/2 flex -translate-x-1/2 translate-y-2 items-center gap-1.5 rounded-full border bg-ivory/90 px-3 py-1.5 text-xs font-medium text-ink-dark opacity-0 backdrop-blur transition-[opacity,transform] duration-220 ease-out-expo will-change-transform focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
+          style={{ borderColor: "var(--line-warm-strong)" }}
         >
           <Eye className="h-3.5 w-3.5" strokeWidth={2} />
-                  View details
+          View details
         </button>
       </div>
 
       {/* BODY */}
       <div className="flex flex-1 flex-col p-4">
-        <p className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-signal-ink">
+        <p className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-copper-muted">
           {product.categories[0]}
         </p>
 
-        <h3 className="mt-1 font-display text-[1.15rem] font-semibold leading-tight text-ink">
+        <h3 className="mt-1 font-display text-[1.15rem] font-semibold leading-tight text-ink-dark">
           {product.name}
         </h3>
-        <p className="mt-0.5 text-sm text-muted">{product.subtitle}</p>
+        <p className="mt-0.5 text-sm text-muted-dark">{product.subtitle}</p>
 
         <div className="mt-3 flex flex-wrap gap-1.5">
-          <span className="data-tag">{product.mass}</span>
-          <span className="data-tag">{product.purity} pure</span>
+          <span className="data-tag-light">{product.mass}</span>
+          <span className="data-tag-light">{product.purity} pure</span>
         </div>
 
-        <div className="mt-2 flex items-center gap-1.5 font-mono text-[0.66rem] text-muted">
+        <div className="mt-2 flex items-center gap-1.5 font-mono text-[0.66rem] text-muted-dark">
           <span className="h-1 w-1 rounded-full bg-brand-cta" />
           Batch {product.batch}
         </div>
 
         <div className="mt-4 flex items-end justify-between pt-1">
           <div>
-            <p className="font-mono text-[0.62rem] uppercase tracking-widest text-muted">Price</p>
-            <p className="font-sans text-xl font-semibold text-ink">{priceLabel(product)}</p>
+            <p className="font-mono text-[0.62rem] uppercase tracking-widest text-muted-dark">Price</p>
+            <p className="font-sans text-xl font-semibold text-ink-dark">{priceLabel(product)}</p>
           </div>
 
           <button
@@ -92,11 +95,12 @@ export function ProductCard({ product }: { product: Product }) {
             className={[
               "group/btn inline-flex h-11 items-center overflow-hidden rounded-full px-3 font-semibold transition-[background-color,transform] duration-160 ease-out-expo will-change-transform active:scale-95",
               !purchasable
-                ? "border border-line-strong bg-paper text-ink-2 hover:text-ink"
+                ? "border bg-transparent text-ink-dark hover:border-copper-muted hover:text-copper-muted"
                 : added
-                  ? "bg-white text-brand-cta"
+                  ? "bg-graphite text-white"
                   : "bg-brand-cta text-white hover:shadow-copper",
             ].join(" ")}
+            style={!purchasable ? { borderColor: "var(--line-warm-strong)" } : undefined}
           >
             {!purchasable ? (
               <Eye className="h-5 w-5" strokeWidth={2.4} />

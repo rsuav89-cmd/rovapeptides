@@ -28,19 +28,22 @@ export function Catalog() {
   const filtered = useMemo(() => products.filter((p) => matches(tab, p)), [tab]);
 
   return (
-    <section id="catalog" className="scroll-mt-24 border-t border-line/70">
+    <section
+      id="catalog"
+      className="surface-warm on-light scroll-mt-24"
+    >
       <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8 lg:py-24">
         {/* Asymmetric section header: title left, filter tabs right */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-lg">
-            <span className="kicker inline-flex items-center gap-2">
+            <span className="kicker-dark inline-flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />
               The Catalog
             </span>
-            <h2 className="mt-4 text-display-md text-ink">
-              Every compound, <span className="text-brand">batch-verified.</span>
+            <h2 className="mt-4 text-display-md text-ink-dark">
+              Every compound, <span className="text-copper-muted">batch-verified.</span>
             </h2>
-            <p className="mt-3 text-ink-2">
+            <p className="mt-3 text-ink-dark-2">
               Filter by category. Each item ships with a lot-specific Certificate of Analysis —
               tap a card to add it, or look up any batch below.
             </p>
@@ -50,7 +53,8 @@ export function Catalog() {
           <div
             role="tablist"
             aria-label="Product categories"
-            className="flex flex-wrap gap-1.5 rounded-full border border-line bg-paper-2/50 p-1.5"
+            className="flex flex-wrap gap-1.5 rounded-full border bg-bone/70 p-1.5"
+            style={{ borderColor: "var(--line-warm-strong)" }}
           >
             {CATEGORY_TABS.map((t) => {
               const active = t === tab;
@@ -62,7 +66,7 @@ export function Catalog() {
                   onClick={() => setTab(t)}
                   className={[
                     "relative rounded-full px-3.5 py-2 text-[0.82rem] font-medium transition-colors duration-160 ease-out-expo",
-                    active ? "text-white" : "text-ink-2 hover:text-ink",
+                    active ? "text-white" : "text-ink-dark-2 hover:text-ink-dark",
                   ].join(" ")}
                 >
                   {active && (
@@ -81,10 +85,10 @@ export function Catalog() {
 
         {/* Count readout */}
         <div className="mt-8 flex items-center gap-3">
-          <span className="font-mono text-[0.7rem] uppercase tracking-widest text-muted">
+          <span className="font-mono text-[0.7rem] uppercase tracking-widest text-muted-dark">
             {filtered.length} {filtered.length === 1 ? "product" : "products"}
           </span>
-          <span className="hairline flex-1" />
+          <span className="hairline-warm flex-1" />
         </div>
 
         {/* Grid — 4-up at xl to avoid the generic 3-col template; animated reflow on filter */}

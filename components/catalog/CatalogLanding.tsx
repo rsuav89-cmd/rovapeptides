@@ -13,7 +13,7 @@ export function CatalogLanding() {
 
   return (
     <>
-      {/* HERO */}
+      {/* HERO — strategic dark brand moment */}
       <section className="relative overflow-hidden border-b border-line/70">
         <div className="mx-auto max-w-[1360px] px-5 py-16 sm:px-8 lg:py-24">
           <p className="kicker inline-flex items-center gap-2">
@@ -40,7 +40,7 @@ export function CatalogLanding() {
         </div>
       </section>
 
-      {/* COLLECTION MOSAIC */}
+      {/* COLLECTION MOSAIC — dark technical grid */}
       <section id="collections" className="scroll-mt-24 border-b border-line/70">
         <div className="mx-auto max-w-[1360px] px-5 py-16 sm:px-8 lg:py-20">
           <div className="max-w-lg">
@@ -62,17 +62,17 @@ export function CatalogLanding() {
         </div>
       </section>
 
-      {/* FEATURED FAMILIES */}
-      <section className="border-b border-line/70">
+      {/* FEATURED FAMILIES — warm light product surface (light cards sit here) */}
+      <section className="surface-warm on-light border-b" style={{ borderColor: "var(--line-warm-strong)" }}>
         <div className="mx-auto max-w-[1360px] px-5 py-16 sm:px-8 lg:py-20">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="kicker">Featured</p>
-              <h2 className="mt-3 text-display-md text-ink">Selected research families</h2>
+              <p className="kicker-dark">Featured</p>
+              <h2 className="mt-3 text-display-md text-ink-dark">Selected research families</h2>
             </div>
             <Link
               href="/shop/all"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-signal-ink transition-colors hover:text-brand"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-copper-muted transition-colors hover:text-copper-deep"
             >
               View all products
               <ArrowRight className="h-4 w-4" strokeWidth={2.2} />
@@ -84,7 +84,7 @@ export function CatalogLanding() {
         </div>
       </section>
 
-      {/* RESEARCH POSITIONING */}
+      {/* RESEARCH POSITIONING — strategic dark close */}
       <section>
         <div className="mx-auto max-w-[1360px] px-5 py-16 sm:px-8 lg:py-20">
           <div className="flex max-w-2xl flex-col gap-4">

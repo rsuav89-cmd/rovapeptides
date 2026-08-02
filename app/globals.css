@@ -5,6 +5,8 @@
 :root {
   --header-h: 76px;
   --notice-h: 40px;
+  --line-warm: rgba(23, 22, 20, 0.12);
+  --line-warm-strong: rgba(23, 22, 20, 0.18);
 }
 
 @layer base {
@@ -40,6 +42,15 @@
     text-transform: uppercase;
     text-wrap: balance;
   }
+
+  /* On warm-light surfaces, headings must read dark. Wrap a light section in
+     `.on-light` and all headings inside flip to ink-dark automatically. */
+  .on-light h1,
+  .on-light h2,
+  .on-light h3,
+  .on-light h4 {
+    @apply text-ink-dark;
+  }
 }
 
 @layer components {
@@ -47,15 +58,30 @@
   .kicker {
     @apply font-sans text-label font-semibold uppercase text-signal-ink;
   }
+  /* Kicker on warm-light surfaces (deeper copper for AA contrast) */
+  .kicker-dark {
+    @apply font-sans text-label font-semibold uppercase text-copper-muted;
+  }
 
   .hairline {
     @apply h-px w-full bg-line;
+  }
+  /* Hairline on light surfaces */
+  .hairline-warm {
+    @apply h-px w-full;
+    background: var(--line-warm);
   }
 
   /* Data tag (mg / concentration / batch) — obsidian chip w/ copper-tinted border */
   .data-tag {
     @apply inline-flex items-center gap-1.5 rounded-md border border-line-strong bg-paper-3/70
            px-2 py-1 font-sans text-[0.68rem] font-medium uppercase tracking-wider text-ink-2;
+  }
+  /* Data tag on warm-light surfaces */
+  .data-tag-light {
+    @apply inline-flex items-center gap-1.5 rounded-md border bg-sand/50
+           px-2 py-1 font-sans text-[0.68rem] font-medium uppercase tracking-wider text-ink-dark-2;
+    border-color: var(--line-warm-strong);
   }
 
   /* PRIMARY CTA — deeper copper fill so white text hits WCAG AA (4.81:1).
@@ -74,6 +100,72 @@
            bg-transparent px-6 py-3 font-sans font-semibold uppercase tracking-wide text-ink
            transition-[transform,border-color,background-color,color] duration-160 ease-out-expo
            will-change-transform hover:border-brand hover:text-brand active:scale-[0.97];
+  }
+
+  /* ── Mixed-surface visual system ─────────────────────────────────────────
+     Semantic section surfaces. Dark stays strategic; warm/neutral surfaces
+     introduce the light rhythm. Pair light surfaces with `.on-light`. */
+  .surface-dark {
+    @apply bg-paper text-ink-2;
+  }
+  .surface-graphite {
+    @apply bg-graphite text-ink-2;
+  }
+  .surface-warm {
+    @apply bg-ivory text-ink-dark-2;
+  }
+  .surface-bone {
+    @apply bg-bone text-ink-dark-2;
+  }
+  .surface-neutral {
+    @apply bg-sand text-ink-dark-2;
+  }
+
+  .text-on-light {
+    @apply text-ink-dark;
+  }
+  .text-on-light-muted {
+    @apply text-muted-dark;
+  }
+
+  /* Light product / editorial card — clearly separated from any surface. */
+  .card-light {
+    @apply relative flex flex-col overflow-hidden rounded-xl2 border bg-bone
+           shadow-card-light transition-[transform,border-color,box-shadow]
+           duration-280 ease-out-expo hover:-translate-y-1 hover:shadow-lift-light;
+    border-color: var(--line-warm-strong);
+  }
+  .card-light:hover {
+    border-color: rgba(168, 105, 87, 0.5); /* copper-muted edge on hover */
+  }
+
+  /* Clean, warm product-image stage for light cards (no dark gradient). */
+  .image-stage-light {
+    background:
+      radial-gradient(60% 55% at 50% 38%, rgba(255, 255, 255, 0.92), transparent 72%),
+      linear-gradient(180deg, #f6f2ec 0%, #e7e0d6 100%);
+  }
+
+  /* Badges on light surfaces */
+  .badge-light {
+    @apply inline-flex items-center gap-1.5 rounded-full border bg-sand/60 px-2.5 py-1
+           font-sans text-[0.56rem] font-bold uppercase tracking-widest text-ink-dark;
+    border-color: var(--line-warm-strong);
+  }
+
+  /* Buttons for warm-light surfaces */
+  .btn-on-light {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full bg-graphite px-6 py-3
+           font-sans font-semibold uppercase tracking-wide text-ink
+           transition-[transform,box-shadow] duration-160 ease-out-expo
+           will-change-transform hover:shadow-lift active:scale-[0.97];
+  }
+  .btn-ghost-light {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border bg-transparent px-6 py-3
+           font-sans font-semibold uppercase tracking-wide text-ink-dark
+           transition-[transform,border-color,color] duration-160 ease-out-expo
+           will-change-transform active:scale-[0.97] hover:border-copper-muted hover:text-copper-muted;
+    border-color: var(--line-warm-strong);
   }
 }
 

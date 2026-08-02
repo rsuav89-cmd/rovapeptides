@@ -35,8 +35,27 @@ const config: Config = {
         copper: {
           DEFAULT: "#B76E59",
           soft: "#CE8A74",
+          light: "#E3AA96",
+          muted: "#A86957", // copper that hits AA on warm-light surfaces
           deep: "#8E5342",
         },
+        // ── Mixed-surface visual system (warm light + neutral tones) ──────────
+        // Warm darks (for strategic dark sections that aren't pure black)
+        graphite: "#151515",
+        charcoal: "#222220",
+        slate: "#343330",
+        // Warm lights & neutrals (editorial / product / catalog surfaces)
+        ivory: "#F3EFE8",
+        bone: "#E7E0D6",
+        sand: "#D4C9BB",
+        stone: "#B4AA9E",
+        mushroom: "#8C857B",
+        bronze: "#805346",
+        clay: "#B77B68",
+        // Text on warm-light surfaces
+        "ink-dark": "#171614", // primary text/headings on light
+        "ink-dark-2": "#4A453F", // secondary text on light
+        "muted-dark": "#6C665E", // muted captions on light (AA on ivory/bone)
         gold: "#C6A15B", // reserved for warnings only
       },
       fontFamily: {
@@ -58,6 +77,9 @@ const config: Config = {
       boxShadow: {
         card: "0 1px 2px rgba(0,0,0,0.5), 0 12px 34px -14px rgba(0,0,0,0.75)",
         lift: "0 10px 24px -8px rgba(0,0,0,0.6), 0 30px 70px -24px rgba(0,0,0,0.85)",
+        // Soft neutral shadow for light cards on warm surfaces
+        "card-light": "0 1px 2px rgba(23,22,20,0.06), 0 14px 34px -18px rgba(23,22,20,0.28)",
+        "lift-light": "0 16px 40px -20px rgba(23,22,20,0.34)",
         drawer: "-24px 0 60px -20px rgba(0,0,0,0.75)",
         copper: "0 8px 26px -10px rgba(183,110,89,0.55)",
       },
