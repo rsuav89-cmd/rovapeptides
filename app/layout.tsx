@@ -47,6 +47,9 @@ export const metadata: Metadata = {
     "RovaPeptides",
   ],
   referrer: "strict-origin-when-cross-origin",
+  verification: {
+    google: "bgrTNQ8Pf9episC6eCpdKeRHhp8uY-68hX6uj_aruwg",
+  },
   formatDetection: { telephone: false, email: false, address: false },
   robots: {
     index: true,
