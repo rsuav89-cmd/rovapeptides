@@ -6,10 +6,16 @@ import { site } from "@/lib/site";
 export function StructuredData() {
   const organization = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": ["Organization", "OnlineStore"],
+    "@id": `${site.siteUrl}#organization`,
     name: site.name,
     url: site.siteUrl,
-    logo: `${site.siteUrl}/icon`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${site.siteUrl}/apple-icon`,
+      width: 180,
+      height: 180,
+    },
     email: site.contactEmail,
     description:
       "Research-grade peptides with 99%+ verified purity and third-party Certificates of Analysis on every batch. For Research Use Only.",

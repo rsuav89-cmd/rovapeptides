@@ -6,8 +6,8 @@ import { Search, X, ShieldCheck, Download, FileCheck2, AlertCircle, Check } from
 import { getCoa, sampleBatches, type Coa } from "@/lib/coa";
 import { Logo } from "@/components/Logo";
 
-export function CoaViewer() {
-  const [query, setQuery] = useState("");
+export function CoaViewer({ initialBatch }: { initialBatch?: string } = {}) {
+  const [query, setQuery] = useState(initialBatch ?? "");
   const [active, setActive] = useState<Coa | null>(null);
   const [notFound, setNotFound] = useState(false);
 
@@ -21,6 +21,12 @@ export function CoaViewer() {
       setNotFound(true);
     }
   }
+
+  // Deep link from a product page (/coas?batch=RV-…) resolves without retyping.
+  useEffect(() => {
+    if (initialBatch) lookup(initialBatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialBatch]);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();

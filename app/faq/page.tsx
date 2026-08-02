@@ -7,6 +7,7 @@ import { faqCategories } from "@/lib/faq";
 import { faqPageJsonLd } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/faq" },
   title: "FAQ — RovaPeptides",
   description:
     "Answers to common questions about product quality, storage & reconstitution, ordering & payments, and shipping & packaging for RovaPeptides research compounds.",

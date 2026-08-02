@@ -37,7 +37,7 @@ export const products: Product[] = [
   {
     id: "bpc-157-5mg",
     name: "BPC-157",
-    subtitle: "Body Protection Compound",
+    subtitle: "Gastric Pentadecapeptide",
     description:
       "A synthetic 15–amino-acid peptide derived from a protein found in gastric juice, among the most widely studied research compounds in tissue- and cellular-recovery models.",
     categories: ["Research Peptides"],
@@ -67,7 +67,7 @@ export const products: Product[] = [
   {
     id: "ss-31-10mg",
     name: "SS-31",
-    subtitle: "Elamipretide · Mitochondrial",
+    subtitle: "Elamipretide · Mitochondrial Tetrapeptide",
     description:
       "A mitochondria-targeted tetrapeptide investigated in cellular-energy and oxidative-stress research models.",
     categories: ["Research Peptides", "Longevity"],
@@ -82,7 +82,7 @@ export const products: Product[] = [
   {
     id: "selank-10mg",
     name: "Selank",
-    subtitle: "Anxiolytic Research Peptide",
+    subtitle: "Tuftsin-Derived Heptapeptide",
     description:
       "A synthetic heptapeptide studied in neuropeptide and behavioral research models. Lyophilized powder for laboratory use.",
     categories: ["Research Peptides"],
@@ -111,7 +111,7 @@ export const products: Product[] = [
   {
     id: "nad-plus-1000mg",
     name: "NAD+",
-    subtitle: "Cellular Coenzyme",
+    subtitle: "Redox Coenzyme",
     description:
       "Nicotinamide adenine dinucleotide, a coenzyme central to cellular-energy and longevity research pathways. High-purity lyophilized research powder.",
     categories: ["Longevity"],
@@ -157,7 +157,7 @@ export const products: Product[] = [
   {
     id: "glutathione-1500mg",
     name: "Glutathione",
-    subtitle: "Master Antioxidant Tripeptide",
+    subtitle: "Glu-Cys-Gly Tripeptide",
     description:
       "A naturally occurring tripeptide antioxidant studied in oxidative-balance and skin research models. High-purity lyophilized powder.",
     categories: ["Skin & Beauty", "Longevity"],
@@ -186,7 +186,7 @@ export const products: Product[] = [
   {
     id: "snap-8-10mg",
     name: "Snap-8",
-    subtitle: "Octapeptide",
+    subtitle: "Acetyl Octapeptide-3",
     description:
       "An eight–amino-acid peptide studied in expression-line and topical cosmetic research models.",
     categories: ["Skin & Beauty"],
@@ -267,9 +267,9 @@ export const products: Product[] = [
   {
     id: "adamax-10mg",
     name: "Adamax",
-    subtitle: "Nootropic Research Peptide",
+    subtitle: "ACTH-Fragment Analog",
     description:
-      "A synthetic nootropic peptide analog studied in neuroplasticity and cognitive research models.",
+      "A synthetic ACTH-fragment peptide analog studied in neuroplasticity and cognitive research models.",
     categories: ["Research Peptides"],
     mass: "10 mg",
     purity: "99%",
@@ -299,7 +299,7 @@ export const products: Product[] = [
   {
     id: "ara-290-10mg",
     name: "ARA-290",
-    subtitle: "Cibinetide · Tissue Repair",
+    subtitle: "Cibinetide · EPO-Derived Peptide",
     description:
       "An erythropoietin-derived peptide (cibinetide) investigated in tissue-repair and neuropathic research models.",
     categories: ["Research Peptides"],
@@ -315,7 +315,7 @@ export const products: Product[] = [
   {
     id: "bpc-157-tb-500-combo",
     name: "BPC-157 + TB-500",
-    subtitle: "Recovery Blend",
+    subtitle: "Two-Peptide Repair Blend",
     description:
       "A combined blend of two of the most widely studied recovery peptides, supplied for tissue- and cellular-repair research.",
     categories: ["Research Peptides"],
@@ -380,7 +380,7 @@ export const products: Product[] = [
   {
     id: "glow-70mg",
     name: "GLOW",
-    subtitle: "Skin & Recovery Blend",
+    subtitle: "GHK-Cu · BPC-157 · TB-500",
     description:
       "A tri-peptide beauty blend (GHK-Cu, BPC-157, TB-500) investigated in skin, collagen, and recovery research models.",
     categories: ["Skin & Beauty"],
@@ -397,7 +397,7 @@ export const products: Product[] = [
   {
     id: "klow-80mg",
     name: "KLOW",
-    subtitle: "Advanced Skin Blend",
+    subtitle: "GHK-Cu · BPC-157 · TB-500 · KPV",
     description:
       "A four-component peptide blend (GHK-Cu, BPC-157, TB-500, KPV) studied in skin, repair, and inflammatory-signaling research.",
     categories: ["Skin & Beauty"],
@@ -413,7 +413,7 @@ export const products: Product[] = [
   {
     id: "mots-c-10mg",
     name: "MOTS-c",
-    subtitle: "Mitochondrial Peptide",
+    subtitle: "Mitochondrial-Derived Peptide",
     description:
       "A mitochondrial-derived peptide investigated in metabolic-regulation and cellular-energy research models.",
     categories: ["Longevity"],
@@ -430,7 +430,7 @@ export const products: Product[] = [
   {
     id: "mots-c-20mg",
     name: "MOTS-c",
-    subtitle: "Mitochondrial Peptide",
+    subtitle: "Mitochondrial-Derived Peptide",
     description:
       "A mitochondrial-derived peptide investigated in metabolic-regulation and cellular-energy research models.",
     categories: ["Longevity"],
@@ -446,7 +446,7 @@ export const products: Product[] = [
   {
     id: "mt-1-10mg",
     name: "MT-1",
-    subtitle: "Melanotan I · Melanocortin",
+    subtitle: "Melanotan I · α-MSH Analog",
     description:
       "A synthetic analog of alpha-melanocyte-stimulating hormone studied in melanogenesis and pigmentation research models.",
     categories: ["Skin & Beauty"],
@@ -462,7 +462,7 @@ export const products: Product[] = [
   {
     id: "mt-2-10mg",
     name: "MT-2",
-    subtitle: "Melanotan II · Melanocortin",
+    subtitle: "Melanotan II · Cyclic Melanocortin Analog",
     description:
       "A synthetic melanocortin analog investigated in pigmentation and melanogenesis research models.",
     categories: ["Skin & Beauty"],
@@ -494,7 +494,7 @@ export const products: Product[] = [
   {
     id: "retatrutide-10mg",
     name: "Retatrutide",
-    subtitle: "Triple-Agonist · Metabolic",
+    subtitle: "GIP/GLP-1/Glucagon Triple Agonist",
     description:
       "A triple-agonist peptide (GIP/GLP-1/glucagon) studied in metabolic and energy-balance research models.",
     categories: ["Research Peptides"],
@@ -511,7 +511,7 @@ export const products: Product[] = [
   {
     id: "retatrutide-20mg",
     name: "Retatrutide",
-    subtitle: "Triple-Agonist · Metabolic",
+    subtitle: "GIP/GLP-1/Glucagon Triple Agonist",
     description:
       "A triple-agonist peptide (GIP/GLP-1/glucagon) studied in metabolic and energy-balance research models.",
     categories: ["Research Peptides"],
@@ -527,7 +527,7 @@ export const products: Product[] = [
   {
     id: "retatrutide-30mg",
     name: "Retatrutide",
-    subtitle: "Triple-Agonist · Metabolic",
+    subtitle: "GIP/GLP-1/Glucagon Triple Agonist",
     description:
       "A triple-agonist peptide (GIP/GLP-1/glucagon) studied in metabolic and energy-balance research models.",
     categories: ["Research Peptides"],
@@ -543,7 +543,7 @@ export const products: Product[] = [
   {
     id: "selank-5mg",
     name: "Selank",
-    subtitle: "Anxiolytic Research Peptide",
+    subtitle: "Tuftsin-Derived Heptapeptide",
     description:
       "A synthetic heptapeptide studied in neuropeptide and behavioral research models. Lyophilized powder for laboratory use.",
     categories: ["Research Peptides"],
@@ -559,9 +559,9 @@ export const products: Product[] = [
   {
     id: "semax-10mg",
     name: "Semax",
-    subtitle: "Nootropic Research Peptide",
+    subtitle: "ACTH(4–10) Fragment Analog",
     description:
-      "A synthetic ACTH-fragment peptide studied in nootropic and neuroprotective research models.",
+      "A synthetic ACTH(4–10) fragment peptide studied in neurotrophic and neuroprotective research models.",
     categories: ["Research Peptides"],
     mass: "10 mg",
     purity: "99%",
@@ -575,7 +575,7 @@ export const products: Product[] = [
   {
     id: "thymosin-alpha-1-10mg",
     name: "Thymosin Alpha-1",
-    subtitle: "Immune Research Peptide",
+    subtitle: "Thymus-Derived Peptide",
     description:
       "A thymus-derived peptide investigated in immune-modulation and cellular-signaling research models.",
     categories: ["Research Peptides"],
@@ -591,7 +591,7 @@ export const products: Product[] = [
   {
     id: "tirzepatide-30mg",
     name: "Tirzepatide",
-    subtitle: "Dual-Agonist · Metabolic",
+    subtitle: "Dual GIP/GLP-1 Agonist",
     description:
       "A dual GIP/GLP-1 receptor-agonist peptide studied in metabolic and glucose-regulation research models.",
     categories: ["Research Peptides"],
@@ -608,7 +608,7 @@ export const products: Product[] = [
   {
     id: "tirzepatide-60mg",
     name: "Tirzepatide",
-    subtitle: "Dual-Agonist · Metabolic",
+    subtitle: "Dual GIP/GLP-1 Agonist",
     description:
       "A dual GIP/GLP-1 receptor-agonist peptide studied in metabolic and glucose-regulation research models.",
     categories: ["Research Peptides"],
@@ -640,7 +640,7 @@ export const products: Product[] = [
   {
     id: "hcg-5000iu",
     name: "HCG",
-    subtitle: "Gonadotropin Research Material",
+    subtitle: "Glycoprotein Hormone",
     description:
       "Human chorionic gonadotropin, studied in endocrine- and reproductive-signaling research models. Lyophilized research material.",
     categories: ["Research Peptides"],

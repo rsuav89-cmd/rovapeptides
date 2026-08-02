@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/privacy" },
   title: "Privacy Policy — RovaPeptides",
   description:
     "Privacy Policy describing how RovaPeptides collects, uses, and protects information submitted through this website.",

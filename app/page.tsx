@@ -48,7 +48,7 @@ export default function Home() {
             <div className="animate-fade-up">
               <span className="kicker inline-flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />
-                USA Laboratory Tested · 99%+ Purity
+                USA Third-Party Tested · Per-Batch COA
               </span>
               <h1 className="mt-5 text-display-xl text-ink">
                 Research peptides,
@@ -62,8 +62,8 @@ export default function Home() {
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                <a href="/shop" className="btn-signal">
-                  Shop All Peptides
+                <a href="/shop/all" className="btn-signal">
+                  Browse All Peptides
                   <ArrowUpRight className="h-4 w-4" strokeWidth={2.2} />
                 </a>
                 <a href="/coas" className="btn-ghost">
@@ -74,7 +74,7 @@ export default function Home() {
 
               <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-line pt-6">
                 {[
-                  { icon: ShieldCheck, label: "99.4% avg. purity" },
+                  { icon: ShieldCheck, label: "99%+ verified purity" },
                   { icon: Microscope, label: "3rd-party verified" },
                   { icon: FileCheck2, label: "COA per batch" },
                 ].map((t) => (

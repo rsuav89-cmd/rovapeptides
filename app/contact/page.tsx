@@ -7,6 +7,7 @@ import { ContactForm } from "@/components/contact/ContactForm";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/contact" },
   title: "Contact — RovaPeptides",
   description:
     "Get in touch with RovaPeptides support for order questions, COA lookups, and bulk research pricing.",

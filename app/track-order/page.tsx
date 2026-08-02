@@ -5,6 +5,8 @@ import { Footer } from "@/components/Footer";
 import { TrackOrderForm } from "@/components/TrackOrderForm";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/track-order" },
+  robots: { index: false, follow: true },
   title: "Order Tracking — RovaPeptides",
   description:
     "Look up the status of your RovaPeptides order using your order number and checkout email.",

@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/wholesale" },
   title: "Wholesale — RovaPeptides",
   description:
     "Bulk research pricing and wholesale inquiries for laboratories and institutions ordering RovaPeptides in volume.",

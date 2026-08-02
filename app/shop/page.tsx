@@ -7,6 +7,7 @@ import { breadcrumbJsonLd } from "@/lib/jsonld";
 import { site } from "@/lib/site";
 
 export const metadata = {
+  alternates: { canonical: "/shop" },
   title: "Research Catalog — Explore by Collection — RovaPeptides",
   description:
     "Browse the RovaPeptides research catalog by collection, product family, strength, and format. For research use only.",

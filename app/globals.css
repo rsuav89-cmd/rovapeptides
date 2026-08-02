@@ -197,3 +197,11 @@
     border-color: var(--c-border, rgba(255, 255, 255, 0.2));
   }
 }
+
+
+/* Product pages render a fixed mobile buy bar; reserve room for it. */
+@media (max-width: 1023.98px) {
+  body.has-buybar {
+    padding-bottom: 5.5rem;
+  }
+}

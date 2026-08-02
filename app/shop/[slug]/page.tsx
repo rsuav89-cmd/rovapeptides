@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { NoticeBar } from "@/components/NoticeBar";
 import { Header } from "@/components/Header";
@@ -9,6 +9,7 @@ import { products } from "@/lib/products";
 import { getFamily, familySlugForSku, families } from "@/lib/catalog";
 import { getCollection } from "@/lib/collections";
 import { breadcrumbJsonLd, productJsonLd } from "@/lib/jsonld";
+import { DEFAULT_FORM, DEFAULT_STORAGE, TESTING_METHOD, getProductDetail } from "@/lib/product-details";
 import { site } from "@/lib/site";
 
 // Canonical params are FAMILY slugs; legacy SKU slugs are handled at runtime.
@@ -57,7 +58,7 @@ export default function ProductPage({
     const sku = products.find((p) => p.id === params.slug);
     if (sku) {
       const fs = familySlugForSku(sku.id);
-      if (fs) redirect(`/shop/${fs}?strength=${strengthKey(sku.mass)}`);
+      if (fs) permanentRedirect(`/shop/${fs}?strength=${strengthKey(sku.mass)}`);
     }
     notFound();
   }
@@ -73,7 +74,20 @@ export default function ProductPage({
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(fam.variants[0].product)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(fam.variants[0].product, {
+              url: `${site.siteUrl}/shop/${fam.slug}`,
+              description: getProductDetail(fam.id)?.overview ?? fam.description,
+              specs: [
+                { name: "Format", value: getProductDetail(fam.id)?.form ?? DEFAULT_FORM },
+                { name: "Purity", value: `${fam.variants[0].product.purity} minimum, third-party verified` },
+                { name: "Testing", value: TESTING_METHOD },
+                { name: "Storage", value: DEFAULT_STORAGE },
+                {
+                  name: "Intended use",
+                  value: "Laboratory and in-vitro research use only. Not for human or veterinary consumption.",
+                },
+              ],
+            })) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <NoticeBar />
       <Header />

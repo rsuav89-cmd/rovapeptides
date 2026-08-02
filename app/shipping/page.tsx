@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/shipping" },
   title: "Shipping & Returns — RovaPeptides",
   description:
     "Shipping timelines, packaging, tracking, and returns information for RovaPeptides research orders.",

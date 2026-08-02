@@ -2,14 +2,22 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FileCheck2, Minus, Plus, ShieldCheck, Snowflake, Truck, type LucideIcon } from "lucide-react";
-import { money, priceLabel, getPurchaseEligibility, productStorageNote } from "@/lib/products";
+import { FileCheck2, Minus, Plus } from "lucide-react";
+import { money, priceLabel, getPurchaseEligibility } from "@/lib/products";
+import {
+  DEFAULT_FORM,
+  DEFAULT_HANDLING,
+  DEFAULT_STORAGE,
+  TESTING_METHOD,
+  getProductDetail,
+} from "@/lib/product-details";
 import type { CatalogProductFamily } from "@/lib/catalog";
 import { familiesInCollection } from "@/lib/catalog";
 import { getCollection } from "@/lib/collections";
 import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 import { FamilyCard } from "@/components/catalog/FamilyCard";
+import { site } from "@/lib/site";
 
 const strengthKey = (s: string) => s.replace(/\s+/g, "").toLowerCase();
 
@@ -35,7 +43,13 @@ export function FamilyDetail({
     io.observe(el);
     return () => io.disconnect();
   }, []);
+  useEffect(() => {
+    // Reserves space at the document end so the fixed bar never covers content.
+    document.body.classList.add("has-buybar");
+    return () => document.body.classList.remove("has-buybar");
+  }, []);
   const collection = getCollection(family.primaryCollectionId);
+  const detail = getProductDetail(family.id);
 
   const initialIdx = useMemo(() => {
     if (!initialStrength) return 0;
@@ -107,6 +121,31 @@ export function FamilyDetail({
               </div>
 
               <p className="mt-5 text-sm leading-relaxed text-ink-2">{family.description}</p>
+              {detail && (
+                <>
+                  {/* Query-shaped heading: "what is <compound>" is the dominant
+                      search shape in this niche and is what LLM retrieval extracts on. */}
+                  <h2 className="mt-6 font-sans text-[0.62rem] uppercase tracking-widest text-muted">
+                    What is {family.name}?
+                  </h2>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-2">{detail.overview}</p>
+                </>
+              )}
+
+              {detail && detail.researchAreas.length > 0 && (
+                <div className="mt-5">
+                  <p className="font-sans text-[0.62rem] uppercase tracking-widest text-muted">
+                    Research context
+                  </p>
+                  <ul className="mt-2 flex flex-wrap gap-1.5">
+                    {detail.researchAreas.map((area) => (
+                      <li key={area} className="data-tag">
+                        {area}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* variant selector */}
               {family.variants.length > 1 && (
@@ -170,15 +209,49 @@ export function FamilyDetail({
                 )}
               </div>
 
-              {/* specs */}
-              <div className="mt-6 space-y-2 rounded-xl border border-line bg-paper-2/40 p-3">
-                <Spec icon={ShieldCheck} label="Purity" value={`${selected.product.purity} (third-party COA)`} />
-                <Spec icon={Snowflake} label="Storage" value={productStorageNote} />
-                <Spec icon={Truck} label="Shipping" value="Discreet · ships within 24h" />
+              {eligible && (
+                <p className="mt-2.5 text-xs text-muted">
+                  {site.freeShippingThreshold - selected.product.price * qty > 0
+                    ? `Free discreet shipping over ${money(site.freeShippingThreshold)} — ${money(
+                        site.freeShippingThreshold - selected.product.price * qty
+                      )} away.`
+                    : "Free discreet shipping included."}
+                </p>
+              )}
+              <p className="mt-1.5 text-xs leading-relaxed text-muted">
+                COA match guarantee — if the vial you receive does not match the{" "}
+                <Link
+                  href={`/coas?batch=${selected.product.batch}`}
+                  className="underline decoration-line-strong underline-offset-2 transition-colors hover:text-ink"
+                >
+                  certificate published for its batch
+                </Link>
+                , we replace or refund it.
+              </p>
+
+              {/* specification table */}
+              <div className="mt-6 overflow-hidden rounded-xl border border-line bg-paper-2/40">
+                <p className="border-b border-line px-4 py-2.5 font-sans text-[0.62rem] uppercase tracking-widest text-muted">
+                  Specifications
+                </p>
+                <dl className="divide-y divide-line">
+                  <SpecRow label="Format" value={detail?.form ?? DEFAULT_FORM} />
+                  <SpecRow label="Strength" value={selected.displayStrength} />
+                  <SpecRow label="Purity" value={`${selected.product.purity} minimum, third-party verified`} />
+                  <SpecRow label="Testing" value={TESTING_METHOD} />
+                  <SpecRow label="Batch" value={selected.product.batch} />
+                  <SpecRow label="Storage" value={DEFAULT_STORAGE} />
+                  <SpecRow label="Handling" value={detail?.handling ?? DEFAULT_HANDLING} />
+                  <SpecRow label="Shipping" value="Discreet, unmarked packaging. Ships within 24 hours." />
+                  <SpecRow
+                    label="Intended use"
+                    value="Laboratory and in-vitro research use only. Not for human or veterinary consumption."
+                  />
+                </dl>
               </div>
 
               <Link
-                href="/coas"
+                href={`/coas?batch=${selected.product.batch}`}
                 className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-signal-ink transition-colors hover:text-brand"
               >
                 <FileCheck2 className="h-4 w-4" strokeWidth={2} />
@@ -254,13 +327,11 @@ export function FamilyDetail({
   );
 }
 
-function Spec({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
+function SpecRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start gap-2.5">
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-signal-ink" strokeWidth={1.9} />
-      <div className="text-sm">
-        <span className="font-medium text-ink">{label}:</span> <span className="text-ink-2">{value}</span>
-      </div>
+    <div className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5 text-sm">
+      <dt className="font-sans text-[0.7rem] uppercase tracking-wider text-muted">{label}</dt>
+      <dd className="leading-relaxed text-ink-2">{value}</dd>
     </div>
   );
 }

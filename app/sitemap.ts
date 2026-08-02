@@ -5,7 +5,9 @@ import { site } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = site.siteUrl;
-  const now = new Date();
+  // Bump when catalog or page content actually changes; a per-deploy timestamp
+  // claims every URL changed on every deploy and gets discounted by crawlers.
+  const now = new Date("2026-08-02");
 
   const staticRoutes = [
     "",
@@ -19,7 +21,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/privacy",
     "/terms",
     "/wholesale",
-    "/track-order",
   ];
 
   return [

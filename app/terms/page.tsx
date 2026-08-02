@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/terms" },
   title: "Terms of Service — RovaPeptides",
   description:
     "Terms of Service governing use of the RovaPeptides website and purchase of research products.",

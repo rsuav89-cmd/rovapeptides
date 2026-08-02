@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata = {
+  alternates: { canonical: "/about" },
   title: "About Us — RovaPeptides",
   description:
     "RovaPeptides supplies high-purity, third-party-tested peptides for laboratory research. Learn about our mission and quality standards.",
@@ -22,7 +23,7 @@ export default function AboutPage() {
       </h1>
       <div className="mt-6 max-w-[640px] space-y-4 text-ink-2">
       <p>
-      RovaPeptides was founded to give researchers a dependable source of laboratory peptides — accurately dosed, independently verified, and shipped fast. Every batch we sell carries its own third-party Certificate of Analysis, so you can confirm identity and purity before it ever reaches the bench.
+      RovaPeptides was founded to give researchers a dependable source of laboratory peptides — accurately filled, independently verified, and shipped fast. Every batch we sell carries its own third-party Certificate of Analysis, so you can confirm identity and purity before it ever reaches the bench.
       </p>
         <p>
         We work only with peptides manufactured and tested to strict laboratory-grade standards, and we publish every result — not just the ones that look good. If a batch doesn’t meet spec, it doesn’t ship.
