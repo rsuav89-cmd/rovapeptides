@@ -56,17 +56,18 @@ export function FamilyDetail({
 
   return (
     <>
-      <section
-        className="border-t border-line/70"
-        style={{ ["--c-glow" as string]: collection.tokens.glow, ["--c-accent" as string]: collection.tokens.accent } as React.CSSProperties}
-      >
+      {/* Editorial split: light product-image stage (left) + dark purchase panel (right) */}
+      <section className="border-t border-line/70">
         <div className="mx-auto max-w-[1360px] px-5 py-10 sm:px-8 lg:py-14">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-start lg:gap-16">
-            {/* image stage */}
-            <div className="image-stage relative aspect-square overflow-hidden rounded-xl2 border collection-border">
+            {/* image stage — warm light, contained vial, no crop */}
+            <div
+              className="image-stage-light relative aspect-square overflow-hidden rounded-xl2 border shadow-card-light"
+              style={{ borderColor: "var(--line-warm-strong)" }}
+            >
               <div className="absolute left-4 top-4 z-10 flex gap-1.5">
-                <span className="data-tag">Batch · {selected.product.batch}</span>
-                {family.isBlend && <span className="data-tag">Blend</span>}
+                <span className="data-tag-light">Batch · {selected.product.batch}</span>
+                {family.isBlend && <span className="data-tag-light">Blend</span>}
               </div>
               <ProductImage
                 product={selected.product}
@@ -75,9 +76,9 @@ export function FamilyDetail({
               />
             </div>
 
-            {/* purchase panel */}
+            {/* purchase panel — dark editorial module (kept dark for authority + AA contrast) */}
             <div className="flex flex-col lg:sticky lg:top-28">
-              <p className="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.18em] collection-accent">
+              <p className="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-signal-ink">
                 {collection.name}
               </p>
               <h1 className="mt-2 font-display text-3xl font-semibold uppercase leading-tight text-ink">
@@ -175,16 +176,16 @@ export function FamilyDetail({
       </section>
 
       {related.length > 0 && (
-        <section className="border-t border-line/70">
+        <section className="surface-warm on-light border-t" style={{ borderColor: "var(--line-warm-strong)" }}>
           <div className="mx-auto max-w-[1360px] px-5 py-12 sm:px-8 lg:py-16">
             <div className="flex items-end justify-between gap-3">
               <div>
-                <p className="kicker">Related Research Products</p>
-                <h2 className="mt-3 text-display-md text-ink">More in {collection.shortName}</h2>
+                <p className="kicker-dark">Related Research Products</p>
+                <h2 className="mt-3 text-display-md text-ink-dark">More in {collection.shortName}</h2>
               </div>
               <Link
                 href={`/shop/collections/${collection.slug}`}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-signal-ink transition-colors hover:text-brand"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-copper-muted transition-colors hover:text-copper-deep"
               >
                 View collection
               </Link>

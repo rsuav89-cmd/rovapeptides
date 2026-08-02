@@ -56,23 +56,24 @@ export function CollectionView({
   }
 
   return (
-    <section className="border-t border-line/70">
+    <section className="surface-warm on-light border-t border-line/70">
       <div className="mx-auto max-w-[1360px] px-5 py-10 sm:px-8 lg:py-14">
         {/* Toolbar */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <label className="relative flex-1 sm:max-w-sm">
             <span className="sr-only">Search in {collectionName}</span>
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={2} />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-dark" strokeWidth={2} />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder={`Search ${collectionName}…`}
-              className="h-11 w-full rounded-full border border-line-strong bg-paper-3/70 pl-10 pr-4 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
+              className="h-11 w-full rounded-full border bg-bone pl-10 pr-4 text-sm text-ink-dark placeholder:text-muted-dark focus:border-copper-muted focus:outline-none"
+              style={{ borderColor: "var(--line-warm-strong)" }}
             />
           </label>
 
           <div className="flex items-center gap-2">
-            <span className="hidden font-sans text-xs uppercase tracking-widest text-muted sm:inline">
+            <span className="hidden font-sans text-xs uppercase tracking-widest text-muted-dark sm:inline">
               {results.length} {results.length === 1 ? "product" : "products"}
             </span>
             <label className="relative">
@@ -80,10 +81,11 @@ export function CollectionView({
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortKey)}
-                className="h-11 rounded-full border border-line-strong bg-paper-3/70 px-4 text-sm text-ink focus:border-brand focus:outline-none"
+                className="h-11 rounded-full border bg-bone px-4 text-sm text-ink-dark focus:border-copper-muted focus:outline-none"
+                style={{ borderColor: "var(--line-warm-strong)" }}
               >
                 {SORTS.map((s) => (
-                  <option key={s.key} value={s.key} className="bg-paper-2">
+                  <option key={s.key} value={s.key} className="bg-ivory text-ink-dark">
                     {s.label}
                   </option>
                 ))}
@@ -93,7 +95,8 @@ export function CollectionView({
               <button
                 type="button"
                 onClick={() => setDrawerOpen(true)}
-                className="inline-flex h-11 items-center gap-2 rounded-full border border-line-strong bg-paper-3/70 px-4 text-sm font-medium text-ink transition-colors hover:border-brand lg:hidden"
+                className="inline-flex h-11 items-center gap-2 rounded-full border bg-bone px-4 text-sm font-medium text-ink-dark transition-colors hover:border-copper-muted lg:hidden"
+                style={{ borderColor: "var(--line-warm-strong)" }}
               >
                 <SlidersHorizontal className="h-4 w-4" strokeWidth={2} />
                 Filters{activeCount ? ` · ${activeCount}` : ""}
@@ -117,7 +120,7 @@ export function CollectionView({
               </Chip>
             )}
             {activeCount > 0 && (
-              <button onClick={reset} className="inline-flex items-center gap-1.5 px-2 text-xs font-medium text-muted transition-colors hover:text-ink">
+              <button onClick={reset} className="inline-flex items-center gap-1.5 px-2 text-xs font-medium text-muted-dark transition-colors hover:text-ink-dark">
                 <RotateCcw className="h-3.5 w-3.5" strokeWidth={2} />
                 Reset
               </button>
@@ -131,12 +134,12 @@ export function CollectionView({
             <FamilyGrid families={results} />
           ) : (
             <div className="mx-auto flex max-w-md flex-col items-center py-20 text-center">
-              <p className="font-display text-xl font-semibold uppercase text-ink">No matches</p>
-              <p className="mt-2 text-sm text-ink-2">
+              <p className="font-display text-xl font-semibold uppercase text-ink-dark">No matches</p>
+              <p className="mt-2 text-sm text-muted-dark">
                 Nothing in {collectionName} matches your search and filters.
               </p>
               <div className="mt-6 flex gap-3">
-                <button onClick={reset} className="btn-ghost">
+                <button onClick={reset} className="btn-ghost-light">
                   Clear filters
                 </button>
                 <a href="/shop" className="btn-signal">
@@ -182,9 +185,10 @@ function Chip({
       className={[
         "rounded-full border px-3.5 py-2 text-xs font-medium transition-colors duration-160",
         active
-          ? "border-brand bg-brand-cta/15 text-ink"
-          : "border-line-strong bg-paper-3/50 text-ink-2 hover:text-ink",
+          ? "border-copper-muted bg-copper-muted/15 text-ink-dark"
+          : "bg-bone text-ink-dark-2 hover:text-ink-dark",
       ].join(" ")}
+      style={active ? undefined : { borderColor: "var(--line-warm-strong)" }}
     >
       {children}
     </button>
@@ -239,7 +243,7 @@ function FilterDrawer({
           <motion.button
             aria-label="Close filters"
             onClick={onClose}
-            className="absolute inset-0 bg-white/40 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-ink-dark/40 backdrop-blur-[2px]"
             variants={{ open: { opacity: 1 }, closed: { opacity: 0 } }}
             transition={{ duration: 0.2 }}
           />
@@ -247,25 +251,27 @@ function FilterDrawer({
             role="dialog"
             aria-modal="true"
             aria-label="Filter products"
-            className="absolute inset-x-0 bottom-0 max-h-[80%] overflow-y-auto rounded-t-xl2 border-t border-line bg-paper-2 p-5"
+            className="absolute inset-x-0 bottom-0 max-h-[80%] overflow-y-auto rounded-t-xl2 border-t bg-ivory p-5"
+            style={{ borderColor: "var(--line-warm-strong)" }}
             variants={{ open: { y: 0 }, closed: { y: "100%" } }}
             transition={{ type: "spring", stiffness: 480, damping: 44, mass: 0.8 }}
           >
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg font-semibold uppercase text-ink">Filters</h2>
+              <h2 className="font-display text-lg font-semibold uppercase text-ink-dark">Filters</h2>
               <button
                 ref={closeRef}
                 onClick={onClose}
                 aria-label="Close filters"
-                className="grid h-10 w-10 place-items-center rounded-full border border-line-strong active:scale-90"
+                className="grid h-10 w-10 place-items-center rounded-full border active:scale-90"
+                style={{ borderColor: "var(--line-warm-strong)" }}
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5 text-ink-dark" />
               </button>
             </div>
 
             {hasBlendChoice && (
               <div className="mt-5">
-                <p className="font-sans text-[0.62rem] uppercase tracking-widest text-muted">Type</p>
+                <p className="font-sans text-[0.62rem] uppercase tracking-widest text-muted-dark">Type</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {(["all", "single", "blend"] as TypeFilter[]).map((t) => (
                     <Chip key={t} active={type === t} onClick={() => setType(t)}>
@@ -277,7 +283,7 @@ function FilterDrawer({
             )}
             {hasAvailabilityChoice && (
               <div className="mt-5">
-                <p className="font-sans text-[0.62rem] uppercase tracking-widest text-muted">Availability</p>
+                <p className="font-sans text-[0.62rem] uppercase tracking-widest text-muted-dark">Availability</p>
                 <div className="mt-2">
                   <Chip active={onlyAvailable} onClick={() => setOnlyAvailable(!onlyAvailable)}>
                     In stock &amp; priced
@@ -287,7 +293,7 @@ function FilterDrawer({
             )}
 
             <div className="mt-7 flex items-center gap-3">
-              <button onClick={onReset} className="btn-ghost flex-1">
+              <button onClick={onReset} className="btn-ghost-light flex-1">
                 Clear
               </button>
               <button onClick={onClose} className="btn-signal flex-1">
