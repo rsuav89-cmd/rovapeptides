@@ -70,7 +70,7 @@ async function readItems(req: NextRequest): Promise<IncomingItem[]> {
 export async function POST(req: NextRequest) {
   if (!HANDOFF_SECRET) {
     return NextResponse.json(
-      { error: "Checkout is not configured (HANDOFF_SECRET missing)." },
+      { error: "HANDOFF_SECRET is missing" },
       { status: 500 },
     );
   }
@@ -119,12 +119,13 @@ export async function POST(req: NextRequest) {
   const data = Buffer.from(payload, "utf8").toString("base64url");
   const sig = crypto.createHmac("sha256", HANDOFF_SECRET).update(data).digest("hex");
 
-  const url = `${SHOP_BASE}/rova-handoff?data=${encodeURIComponent(data)}&sig=${sig}`;
+  const redirectUrl = `${SHOP_BASE}/rova-handoff?data=${encodeURIComponent(data)}&sig=${sig}`;
 
-  // 302: the browser follows this to the shop, which builds the cart and
-  // redirects on to /checkout/. (A form POST triggers a top-level GET on the
-  // 302 target — no CORS, first-party WooCommerce session.)
-  return NextResponse.redirect(url, 302);
+  // Always hand off to /rova-handoff on the shop; the mu-plugin rebuilds the
+  // cart and forwards to /checkout/. A form POST makes the browser follow this
+  // 303 as a top-level GET — no CORS, first-party WooCommerce session. Never /cart.
+  console.log("[CHECKOUT_REDIRECT]", redirectUrl);
+  return NextResponse.redirect(redirectUrl, 303);
 }
 
 // Optional: a bare GET is not a valid entry point; nudge callers to POST.
