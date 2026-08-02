@@ -17,7 +17,7 @@ export default function ContactPage() {
     <>
     <NoticeBar />
     <Header />
-      <main className="mx-auto grid max-w-[1080px] gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_1.1fr]">
+      <main id="main-content" className="mx-auto grid max-w-[1080px] gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_1.1fr]">
       <div>
       <span className="kicker inline-flex items-center gap-2">
       <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />

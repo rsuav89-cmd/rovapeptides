@@ -17,7 +17,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="grid min-h-[70vh] place-items-center bg-paper px-6 text-center">
+    <main id="main-content" className="grid min-h-[70vh] place-items-center bg-paper px-6 text-center">
       <div className="max-w-md">
         <p className="font-sans text-xs font-semibold uppercase tracking-[0.3em] text-muted">
           Error 500

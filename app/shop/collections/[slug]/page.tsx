@@ -50,7 +50,7 @@ export default function CollectionPage({ params }: { params: { slug: string } })
           { label: c.name },
         ]}
       />
-      <main>
+      <main id="main-content">
         <section
           className="image-stage relative overflow-hidden border-b border-line/70"
           style={{ ["--c-glow" as string]: c.tokens.glow, ["--c-accent" as string]: c.tokens.accent } as React.CSSProperties}

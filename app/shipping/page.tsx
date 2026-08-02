@@ -14,7 +14,7 @@ export default function ShippingPage() {
     <>
     <NoticeBar />
     <Header />
-    <main className="mx-auto max-w-[760px] px-5 py-16 sm:px-8">
+    <main id="main-content" className="mx-auto max-w-[760px] px-5 py-16 sm:px-8">
     <span className="kicker">Support</span>
       <h1 className="mt-3 text-display-lg text-ink">Shipping & Returns</h1>
     <p className="mt-4 text-sm text-ink-2">Last updated: July 2026</p>

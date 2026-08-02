@@ -8,6 +8,21 @@ import { CoaViewer } from "@/components/CoaViewer";
 import { FaqPreview } from "@/components/faq/FaqPreview";
 import { Footer } from "@/components/Footer";
 import { site } from "@/lib/site";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: `${site.name} — ${site.tagline}`,
+  description:
+    "Research-grade peptides with third-party HPLC verification and a certificate of analysis for every batch. Discreet shipping, transparent purity data, and COA lookup by batch number.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: `${site.name} — ${site.tagline}`,
+    description:
+      "Third-party HPLC-verified research peptides. Every batch ships with a certificate of analysis.",
+    url: site.siteUrl,
+    type: "website",
+  },
+};
 
 export default function Home() {
   return (
@@ -15,7 +30,7 @@ export default function Home() {
       <NoticeBar />
       <Header />
 
-      <main>
+      <main id="main-content">
         {/* HERO — dark editorial brand moment that resolves into the warm catalog */}
         <section className="relative overflow-hidden">
           {/* faint editorial column rules — framing, not decoration */}

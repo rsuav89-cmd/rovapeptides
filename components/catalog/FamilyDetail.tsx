@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FileCheck2, Minus, Plus, ShieldCheck, Snowflake, Truck, type LucideIcon } from "lucide-react";
 import { money, priceLabel, getPurchaseEligibility, productStorageNote } from "@/lib/products";
 import type { CatalogProductFamily } from "@/lib/catalog";
@@ -21,6 +21,20 @@ export function FamilyDetail({
   initialStrength?: string;
 }) {
   const { add, open: openCart } = useCart();
+
+  // Mobile sticky buy bar — shown only once the inline purchase CTA scrolls away.
+  const buyRef = useRef<HTMLDivElement | null>(null);
+  const [showBuyBar, setShowBuyBar] = useState(false);
+  useEffect(() => {
+    const el = buyRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => setShowBuyBar(!entry.isIntersecting && entry.boundingClientRect.top < 0),
+      { rootMargin: "0px 0px -40% 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   const collection = getCollection(family.primaryCollectionId);
 
   const initialIdx = useMemo(() => {
@@ -127,7 +141,7 @@ export function FamilyDetail({
               </div>
 
               {/* qty + add */}
-              <div className="mt-4 flex items-center gap-3">
+              <div ref={buyRef} className="mt-4 flex items-center gap-3">
                 <div className="flex items-center rounded-full border border-line-strong">
                   <button
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
@@ -198,6 +212,44 @@ export function FamilyDetail({
           </div>
         </section>
       )}
+
+      {/* mobile sticky buy bar — keeps the primary CTA reachable on small screens */}
+      <div
+        className={[
+          "fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur",
+          "pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-220 ease-out-expo lg:hidden",
+          showBuyBar ? "translate-y-0" : "translate-y-full",
+        ].join(" ")}
+        aria-hidden={!showBuyBar}
+      >
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-sans text-sm font-medium text-ink">{family.name}</p>
+            <p className="text-xs text-muted">
+              {selected.displayStrength} · {priceLabel(selected.product)}
+            </p>
+          </div>
+          {eligible ? (
+            <button
+              onClick={addToCart}
+              tabIndex={showBuyBar ? 0 : -1}
+              className="btn-signal shrink-0"
+            >
+              Add · {money(selected.product.price * qty)}
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              tabIndex={-1}
+              className="btn-signal shrink-0 cursor-not-allowed opacity-60"
+            >
+              Coming soon
+            </button>
+          )}
+        </div>
+      </div>
     </>
   );
 }

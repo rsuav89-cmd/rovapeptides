@@ -85,7 +85,7 @@ export default function ProductPage({
           { label: fam.name },
         ]}
       />
-      <main>
+      <main id="main-content">
         <FamilyDetail family={fam} initialStrength={searchParams?.strength} />
       </main>
       <Footer />

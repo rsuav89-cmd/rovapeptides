@@ -30,7 +30,7 @@ export default function ShopAllPage() {
       <Breadcrumbs
         items={[{ label: "Home", href: "/" }, { label: "Shop", href: "/shop" }, { label: "All Products" }]}
       />
-      <main>
+      <main id="main-content">
         <Catalog />
       </main>
       <Footer />
