@@ -120,7 +120,7 @@ export function FamilyDetail({
               <p className="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-signal-ink">
                 {collection.name}
               </p>
-              <h1 className="mt-2 font-display text-3xl font-semibold uppercase leading-tight text-ink">
+              <h1 className="mt-2 whitespace-normal break-words font-display text-2xl font-semibold uppercase leading-tight text-ink [overflow-wrap:anywhere] sm:text-3xl">
                 {family.name}
               </h1>
               <p className="mt-2 text-ink-2">{family.subtitle}</p>
@@ -336,8 +336,10 @@ export function FamilyDetail({
       >
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
-            <p className="truncate font-sans text-sm font-medium text-ink">{family.name}</p>
-            <p className="truncate text-xs text-muted">
+            <p className="break-words font-sans text-sm font-medium leading-snug text-ink">
+              {family.name}
+            </p>
+            <p className="break-words text-xs leading-snug text-muted">
               {selected.displayStrength} · {priceLabel(selected.product)}
               {eligible &&
                 (site.freeShippingThreshold - selected.product.price * qty > 0

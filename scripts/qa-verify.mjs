@@ -205,6 +205,52 @@ for (const fam of families) {
   }
 }
 
+// ── 9b. Mobile typography regressions (reported by users, Aug 2026) ────────
+{
+  // Product names must wrap, never clip: "TESAMORELI" / "BACTERIOST" were being
+  // cut off inside 2-up cards on iPhone-width viewports.
+  const TITLE_FILES = [
+    ["components/catalog/ProductCard.tsx", "<h3"],
+    ["components/catalog/FamilyCard.tsx", "<h3"],
+    ["components/catalog/FamilyDetail.tsx", "<h1"],
+  ];
+  for (const [file, tag] of TITLE_FILES) {
+    const src = read(join(ROOT, file));
+    const start = src.indexOf(tag);
+    const heading = src.slice(start, src.indexOf(">", start));
+    check("product name wraps", /break-words/.test(heading), `${file} ${tag}`);
+    check("product name is not clipped", !/truncate|line-clamp|whitespace-nowrap|text-ellipsis/.test(heading), `${file} ${tag}`);
+  }
+
+  // No element may clip a product name anywhere it is rendered.
+  for (const file of ["components/cart/CartDrawer.tsx", "components/SearchOverlay.tsx", "components/catalog/FamilyDetail.tsx"]) {
+    const src = read(join(ROOT, file));
+    for (const line of src.split("\n")) {
+      if (!/truncate/.test(line)) continue;
+      check("no truncation on a product name", !/\{p\.name\}|\{family\.name\}|\{product\.name\}|line\.product\.name/.test(line), `${file} → ${line.trim().slice(0, 70)}`);
+    }
+  }
+
+  // The decorative full-height column rules read as debug artifacts on mobile.
+  const home = read(join(ROOT, "app/page.tsx"));
+  check("no full-bleed column-rule overlay on the home page",
+    !/last:border-r/.test(home), "app/page.tsx");
+
+  // The home page renders a capped, curated grid; /shop/all stays complete.
+  const homeSrc = read(join(ROOT, "app/page.tsx"));
+  const allSrc = read(join(ROOT, "app/shop/all/page.tsx"));
+  check("home catalog is capped", /<Catalog limit=\{\d+\}/.test(homeSrc), "app/page.tsx");
+  check("full catalog page is uncapped", /<Catalog \/>/.test(allSrc), "app/shop/all/page.tsx");
+  const catalogSrc = read(join(ROOT, "components/catalog/Catalog.tsx"));
+  check("capped grid offers a view-all route", /href="\/shop/.test(catalogSrc), "components/catalog/Catalog.tsx");
+
+  // Card grids must not go 2-up until a card is wide enough for a compound name.
+  const catalog = read(join(ROOT, "components/catalog/Catalog.tsx"));
+  const twoUp = catalog.match(/min-\[(\d+)px\]:grid-cols-2/);
+  check("catalog grid stays single-column on phone widths",
+    Boolean(twoUp) && Number(twoUp[1]) >= 480, twoUp ? `${twoUp[1]}px` : "no breakpoint found");
+}
+
 // ── 10. Certificates resolve for every batch in the catalog ────────────────
 for (const p of products) {
   const coa = getCoa(p.batch);

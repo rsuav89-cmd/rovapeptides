@@ -73,10 +73,12 @@ export function ProductCard({ product }: { product: Product }) {
           {product.categories[0]}
         </p>
 
-        <h3 className="mt-1 break-words font-display text-[1.15rem] font-semibold leading-tight text-ink-dark hyphens-auto">
+        <h3 className="mt-1 whitespace-normal break-words hyphens-auto font-display text-[1.05rem] font-semibold leading-tight text-ink-dark [overflow-wrap:anywhere] min-[520px]:text-[1.15rem]">
           {product.name}
         </h3>
-        <p className="mt-0.5 text-sm text-muted-dark">{product.subtitle}</p>
+        <p className="mt-0.5 break-words text-sm text-muted-dark [overflow-wrap:anywhere]">
+          {product.subtitle}
+        </p>
 
         <div className="mt-3 flex flex-wrap gap-1.5">
           <span className="data-tag-light">{product.mass}</span>

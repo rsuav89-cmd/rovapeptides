@@ -153,7 +153,7 @@ export function CartDrawer() {
                             />
                           </span>
                           <span className="min-w-0 flex-1">
-                            <span className="block truncate text-xs font-medium text-ink">
+                            <span className="block break-words text-xs font-medium leading-snug text-ink">
                               {p.name}
                             </span>
                             <span className="block font-mono text-[0.65rem] text-muted">

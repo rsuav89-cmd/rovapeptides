@@ -43,17 +43,6 @@ export default function Home() {
       <main id="main-content" tabIndex={-1}>
         {/* HERO — dark editorial brand moment that resolves into the warm catalog */}
         <section className="relative overflow-hidden">
-          {/* faint editorial column rules — framing, not decoration */}
-          <div aria-hidden className="pointer-events-none absolute inset-0">
-            <div className="mx-auto h-full max-w-[1280px] px-5 sm:px-8">
-              <div className="grid h-full grid-cols-2 lg:grid-cols-4">
-                {[0, 1, 2, 3].map((i) => (
-                  <div key={i} className="border-l border-line/40 last:border-r" />
-                ))}
-              </div>
-            </div>
-          </div>
-
           <div className="relative mx-auto grid max-w-[1280px] items-end gap-10 px-5 pb-28 pt-10 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:pb-32 lg:pt-20">
             <div className="animate-fade-up">
               <span className="kicker inline-flex items-center gap-2">
@@ -107,7 +96,8 @@ export default function Home() {
         </section>
 
         {/* CATALOG — M2 (warm ivory surface, M1) */}
-        <Catalog />
+        {/* Home shows a curated 12 with a view-all CTA; /shop/all renders the full grid. */}
+        <Catalog limit={12} />
 
         {/* TRUST & QUALITY — M4 */}
         <TrustQuality />

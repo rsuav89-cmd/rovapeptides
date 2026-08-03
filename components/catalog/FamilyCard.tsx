@@ -68,10 +68,10 @@ export function FamilyCard({ family }: { family: CatalogProductFamily }) {
         <p className="font-sans text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-copper-muted">
           {collection.shortName}
         </p>
-        <h3 className="mt-1.5 font-display text-[1.28rem] font-semibold uppercase leading-tight text-ink-dark">
+        <h3 className="mt-1.5 whitespace-normal break-words hyphens-auto font-display text-[1.15rem] font-semibold uppercase leading-tight text-ink-dark [overflow-wrap:anywhere] sm:text-[1.28rem]">
           {family.name}
         </h3>
-        <p className="mt-1 text-sm text-muted-dark">
+        <p className="mt-1 break-words text-sm text-muted-dark [overflow-wrap:anywhere]">
           {family.variants.length > 1
             ? family.strengthSummary
             : `${family.subtitle}`}

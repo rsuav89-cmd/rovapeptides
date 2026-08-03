@@ -98,7 +98,7 @@ export function SearchOverlay({
                         <ProductImage product={p} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-ink">{p.name}</p>
+                        <p className="break-words text-sm font-semibold leading-snug text-ink">{p.name}</p>
                         <p className="truncate font-mono text-[0.62rem] uppercase tracking-wider text-muted">
                           {p.mass} · {p.batch}
                         </p>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CATEGORY_TABS, products, type Category } from "@/lib/products";
 import { ProductCard } from "./ProductCard";
@@ -17,7 +19,13 @@ function matches(tab: Tab, p: (typeof products)[number]): boolean {
   return p.categories.includes(tab as Category);
 }
 
-export function Catalog() {
+/**
+ * `limit` caps the grid — used on the home page, where showing all 40 SKUs
+ * created an extremely long mobile scroll. Capped rendering puts featured
+ * compounds first and pairs the grid with a view-all CTA. `/shop/all` renders
+ * the same component uncapped.
+ */
+export function Catalog({ limit }: { limit?: number } = {}) {
   const [tab, setTab] = useState<Tab>("All");
 
   useEffect(() => {
@@ -25,7 +33,17 @@ export function Catalog() {
     setTab(toTab(params.get("category") ?? undefined));
   }, []);
 
-  const filtered = useMemo(() => products.filter((p) => matches(tab, p)), [tab]);
+  const matching = useMemo(() => products.filter((p) => matches(tab, p)), [tab]);
+
+  const filtered = useMemo(() => {
+    if (!limit) return matching;
+    // Featured first, catalog order preserved within each group, then capped.
+    return [...matching]
+      .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)))
+      .slice(0, limit);
+  }, [matching, limit]);
+
+  const capped = filtered.length < matching.length;
 
   return (
     <section
@@ -89,7 +107,9 @@ export function Catalog() {
             aria-live="polite"
             className="font-mono text-[0.7rem] uppercase tracking-widest text-muted-dark"
           >
-            {filtered.length} {filtered.length === 1 ? "product" : "products"}
+            {capped
+              ? `Showing ${filtered.length} of ${matching.length} products`
+              : `${filtered.length} ${filtered.length === 1 ? "product" : "products"}`}
           </span>
           <span className="hairline-warm flex-1" />
         </div>
@@ -97,7 +117,7 @@ export function Catalog() {
         {/* Grid — 4-up at xl to avoid the generic 3-col template; animated reflow on filter */}
         <motion.div
           layout
-          className="mt-6 grid grid-cols-1 gap-4 min-[380px]:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
+          className="mt-6 grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
         >
           <AnimatePresence mode="popLayout">
             {filtered.map((p) => (
@@ -114,6 +134,22 @@ export function Catalog() {
             ))}
           </AnimatePresence>
         </motion.div>
+
+        {limit ? (
+          <div className="mt-12 flex flex-col items-center gap-3 text-center">
+            <Link
+              href="/shop"
+              className="btn-signal inline-flex min-h-[52px] items-center px-8 text-base"
+            >
+              View All Peptides
+              <ArrowUpRight className="h-5 w-5" strokeWidth={2.2} />
+            </Link>
+            <p className="max-w-sm text-sm text-muted-dark">
+              All {products.length} research compounds, each shipping with a batch-specific
+              Certificate of Analysis.
+            </p>
+          </div>
+        ) : null}
       </div>
     </section>
   );
