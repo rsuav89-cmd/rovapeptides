@@ -17,7 +17,7 @@ export default function TrackOrderPage() {
     <>
       <NoticeBar />
       <Header />
-      <main id="main-content" className="mx-auto max-w-lg px-5 py-16 sm:px-8">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-lg px-5 py-16 sm:px-8">
         <span className="kicker inline-flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />
           Orders

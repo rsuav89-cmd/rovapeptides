@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, X, ShieldCheck, Download, FileCheck2, AlertCircle, Check } from "lucide-react";
 import { getCoa, sampleBatches, type Coa } from "@/lib/coa";
+import { useModal } from "@/lib/useModal";
 import { Logo } from "@/components/Logo";
 
 export function CoaViewer({ initialBatch }: { initialBatch?: string } = {}) {
@@ -76,6 +77,7 @@ export function CoaViewer({ initialBatch }: { initialBatch?: string } = {}) {
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
+                  role="status"
                   className="mt-3 flex items-center gap-2 text-sm text-ink-2"
                 >
                   <AlertCircle className="h-4 w-4 text-gold" strokeWidth={2} />
@@ -108,7 +110,7 @@ export function CoaViewer({ initialBatch }: { initialBatch?: string } = {}) {
           {/* Right: certificate preview stub */}
           <button
             onClick={() => lookup(sampleBatches[0])}
-            aria-label="Open a sample certificate"
+            aria-label="View a sample certificate"
             className="group relative hidden overflow-hidden rounded-xl2 border border-line bg-gradient-to-br from-graphite to-paper p-8 text-left shadow-lift lg:block"
           >
             <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(50%_50%_at_80%_10%,rgba(183,110,89,0.3),transparent_60%)]" />
@@ -147,17 +149,9 @@ export function CoaViewer({ initialBatch }: { initialBatch?: string } = {}) {
 }
 
 function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
-  useEffect(() => {
-    if (!coa) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [coa, onClose]);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useModal(!!coa, onClose, panelRef, closeRef);
 
   return (
     <AnimatePresence>
@@ -180,6 +174,7 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
           />
 
           <motion.div
+            ref={panelRef}
             className="relative z-10 flex max-h-[calc(100dvh-0.75rem)] w-full max-w-2xl flex-col overflow-hidden rounded-t-xl2 border border-line bg-paper-2 shadow-lift sm:max-h-[92vh] sm:rounded-xl2"
             variants={{
               open: { opacity: 1, scale: 1, y: 0 },
@@ -204,9 +199,10 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
                   {coa.overall}
                 </span>
                 <button
+                  ref={closeRef}
                   onClick={onClose}
                   aria-label="Close"
-                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-line-strong px-3 text-xs font-semibold text-ink transition-[transform,border-color] duration-160 ease-out-expo active:scale-90 sm:h-9 sm:w-9 sm:px-0"
+                  className="inline-flex h-11 items-center sm:h-9 justify-center gap-1.5 rounded-full border border-line-strong px-3 text-xs font-semibold text-ink transition-[transform,border-color] duration-160 ease-out-expo active:scale-90 sm:h-9 sm:w-9 sm:px-0"
                 >
                   <X className="h-4 w-4" strokeWidth={2} />
                   <span className="sm:hidden">Close</span>
@@ -228,16 +224,16 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
                 <table className="min-w-[560px] w-full border-collapse text-left text-sm">
                   <thead>
                     <tr className="border-b border-line-strong">
-                      <th className="py-2 pr-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Analyte</th>
-                      <th className="px-2 py-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Method</th>
-                      <th className="px-2 py-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Spec</th>
-                      <th className="py-2 pl-2 text-right font-mono text-[0.62rem] uppercase tracking-widest text-muted">Result</th>
+                      <th scope="col" className="py-2 pr-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Analyte</th>
+                      <th scope="col" className="px-2 py-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Method</th>
+                      <th scope="col" className="px-2 py-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted">Spec</th>
+                      <th scope="col" className="py-2 pl-2 text-right font-mono text-[0.62rem] uppercase tracking-widest text-muted">Result</th>
                     </tr>
                   </thead>
                   <tbody>
                     {coa.rows.map((r) => (
                       <tr key={r.analyte} className="border-b border-line last:border-0">
-                        <td className="py-2.5 pr-2 font-medium text-ink">{r.analyte}</td>
+                        <th scope="row" className="py-2.5 pr-2 text-left font-medium text-ink">{r.analyte}</th>
                         <td className="px-2 py-2.5 text-ink-2">{r.method}</td>
                         <td className="px-2 py-2.5 font-mono text-xs text-muted">{r.spec}</td>
                         <td className="py-2.5 pl-2 text-right">

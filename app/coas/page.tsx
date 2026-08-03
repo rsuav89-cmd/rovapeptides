@@ -28,7 +28,7 @@ export default function CoasPage({
     <>
       <NoticeBar />
       <Header />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <div className="mx-auto max-w-[1280px] px-5 pt-12 sm:px-8">
           <h1 className="text-display-md text-ink">Certificate of Analysis lookup</h1>
           <p className="mt-3 max-w-xl text-ink-2">

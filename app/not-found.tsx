@@ -16,7 +16,7 @@ export default function NotFound() {
     <>
       <NoticeBar />
       <Header />
-      <main id="main-content" className="grid min-h-[60vh] place-items-center px-6 py-20 text-center">
+      <main id="main-content" tabIndex={-1} className="grid min-h-[60vh] place-items-center px-6 py-20 text-center">
         <div className="max-w-lg">
           <p className="font-sans text-xs font-semibold uppercase tracking-[0.3em] text-muted">
             Error 404

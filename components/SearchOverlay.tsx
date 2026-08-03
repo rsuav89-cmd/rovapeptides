@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Search, X } from "lucide-react";
 import { products } from "@/lib/products";
 import { ProductImage } from "@/components/ProductImage";
+import { useModal } from "@/lib/useModal";
 
 export function SearchOverlay({
   open,
@@ -28,27 +29,18 @@ export function SearchOverlay({
     );
   }, [query]);
 
+  const panelRef = useRef<HTMLDivElement>(null);
+  useModal(open, onClose, panelRef, inputRef);
+
   useEffect(() => {
-    if (!open) {
-      setQuery("");
-      return;
-    }
-    inputRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [open, onClose]);
+    if (!open) setQuery("");
+  }, [open]);
 
   return (
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[85]"
+          className="fixed inset-0 z-[85] flex items-start justify-center px-3 pt-[max(1rem,env(safe-area-inset-top))]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -64,7 +56,8 @@ export function SearchOverlay({
           />
 
           <motion.div
-            className="relative mx-auto mt-[var(--header-h)] max-h-[calc(100vh-var(--header-h)-1rem)] w-full max-w-xl overflow-hidden rounded-b-xl2 border border-line bg-paper-2 shadow-lift"
+            ref={panelRef}
+            className="relative max-h-[calc(100dvh-2rem)] w-full max-w-xl overflow-hidden rounded-xl2 border border-line bg-paper-2 shadow-lift"
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
@@ -84,7 +77,7 @@ export function SearchOverlay({
                 type="button"
                 onClick={onClose}
                 aria-label="Close search"
-                className="grid h-9 w-9 place-items-center rounded-full border border-line-strong transition-transform active:scale-90"
+                className="grid h-11 w-11 place-items-center sm:h-9 sm:w-9 rounded-full border border-line-strong transition-transform active:scale-90"
               >
                 <X className="h-4 w-4" strokeWidth={2} />
               </button>

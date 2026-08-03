@@ -19,7 +19,7 @@ export function NewsletterForm() {
 
   if (state === "done") {
     return (
-      <div className="flex items-center gap-2.5 rounded-full border border-signal/40 bg-brand-cta/10 px-4 py-3 text-sm text-white">
+      <div role="status" className="flex items-center gap-2.5 rounded-full border border-signal/40 bg-brand-cta/10 px-4 py-3 text-sm text-white">
         <span className="grid h-6 w-6 place-items-center rounded-full bg-brand-cta text-white">
           <Check className="h-3.5 w-3.5" strokeWidth={3} />
         </span>
@@ -45,18 +45,22 @@ export function NewsletterForm() {
           }}
           placeholder="you@lab.com"
           aria-label="Email address"
-          className="min-w-0 flex-1 bg-transparent py-2 text-sm text-white outline-none placeholder:text-white/40"
+          aria-invalid={state === "error"}
+          aria-describedby={state === "error" ? "newsletter-error" : undefined}
+          className="min-w-0 flex-1 bg-transparent py-2 text-sm text-white outline-none placeholder:text-white/55"
         />
         <button
           type="submit"
           aria-label="Subscribe"
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-cta text-white transition-transform duration-160 ease-out-expo hover:shadow-lift active:scale-90"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-cta text-white transition-transform duration-160 ease-out-expo hover:shadow-lift active:scale-90"
         >
           <ArrowRight className="h-5 w-5" strokeWidth={2.2} />
         </button>
       </div>
       {state === "error" && (
-        <p className="mt-2 pl-1 text-xs text-gold">Please enter a valid email address.</p>
+        <p id="newsletter-error" role="alert" className="mt-2 pl-1 text-xs text-gold">
+          Please enter a valid email address.
+        </p>
       )}
     </form>
   );

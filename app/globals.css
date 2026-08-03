@@ -34,6 +34,9 @@
     outline: 2px solid #b76e59;
     outline-offset: 3px;
     border-radius: 3px;
+    /* Dark halo so the ring stays perceivable when it lands on a copper CTA
+       fill, where copper-on-copper is only 1.24:1 (WCAG 1.4.11). */
+    box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.35);
   }
 
   /* Syncopate headings — uppercase, geometric, luxury */
@@ -202,6 +205,31 @@
 /* Product pages render a fixed mobile buy bar; reserve room for it. */
 @media (max-width: 1023.98px) {
   body.has-buybar {
-    padding-bottom: 5.5rem;
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+}
+
+
+/* Focus ring legibility on the warm-light surfaces (WCAG 1.4.11): pure copper
+   only reaches 2.98:1 on bone and 2.39:1 on sand, so those surfaces get the
+   deeper copper and drop the dark halo. */
+.on-light :focus-visible,
+.surface-warm :focus-visible,
+.surface-bone :focus-visible,
+.surface-neutral :focus-visible {
+  outline-color: #8e5342;
+  box-shadow: none;
+}
+
+/* WCAG 2.4.11 — the sticky header and fixed buy bar must never obscure a
+   focused element when it is scrolled into view. */
+html {
+  scroll-padding-top: calc(var(--header-h) + var(--notice-h) + 0.75rem);
+  scroll-padding-bottom: 1rem;
+}
+
+@media (max-width: 1023.98px) {
+  html:has(body.has-buybar) {
+    scroll-padding-bottom: 7rem;
   }
 }

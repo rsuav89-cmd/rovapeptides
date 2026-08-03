@@ -23,9 +23,11 @@ export function TrackOrderForm() {
         <span className="text-sm font-medium text-ink">Order number</span>
         <input
           required
+          inputMode="numeric"
+          autoComplete="off"
           value={orderId}
           onChange={(e) => setOrderId(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-line-strong bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
+          className="mt-1.5 w-full rounded-lg border border-[rgba(255,255,255,0.42)] bg-paper-3 px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
           placeholder="e.g. 1042"
         />
       </label>
@@ -35,9 +37,10 @@ export function TrackOrderForm() {
         <input
           required
           type="email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-line-strong bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
+          className="mt-1.5 w-full rounded-lg border border-[rgba(255,255,255,0.42)] bg-paper-3 px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
           placeholder="you@lab.edu"
         />
       </label>

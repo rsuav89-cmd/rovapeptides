@@ -140,7 +140,7 @@ export const collections: Collection[] = [
       "Browse RovaPeptides research materials studied in neuropeptide and cognitive models. For research use only.",
     motif: "signal",
     tokens: {
-      accent: "#7C6BB0",
+      accent: "#8F7EC4",
       accentSoft: "#A99BD3",
       glow: "rgba(124,107,176,0.16)",
       border: "rgba(124,107,176,0.32)",
@@ -163,7 +163,7 @@ export const collections: Collection[] = [
       "Browse RovaPeptides research materials studied in endocrine and neuroendocrine models. For research use only.",
     motif: "orbital",
     tokens: {
-      accent: "#5C7BA6",
+      accent: "#7E9BC4",
       accentSoft: "#8EA7C7",
       glow: "rgba(92,123,166,0.16)",
       border: "rgba(92,123,166,0.32)",

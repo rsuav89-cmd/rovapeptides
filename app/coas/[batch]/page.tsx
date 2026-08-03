@@ -66,7 +66,7 @@ export default function CoaBatchPage({ params }: { params: { batch: string } }) 
         ]}
       />
 
-      <main id="main-content" className="mx-auto max-w-[880px] px-5 py-12 sm:px-8">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-[880px] px-5 py-12 sm:px-8">
         <span className="kicker inline-flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />
           Certificate of Analysis
@@ -93,7 +93,7 @@ export default function CoaBatchPage({ params }: { params: { batch: string } }) 
           Analytical results
         </h2>
         <div className="mt-4 overflow-x-auto rounded-xl border border-line bg-paper-2/40">
-          <table className="w-full min-w-[560px] border-collapse text-sm">
+          <table className="w-full min-w-[440px] border-collapse text-sm">
             <caption className="sr-only">
               Analytical results for {coa.productName} batch {coa.batch}
             </caption>
@@ -119,6 +119,8 @@ export default function CoaBatchPage({ params }: { params: { batch: string } }) 
             </tbody>
           </table>
         </div>
+
+        <p className="mt-2 text-xs text-muted sm:hidden">Swipe the table to see all columns.</p>
 
         <dl className="mt-6 grid gap-3 rounded-xl border border-line bg-paper-2/40 p-4 text-sm sm:grid-cols-2">
           <div><dt className="text-muted">Appearance</dt><dd className="mt-0.5 text-ink-2">{coa.appearance}</dd></div>

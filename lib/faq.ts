@@ -100,6 +100,46 @@ export const faqCategories: FaqCategory[] = [
     ],
   },
   {
+    title: "Analytical Methods",
+    items: [
+      {
+        question: "How do I read the chromatogram on a peptide COA?",
+        answer:
+          "An RP-HPLC trace plots detector response against retention time. The target sequence elutes as the dominant peak; everything else — truncated sequences, deletion products, scavenger adducts, residual solvent — appears as smaller peaks before or after it. Purity is the area of the main peak divided by the summed area of all integrated peaks, expressed as a percentage. A single sharp, symmetrical main peak with a flat baseline is what a clean lot looks like; shoulders or a broad tail indicate co-eluting related substances.",
+      },
+      {
+        question: "Why is detection run at 220 nm rather than 280 nm?",
+        answer:
+          "220 nm targets the peptide bond itself, so every residue contributes to the signal. 280 nm targets aromatic side chains — tryptophan, tyrosine, phenylalanine — which many research peptides contain in small numbers or not at all. A sequence with no aromatic residues is effectively invisible at 280 nm, which is why 220 nm is the standard wavelength for peptide purity work.",
+      },
+      {
+        question: "What does mass spectrometry confirm that HPLC cannot?",
+        answer:
+          "HPLC quantifies how much of a sample is the main component; it says nothing about what that component is. Electrospray-ionization mass spectrometry measures the molecular mass of the eluting species and compares it against the theoretical mass of the intended sequence. A lot can be 99% pure and still be the wrong peptide — running both methods closes that gap, which is why identity and purity are reported as separate lines on every certificate.",
+      },
+      {
+        question: "What is the difference between chromatographic purity and peptide content?",
+        answer:
+          "They measure different things and both appear on our certificates. Chromatographic purity (RP-HPLC) describes the proportion of peptide-related material that is the target sequence. Peptide content (nitrogen determination or amino-acid analysis) describes how much of the vial's total mass is peptide at all, with the remainder being counterion salt, residual water, and solvent. A vial can be 99% pure by HPLC and roughly 80% peptide by mass — that is normal for a lyophilized acetate salt, not a discrepancy.",
+      },
+      {
+        question: "How do I calculate the concentration of a reconstituted solution?",
+        answer:
+          "Concentration equals mass divided by volume. Reconstituting a 10 mg vial with 2 mL of bacteriostatic water yields 5 mg/mL; the same vial with 1 mL yields 10 mg/mL. Working in mg/mL and recording the exact diluent volume in your lab notebook keeps subsequent dilution calculations traceable. This is solution-preparation arithmetic for laboratory use and is not guidance on administering anything.",
+      },
+      {
+        question: "Why is acetate content reported, and does it affect my calculations?",
+        answer:
+          "Most synthetic peptides are purified as acetate salts, so a portion of the vial's mass is counterion rather than peptide. We report acetate content per batch (specification ≤ 15.0%) precisely so that laboratories doing mass-based calculations can account for it. If your work requires net peptide mass rather than gross vial mass, use the peptide content figure on the certificate.",
+      },
+      {
+        question: "What do the endotoxin and water-content results mean?",
+        answer:
+          "Bacterial endotoxins are measured by LAL assay and reported in endotoxin units per milligram; a low result indicates the material was handled under controlled conditions during synthesis and fill. Water content is measured by Karl Fischer titration — excess residual moisture accelerates degradation of a lyophilized powder in storage, so a low figure is a stability indicator as much as a purity one.",
+      },
+    ],
+  },
+  {
     title: "Ordering & Payments",
     items: [
       {

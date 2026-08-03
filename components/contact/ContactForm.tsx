@@ -30,9 +30,10 @@ ${message}`;
           <span className="text-sm font-medium text-ink">Name</span>
           <input
             required
+            autoComplete="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1.5 w-full rounded-lg border border-line-strong bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
+            className="mt-1.5 w-full rounded-lg border border-[rgba(255,255,255,0.42)] bg-paper-3 px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
             placeholder="Jane Researcher"
           />
         </label>
@@ -41,9 +42,10 @@ ${message}`;
           <input
             required
             type="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1.5 w-full rounded-lg border border-line-strong bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
+            className="mt-1.5 w-full rounded-lg border border-[rgba(255,255,255,0.42)] bg-paper-3 px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
             placeholder="jane@lab.edu"
           />
         </label>
@@ -54,7 +56,7 @@ ${message}`;
         <input
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-line-strong bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
+          className="mt-1.5 w-full rounded-lg border border-[rgba(255,255,255,0.42)] bg-paper-3 px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
           placeholder="Order question, COA lookup, bulk pricing…"
         />
       </label>
@@ -66,7 +68,7 @@ ${message}`;
           rows={5}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="mt-1.5 w-full resize-none rounded-lg border border-line-strong bg-paper px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
+          className="mt-1.5 w-full resize-none rounded-lg border border-[rgba(255,255,255,0.42)] bg-paper-3 px-3.5 py-2.5 text-sm outline-none focus:border-brand-cta"
           placeholder="How can we help?"
         />
       </label>

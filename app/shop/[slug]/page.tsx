@@ -8,7 +8,8 @@ import { FamilyDetail } from "@/components/catalog/FamilyDetail";
 import { products } from "@/lib/products";
 import { getFamily, familySlugForSku, families } from "@/lib/catalog";
 import { getCollection } from "@/lib/collections";
-import { breadcrumbJsonLd, productGroupJsonLd, productJsonLd } from "@/lib/jsonld";
+import { breadcrumbJsonLd, faqPageJsonLd, productGroupJsonLd, productJsonLd } from "@/lib/jsonld";
+import { buildProductFaqs } from "@/lib/product-faq";
 import { DEFAULT_FORM, DEFAULT_STORAGE, TESTING_METHOD, getProductDetail } from "@/lib/product-details";
 import { site } from "@/lib/site";
 
@@ -103,6 +104,12 @@ export default function ProductPage({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqPageJsonLd(buildProductFaqs(fam))),
+        }}
+      />
       <NoticeBar />
       <Header />
       <Breadcrumbs
@@ -113,7 +120,7 @@ export default function ProductPage({
           { label: fam.name },
         ]}
       />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <FamilyDetail family={fam} initialStrength={searchParams?.strength} />
       </main>
       <Footer />

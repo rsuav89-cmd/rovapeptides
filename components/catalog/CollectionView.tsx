@@ -1,5 +1,7 @@
 "use client";
 
+import { useModal } from "@/lib/useModal";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, SlidersHorizontal, X, RotateCcw } from "lucide-react";
@@ -73,7 +75,11 @@ export function CollectionView({
           </label>
 
           <div className="flex items-center gap-2">
-            <span className="hidden font-sans text-xs uppercase tracking-widest text-muted-dark sm:inline">
+            <span
+              role="status"
+              aria-live="polite"
+              className="font-sans text-xs uppercase tracking-widest text-muted-dark max-sm:sr-only"
+            >
               {results.length} {results.length === 1 ? "product" : "products"}
             </span>
             <label className="relative">
@@ -120,7 +126,7 @@ export function CollectionView({
               </Chip>
             )}
             {activeCount > 0 && (
-              <button onClick={reset} className="inline-flex items-center gap-1.5 px-2 text-xs font-medium text-muted-dark transition-colors hover:text-ink-dark">
+              <button onClick={reset} className="inline-flex min-h-[44px] items-center gap-1.5 px-2 py-1.5 text-xs font-medium text-muted-dark sm:min-h-[24px] transition-colors hover:text-ink-dark">
                 <RotateCcw className="h-3.5 w-3.5" strokeWidth={2} />
                 Reset
               </button>
@@ -219,22 +225,8 @@ function FilterDrawer({
   setOnlyAvailable: (v: boolean) => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
-  const prevFocus = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    prevFocus.current = document.activeElement as HTMLElement;
-    closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
-      prevFocus.current?.focus();
-    };
-  }, [open, onClose]);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useModal(open, onClose, panelRef, closeRef);
 
   return (
     <AnimatePresence>
@@ -248,6 +240,7 @@ function FilterDrawer({
             transition={{ duration: 0.2 }}
           />
           <motion.div
+            ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label="Filter products"

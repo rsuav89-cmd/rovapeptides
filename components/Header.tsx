@@ -103,7 +103,7 @@ export function Header() {
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label="Search products"
-              className="grid h-10 w-10 place-items-center rounded-full transition-[transform,background-color] duration-160 ease-out-expo hover:bg-white/[0.05] active:scale-90"
+              className="grid h-11 w-11 place-items-center lg:h-10 lg:w-10 rounded-full transition-[transform,background-color] duration-160 ease-out-expo hover:bg-white/[0.05] active:scale-90"
             >
               <Search className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.9} />
             </button>
@@ -112,7 +112,7 @@ export function Header() {
               type="button"
               onClick={open}
               aria-label={`Cart, ${count} items`}
-              className="relative grid h-10 w-10 place-items-center rounded-full transition-[transform,background-color] duration-160 ease-out-expo hover:bg-white/[0.05] active:scale-90"
+              className="relative grid h-11 w-11 place-items-center lg:h-10 lg:w-10 rounded-full transition-[transform,background-color] duration-160 ease-out-expo hover:bg-white/[0.05] active:scale-90"
             >
               <ShoppingBag className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.9} />
               {count > 0 && (
@@ -132,7 +132,7 @@ export function Header() {
               type="button"
               aria-label="Open menu"
               onClick={() => setMenuOpen(true)}
-              className="grid h-10 w-10 place-items-center rounded-full transition-transform duration-160 ease-out-expo hover:bg-white/[0.05] active:scale-90 lg:hidden"
+              className="grid h-11 w-11 place-items-center lg:h-10 lg:w-10 rounded-full transition-transform duration-160 ease-out-expo hover:bg-white/[0.05] active:scale-90 lg:hidden"
             >
               <Menu className="h-[1.3rem] w-[1.3rem]" strokeWidth={1.9} />
             </button>

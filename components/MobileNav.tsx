@@ -1,11 +1,13 @@
 "use client";
 
+import { useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { primaryNav, utilityNav, site } from "@/lib/site";
 import { collectionsInOrder } from "@/lib/collections";
 import { primaryFamilyCount } from "@/lib/catalog";
 import { Logo } from "./Logo";
+import { useModal } from "@/lib/useModal";
 
 // Spring-physics slide-in panel. Backdrop fades (opacity), panel springs (transform).
 // Both are GPU-accelerated; nav links stagger in under 300ms.
@@ -16,6 +18,10 @@ export function MobileNav({
   open: boolean;
   onClose: () => void;
 }) {
+  const panelRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useModal(open, onClose, panelRef, closeRef);
+
   return (
     <AnimatePresence>
       {open && (
@@ -36,6 +42,10 @@ export function MobileNav({
 
           {/* Panel */}
           <motion.aside
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
             className="absolute right-0 top-0 flex h-full w-[86%] max-w-sm flex-col bg-paper-2 shadow-drawer"
             variants={{
               open: { x: 0 },
@@ -46,15 +56,16 @@ export function MobileNav({
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <Logo />
               <button
+                ref={closeRef}
                 onClick={onClose}
                 aria-label="Close menu"
-                className="grid h-10 w-10 place-items-center rounded-full border border-line-strong transition-transform duration-160 ease-out-expo active:scale-90"
+                className="grid h-11 w-11 place-items-center rounded-full border border-line-strong transition-transform duration-160 ease-out-expo active:scale-90"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <nav className="flex-1 overflow-y-auto px-5 py-6">
+            <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-5 py-6">
               <ul className="space-y-1">
                 {primaryNav.map((item, i) => (
                   <motion.li
@@ -94,7 +105,7 @@ export function MobileNav({
                     <a
                       href={`/shop/collections/${c.slug}`}
                       onClick={onClose}
-                      className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[0.95rem] text-ink-2 transition-colors hover:bg-white/[0.04] hover:text-ink"
+                      className="flex items-center justify-between rounded-lg px-3 py-3 text-[0.95rem] text-ink-2 transition-colors hover:bg-white/[0.04] hover:text-ink"
                     >
                       {c.shortName}
                       <span className="font-mono text-xs text-muted">{primaryFamilyCount(c.id)}</span>
@@ -112,7 +123,7 @@ export function MobileNav({
                       href={item.href}
                       {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={onClose}
-                      className="block rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-ink"
+                      className="block rounded-lg px-3 py-3 text-sm text-muted transition-colors hover:text-ink"
                     >
                       {item.label}
                     </a>
@@ -122,7 +133,7 @@ export function MobileNav({
             </nav>
 
             <div className="border-t border-line px-5 py-5">
-                        <a href="/shop" onClick={onClose} className="btn-signal w-full">
+                        <a href="/shop/all" onClick={onClose} className="btn-signal w-full">
                 Shop All Peptides
               </a>
               <p className="mt-3 text-center font-mono text-[0.62rem] uppercase tracking-widest text-muted">

@@ -18,6 +18,7 @@ import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 import { FamilyCard } from "@/components/catalog/FamilyCard";
 import { site } from "@/lib/site";
+import { buildProductFaqs } from "@/lib/product-faq";
 
 const strengthKey = (s: string) => s.replace(/\s+/g, "").toLowerCase();
 
@@ -50,6 +51,7 @@ export function FamilyDetail({
   }, []);
   const collection = getCollection(family.primaryCollectionId);
   const detail = getProductDetail(family.id);
+  const faqs = buildProductFaqs(family);
 
 
   const initialIdx = useMemo(() => {
@@ -192,7 +194,7 @@ export function FamilyDetail({
               </div>
 
               {/* qty + add */}
-              <div ref={buyRef} className="mt-4 flex items-center gap-3">
+              <div ref={buyRef} className="mt-4 flex flex-wrap items-center gap-3">
                 <div className="flex items-center rounded-full border border-line-strong">
                   <button
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
@@ -211,11 +213,11 @@ export function FamilyDetail({
                   </button>
                 </div>
                 {eligible ? (
-                  <button onClick={addToCart} className="btn-signal flex-1">
+                  <button onClick={addToCart} className="btn-signal basis-full sm:basis-0 sm:flex-1">
                     Add {qty > 1 ? `${qty} ` : ""}· {money(selected.product.price * qty)}
                   </button>
                 ) : (
-                  <button type="button" disabled aria-disabled="true" className="btn-signal flex-1 cursor-not-allowed opacity-60">
+                  <button type="button" disabled aria-disabled="true" className="btn-signal basis-full cursor-not-allowed opacity-60 sm:basis-0 sm:flex-1">
                     Pricing coming soon
                   </button>
                 )}
@@ -274,6 +276,31 @@ export function FamilyDetail({
         </div>
       </section>
 
+      {/* Visible Q&A — the same source as the FAQPage JSON-LD on this route, so
+          the structured data never describes content a visitor cannot see.
+          Native <details> keeps it keyboard- and screen-reader-correct with no JS. */}
+      <section className="border-t border-line">
+        <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8">
+          <h2 className="text-display-md text-ink">Common questions</h2>
+          <div className="mt-6 divide-y divide-line border-y border-line">
+            {faqs.map((faq) => (
+              <details key={faq.question} className="group py-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-ink marker:hidden">
+                  <span>{faq.question}</span>
+                  <span
+                    aria-hidden
+                    className="shrink-0 font-mono text-lg text-muted transition-transform duration-220 group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-ink-2">{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {related.length > 0 && (
         <section className="surface-warm on-light border-t" style={{ borderColor: "var(--line-warm-strong)" }}>
           <div className="mx-auto max-w-[1360px] px-5 py-12 sm:px-8 lg:py-16">
@@ -301,7 +328,7 @@ export function FamilyDetail({
       {/* mobile sticky buy bar — keeps the primary CTA reachable on small screens */}
       <div
         className={[
-          "fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur",
+          "fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur",
           "pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-220 ease-out-expo lg:hidden",
           showBuyBar ? "translate-y-0" : "translate-y-full",
         ].join(" ")}
@@ -310,7 +337,7 @@ export function FamilyDetail({
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
             <p className="truncate font-sans text-sm font-medium text-ink">{family.name}</p>
-            <p className="text-xs text-muted">
+            <p className="truncate text-xs text-muted">
               {selected.displayStrength} · {priceLabel(selected.product)}
               {eligible &&
                 (site.freeShippingThreshold - selected.product.price * qty > 0
@@ -347,7 +374,7 @@ export function FamilyDetail({
 
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5 text-sm">
+    <div className="grid grid-cols-1 gap-1 px-4 py-3 text-sm sm:grid-cols-[7.5rem_1fr] sm:gap-3 sm:py-2.5">
       <dt className="font-sans text-[0.7rem] uppercase tracking-wider text-muted">{label}</dt>
       <dd className="leading-relaxed text-ink-2">{value}</dd>
     </div>

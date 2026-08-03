@@ -14,12 +14,12 @@ export function Logo({
 
   return (
     <a
-      href="#top"
+      href="/"
       aria-label={`${site.name} — home`}
       className={`group inline-flex items-center gap-2.5 ${className}`}
     >
-      <span className="relative inline-flex h-9 w-9 items-center justify-center">
-        <svg viewBox="0 0 40 40" className="h-9 w-9" aria-hidden="true">
+      <span className="relative inline-flex h-8 w-8 items-center justify-center sm:h-9 sm:w-9">
+        <svg viewBox="0 0 40 40" className="h-8 w-8 sm:h-9 sm:w-9" aria-hidden="true">
           <path
             d="M20 3 L33.9 11 V27 L20 35 L6.1 27 V11 Z"
             fill="none"
@@ -33,7 +33,7 @@ export function Logo({
           <path d="M14 17 L20 23 L26 17" fill="none" stroke={mark} strokeWidth="1.6" strokeLinecap="round" />
         </svg>
       </span>
-      <span className="font-display text-[1.15rem] font-bold uppercase tracking-tight text-white">
+      <span className="hidden font-display text-[1.15rem] font-bold uppercase tracking-tight text-white min-[400px]:inline">
         Rova<span className="text-brand">Peptides</span>
       </span>
     </a>

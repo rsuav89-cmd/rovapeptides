@@ -35,7 +35,7 @@ export function CollectionsMegaMenu() {
       <button
         ref={btnRef}
         type="button"
-        aria-haspopup="true"
+        aria-controls="collections-panel"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className="group inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[0.9rem] text-ink-2 transition-colors duration-160 hover:text-ink"

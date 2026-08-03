@@ -15,7 +15,7 @@ export default function AboutPage() {
     <>
     <NoticeBar />
     <Header />
-    <main id="main-content" className="border-t border-line/70">
+    <main id="main-content" tabIndex={-1} className="border-t border-line/70">
     <div className="mx-auto max-w-[860px] px-5 py-16 sm:px-8 lg:py-24">
     <span className="kicker">About RovaPeptides</span>
       <h1 className="mt-4 text-display-md text-ink">

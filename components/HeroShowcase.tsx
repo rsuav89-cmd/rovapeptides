@@ -100,11 +100,16 @@ export function HeroShowcase() {
               key={f.id}
               onClick={() => setI(idx)}
               aria-label={`Show ${f.name}`}
-              className={[
-                "h-1.5 rounded-full transition-[width,background-color] duration-220 ease-out-expo",
-                idx === i ? "w-7 bg-brand-cta" : "w-1.5 bg-line-strong hover:bg-muted",
-              ].join(" ")}
-            />
+              aria-current={idx === i ? "true" : undefined}
+              className="group/dot grid h-11 w-6 place-items-center"
+            >
+              <span
+                className={[
+                  "h-1.5 rounded-full transition-[width,background-color] duration-220 ease-out-expo",
+                  idx === i ? "w-7 bg-brand-cta" : "w-1.5 bg-line-strong group-hover/dot:bg-muted",
+                ].join(" ")}
+              />
+            </button>
           ))}
         </div>
       )}

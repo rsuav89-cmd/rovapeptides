@@ -51,9 +51,9 @@ export function Catalog() {
 
           {/* Filter tabs with sliding active pill */}
           <div
-            role="tablist"
+            role="group"
             aria-label="Product categories"
-            className="flex flex-wrap gap-1.5 rounded-full border bg-bone/70 p-1.5"
+            className="flex gap-1.5 overflow-x-auto rounded-2xl border bg-bone/70 p-1.5 [scrollbar-width:none] lg:flex-wrap lg:overflow-visible lg:rounded-full [&::-webkit-scrollbar]:hidden"
             style={{ borderColor: "var(--line-warm-strong)" }}
           >
             {CATEGORY_TABS.map((t) => {
@@ -61,11 +61,10 @@ export function Catalog() {
               return (
                 <button
                   key={t}
-                  role="tab"
-                  aria-selected={active}
+                  aria-pressed={active}
                   onClick={() => setTab(t)}
                   className={[
-                    "relative rounded-full px-3.5 py-2 text-[0.82rem] font-medium transition-colors duration-160 ease-out-expo",
+                    "relative inline-flex min-h-[44px] shrink-0 items-center rounded-full px-3.5 py-2 text-[0.82rem] font-medium transition-colors duration-160 ease-out-expo lg:min-h-0",
                     active ? "text-white" : "text-ink-dark-2 hover:text-ink-dark",
                   ].join(" ")}
                 >
@@ -85,7 +84,11 @@ export function Catalog() {
 
         {/* Count readout */}
         <div className="mt-8 flex items-center gap-3">
-          <span className="font-mono text-[0.7rem] uppercase tracking-widest text-muted-dark">
+          <span
+            role="status"
+            aria-live="polite"
+            className="font-mono text-[0.7rem] uppercase tracking-widest text-muted-dark"
+          >
             {filtered.length} {filtered.length === 1 ? "product" : "products"}
           </span>
           <span className="hairline-warm flex-1" />
@@ -94,7 +97,7 @@ export function Catalog() {
         {/* Grid — 4-up at xl to avoid the generic 3-col template; animated reflow on filter */}
         <motion.div
           layout
-          className="mt-6 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
+          className="mt-6 grid grid-cols-1 gap-4 min-[380px]:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
         >
           <AnimatePresence mode="popLayout">
             {filtered.map((p) => (

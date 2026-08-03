@@ -28,7 +28,7 @@ export default function ShopPage() {
       <NoticeBar />
       <Header />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Shop" }]} />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <CatalogLanding />
       </main>
       <Footer />

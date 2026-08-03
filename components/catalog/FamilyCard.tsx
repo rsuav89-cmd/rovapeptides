@@ -52,7 +52,7 @@ export function FamilyCard({ family }: { family: CatalogProductFamily }) {
           className="absolute inset-0 h-full w-full object-contain p-6 transition-transform duration-280 ease-out-expo will-change-transform group-hover:scale-[1.04]"
         />
         {isNew && (
-          <span className="badge-light absolute left-3 top-3 !text-copper-muted backdrop-blur">
+          <span className="badge-light absolute left-3 top-3 !text-ink-dark backdrop-blur">
             New
           </span>
         )}

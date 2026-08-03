@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Trash2, Lock, Check } from "lucide-react";
 import { paymentMethods, site } from "@/lib/site";
 import { money, getRecommended, isPurchasable } from "@/lib/products";
 import { cartHasIneligible, WC_STORE_BASE } from "@/lib/wc";
 import { useCart } from "@/components/cart/CartContext";
+import { useModal } from "@/lib/useModal";
 import { ProductImage } from "@/components/ProductImage";
 
 export function CartDrawer() {
@@ -64,17 +65,9 @@ export function CartDrawer() {
     form.submit();
   }
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
-    document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [isOpen, close]);
+  const asideRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useModal(isOpen, close, asideRef, closeRef);
 
   return (
     <AnimatePresence>
@@ -89,6 +82,10 @@ export function CartDrawer() {
           />
 
           <motion.aside
+            ref={asideRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cart-title"
             className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-line bg-graphite text-ink shadow-drawer"
             variants={{ open: { x: 0 }, closed: { x: "100%" } }}
             transition={{ type: "spring", stiffness: 520, damping: 44, mass: 0.8 }}
@@ -100,15 +97,16 @@ export function CartDrawer() {
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <div className="flex items-center gap-2.5">
                 <ShoppingBag className="h-5 w-5 text-signal-ink" strokeWidth={2} />
-                <h2 className="font-display text-lg font-semibold text-ink">Your Cart</h2>
+                <h2 id="cart-title" className="font-display text-lg font-semibold text-ink">Your Cart</h2>
                 <span className="rounded-full border border-brand/30 bg-brand-cta/15 px-2 py-0.5 font-mono text-[0.65rem] text-signal-ink">
                   {count}
                 </span>
               </div>
               <button
+                ref={closeRef}
                 onClick={close}
                 aria-label="Close cart"
-                className="grid h-9 w-9 place-items-center rounded-full border border-line-strong transition-transform duration-160 ease-out-expo hover:border-ink active:scale-90"
+                className="grid h-11 w-11 place-items-center sm:h-9 sm:w-9 rounded-full border border-line-strong transition-transform duration-160 ease-out-expo hover:border-ink active:scale-90"
               >
                 <X className="h-4 w-4" strokeWidth={2} />
               </button>
@@ -165,7 +163,7 @@ export function CartDrawer() {
                           <button
                             onClick={() => add(p, 1)}
                             aria-label={`Add ${p.name} to cart`}
-                            className="shrink-0 rounded-full border border-line-strong px-2.5 py-1 text-[0.7rem] font-semibold text-ink transition-colors duration-160 hover:border-brand hover:text-signal-ink"
+                            className="inline-flex min-h-[44px] shrink-0 items-center rounded-full border border-line-strong px-3.5 py-2 text-[0.7rem] font-semibold sm:min-h-0 sm:px-2.5 sm:py-1 text-ink transition-colors duration-160 hover:border-brand hover:text-signal-ink"
                           >
                             + Add
                           </button>
@@ -225,7 +223,7 @@ export function CartDrawer() {
                             <button
                               onClick={() => remove(line.product.id)}
                               aria-label={`Remove ${line.product.name}`}
-                              className="grid h-7 w-7 place-items-center rounded-full text-muted transition-[color,transform] duration-160 hover:text-signal-ink active:scale-90"
+                              className="relative grid h-7 w-7 place-items-center after:absolute after:-inset-2 after:content-[''] rounded-full text-muted transition-[color,transform] duration-160 hover:text-signal-ink active:scale-90"
                             >
                               <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
                             </button>
@@ -236,7 +234,7 @@ export function CartDrawer() {
                               <button
                                 onClick={() => setQty(line.product.id, line.qty - 1)}
                                 aria-label="Decrease quantity"
-                                className="grid h-8 w-8 place-items-center rounded-full transition-transform duration-160 hover:bg-white/[0.04] active:scale-90"
+                                className="grid h-11 w-11 place-items-center sm:h-8 sm:w-8 rounded-full transition-transform duration-160 hover:bg-white/[0.04] active:scale-90"
                               >
                                 <Minus className="h-3.5 w-3.5" strokeWidth={2.2} />
                               </button>
@@ -246,7 +244,7 @@ export function CartDrawer() {
                               <button
                                 onClick={() => setQty(line.product.id, line.qty + 1)}
                                 aria-label="Increase quantity"
-                                className="grid h-8 w-8 place-items-center rounded-full transition-transform duration-160 hover:bg-white/[0.04] active:scale-90"
+                                className="grid h-11 w-11 place-items-center sm:h-8 sm:w-8 rounded-full transition-transform duration-160 hover:bg-white/[0.04] active:scale-90"
                               >
                                 <Plus className="h-3.5 w-3.5" strokeWidth={2.2} />
                               </button>

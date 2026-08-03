@@ -59,7 +59,7 @@ export function ProductCard({ product }: { product: Product }) {
             router.push(`/shop/${product.id}`);
           }}
           aria-label={`View details for ${product.name}`}
-          className="absolute bottom-3 left-1/2 flex -translate-x-1/2 translate-y-2 items-center gap-1.5 rounded-full border bg-ivory/90 px-3 py-1.5 text-xs font-medium text-ink-dark backdrop-blur transition-[opacity,transform] duration-220 ease-out-expo will-change-transform focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 sm:translate-y-2 sm:opacity-0"
+          className="absolute bottom-3 left-1/2 hidden -translate-x-1/2 sm:flex translate-y-2 items-center gap-1.5 rounded-full border bg-ivory/90 px-3 py-1.5 text-xs font-medium text-ink-dark backdrop-blur transition-[opacity,transform] duration-220 ease-out-expo will-change-transform focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 sm:translate-y-2 sm:opacity-0"
           style={{ borderColor: "var(--line-warm-strong)" }}
         >
           <Eye className="h-3.5 w-3.5" strokeWidth={2} />
@@ -73,7 +73,7 @@ export function ProductCard({ product }: { product: Product }) {
           {product.categories[0]}
         </p>
 
-        <h3 className="mt-1 font-display text-[1.15rem] font-semibold leading-tight text-ink-dark">
+        <h3 className="mt-1 break-words font-display text-[1.15rem] font-semibold leading-tight text-ink-dark hyphens-auto">
           {product.name}
         </h3>
         <p className="mt-0.5 text-sm text-muted-dark">{product.subtitle}</p>
@@ -88,15 +88,15 @@ export function ProductCard({ product }: { product: Product }) {
           Batch {product.batch}
         </div>
 
-        <div className="mt-4 flex items-end justify-between pt-1">
-          <div>
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-3 pt-1">
+          <div className="min-w-0">
             <p className="font-mono text-[0.62rem] uppercase tracking-widest text-muted-dark">Price</p>
             <p className="font-sans text-xl font-semibold text-ink-dark">{priceLabel(product)}</p>
           </div>
 
           <button
             onClick={quickAdd}
-            aria-label={purchasable ? `Add ${product.name} to cart` : `View pricing for ${product.name}`}
+            aria-label={purchasable ? `Add ${product.name} to cart` : `Details and pricing for ${product.name}`}
             className={[
               "group/btn pointer-events-auto relative z-10 inline-flex h-11 items-center overflow-hidden rounded-full px-3 font-semibold transition-[background-color,transform] duration-160 ease-out-expo will-change-transform active:scale-95",
               !purchasable

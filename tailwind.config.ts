@@ -17,7 +17,7 @@ const config: Config = {
         // Text & structure (crisp white + muted silver)
         ink: "#FFFFFF", // primary headings / high-contrast text
         "ink-2": "#B7B7C0", // secondary text / silver
-        muted: "#7C7C86", // subtext / captions
+        muted: "#8A8A94", // subtext / captions
         line: "rgba(255,255,255,0.10)", // hairlines / secondary borders
         "line-strong": "rgba(255,255,255,0.20)",
         // Copper — the single accent (CTAs, active states, borders, badges)
@@ -36,7 +36,7 @@ const config: Config = {
           DEFAULT: "#B76E59",
           soft: "#CE8A74",
           light: "#E3AA96",
-          muted: "#A86957", // copper that hits AA on warm-light surfaces
+          muted: "#8A4F3E", // copper that hits AA on warm-light surfaces
           deep: "#8E5342",
         },
         // ── Mixed-surface visual system (warm light + neutral tones) ──────────
@@ -55,7 +55,7 @@ const config: Config = {
         // Text on warm-light surfaces
         "ink-dark": "#171614", // primary text/headings on light
         "ink-dark-2": "#4A453F", // secondary text on light
-        "muted-dark": "#6C665E", // muted captions on light (AA on ivory/bone)
+        "muted-dark": "#575249", // muted captions on light (AA on ivory/bone)
         gold: "#C6A15B", // reserved for warnings only
       },
       fontFamily: {
