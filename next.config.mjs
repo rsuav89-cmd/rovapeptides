@@ -9,6 +9,15 @@ const nextConfig = {
     deviceSizes: [360, 480, 640, 828, 1080, 1280, 1600],
     imageSizes: [96, 160, 240, 320, 420],
   },
+  async redirects() {
+    return [
+      { source: "/coa-lookup", destination: "/coas", permanent: true },
+      { source: "/coa-lookup/:batch", destination: "/coas/:batch", permanent: true },
+      { source: "/collections", destination: "/shop", permanent: true },
+      { source: "/collections/:slug", destination: "/shop/collections/:slug", permanent: true },
+      { source: "/product/:slug", destination: "/shop/:slug", permanent: true },
+    ];
+  },
   experimental: {
     // Barrel-file tree shaking: lucide-react alone ships ~1,500 icon modules.
     optimizePackageImports: ["lucide-react", "framer-motion"],

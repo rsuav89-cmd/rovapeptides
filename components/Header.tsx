@@ -15,7 +15,6 @@ const SearchOverlay = dynamic(
   () => import("./SearchOverlay").then((m) => m.SearchOverlay),
   { ssr: false }
 );
-import { CollectionsMegaMenu } from "@/components/catalog/CollectionsMegaMenu";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -39,7 +38,7 @@ export function Header() {
           // warm-light sections as the page scrolls beneath it). At the top it
           // is transparent over the dark hero. White text throughout.
           scrolled
-            ? "border-b border-line bg-graphite/85 shadow-card backdrop-blur-xl"
+            ? "glass-dark border-b border-line shadow-d-2"
             : "border-b border-transparent bg-transparent",
         ].join(" ")}
       >
@@ -54,8 +53,7 @@ export function Header() {
               <Logo />
             </span>
 
-            <nav className="hidden items-center gap-1 lg:flex">
-              <CollectionsMegaMenu />
+            <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
               <ul className="flex items-center gap-1">
                 {primaryNav.map((item) => (
                   <li key={item.label}>
@@ -79,14 +77,6 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <a
-              href="/coas"
-              className="hidden items-center gap-2 rounded-full border border-line-strong px-4 py-2 text-sm font-medium transition-[transform,border-color,background-color] duration-160 ease-out-expo hover:border-ink hover:bg-white/[0.03] active:scale-95 md:inline-flex"
-            >
-              <FileCheck2 className="h-4 w-4 text-signal-ink" strokeWidth={2} />
-              View COAs
-            </a>
-
             {headerUtilityLinks.map((link) => (
               <a
                 key={link.label}

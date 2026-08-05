@@ -78,7 +78,7 @@ export default function ProductPage({
     description: getProductDetail(fam.id)?.overview ?? fam.description,
     specs: [
       { name: "Format", value: getProductDetail(fam.id)?.form ?? DEFAULT_FORM },
-      { name: "Purity", value: `${fam.variants[0].product.purity} minimum, third-party verified` },
+      { name: "Purity", value: `${fam.variants[0].product.purity} measured · ≥ 98.0% release specification` },
       { name: "Testing", value: TESTING_METHOD },
       { name: "Storage", value: DEFAULT_STORAGE },
       {

@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const MULTI_VARIANT = "/shop/retatrutide";
+const MULTI_VARIANT = "/shop/glp-3";
 
 test.describe("variant selection and cart state", () => {
   test("selecting a strength updates price and per-mg readout", async ({ page }) => {

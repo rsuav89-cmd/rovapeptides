@@ -11,7 +11,7 @@ test.describe("keyboard and screen-reader affordances", () => {
   });
 
   test("cart drawer traps focus and restores it on close", async ({ page }) => {
-    await page.goto("/shop/bpc-157");
+    await page.goto("/shop/bpc-157-tb-500");
     const trigger = page.getByRole("button", { name: /^Add/ }).first();
     await trigger.click();
 
@@ -43,7 +43,7 @@ test.describe("keyboard and screen-reader affordances", () => {
   });
 
   test("every page exposes exactly one h1 and a main landmark", async ({ page }) => {
-    for (const path of ["/", "/shop/all", "/shop/bpc-157", "/coas", "/coas/RV-BPC-2431", "/faq"]) {
+    for (const path of ["/", "/shop/all", "/shop/bpc-157-tb-500", "/coas", "/coas/RV-BTB-2418", "/faq"]) {
       await page.goto(path);
       await expect(page.locator("main#main-content")).toHaveCount(1);
       expect(await page.locator("h1").count()).toBeLessThanOrEqual(1);

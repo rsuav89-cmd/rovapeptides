@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FileCheck2, Minus, Plus } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { FileCheck2, Minus, Plus, ShieldCheck } from "lucide-react";
 import { money, priceLabel, getPurchaseEligibility } from "@/lib/products";
 import {
   DEFAULT_FORM,
@@ -17,6 +18,9 @@ import { getCollection } from "@/lib/collections";
 import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 import { FamilyCard } from "@/components/catalog/FamilyCard";
+import { BatchCoaPreview } from "@/components/catalog/BatchCoaPreview";
+import { getCoa } from "@/lib/coa";
+import { AnalyticalAuthority } from "@/components/AnalyticalAuthority";
 import { site } from "@/lib/site";
 import { buildProductFaqs } from "@/lib/product-faq";
 
@@ -52,6 +56,7 @@ export function FamilyDetail({
   const collection = getCollection(family.primaryCollectionId);
   const detail = getProductDetail(family.id);
   const faqs = buildProductFaqs(family);
+  const [coaOpen, setCoaOpen] = useState(false);
 
 
   const initialIdx = useMemo(() => {
@@ -67,6 +72,11 @@ export function FamilyDetail({
   const eligible = getPurchaseEligibility(selected.product).purchasable;
   // Unit economics, shown only when the strength is a clean mg figure. Purely
   // factual — it removes the arithmetic a buyer would otherwise do by hand.
+  const coa = getCoa(selected.product.batch);
+  const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+  const analyteCount = coa
+    ? (NUMBER_WORDS[coa.rows.length] ?? String(coa.rows.length))
+    : "";
   const perMg = (() => {
     const m = /^([\d.]+)\s*mg$/i.exec(selected.displayStrength.trim());
     const mg = m ? Number(m[1]) : NaN;
@@ -170,28 +180,71 @@ export function FamilyDetail({
                         key={v.sourceId}
                         type="button"
                         aria-pressed={i === idx}
+                        disabled={!v.available}
                         onClick={() => selectVariant(i)}
                         className={[
-                          "rounded-full border px-4 py-2.5 text-sm font-medium transition-colors duration-160",
-                          i === idx
-                            ? "border-brand bg-brand-cta/15 text-ink"
-                            : "border-line-strong text-ink-2 hover:text-ink",
+                          "relative min-h-[44px] rounded-full border px-4 py-2 text-left transition-[border-color,background-color,color] duration-200 ease-snap active:scale-[0.97]",
+                          !v.available
+                            ? "cursor-not-allowed border-line text-muted opacity-60"
+                            : i === idx
+                              ? "border-brand bg-brand-cta/15 text-ink"
+                              : "border-line-strong text-ink-2 hover:border-ink hover:text-ink",
                         ].join(" ")}
                       >
-                        {v.displayStrength}
-                        {!v.available && <span className="ml-1.5 text-[0.6rem] uppercase text-muted">soon</span>}
+                        <span className="block text-sm font-medium">{v.displayStrength}</span>
+                        <span className="block font-mono text-[0.7rem] tabular-nums text-muted">
+                          {v.available ? money(v.price) : "Pricing soon"}
+                        </span>
                       </button>
                     ))}
                   </div>
+                  <p aria-live="polite" className="sr-only">
+                    {selected.displayStrength} selected. {priceLabel(selected.product)}. Batch{" "}
+                    {selected.product.batch}.
+                  </p>
                 </div>
               )}
 
-              <div className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <p className="font-sans text-2xl font-semibold text-ink">{priceLabel(selected.product)}</p>
-                {perMg && (
-                  <p className="font-mono text-xs text-muted">{perMg} per mg</p>
-                )}
-              </div>
+              {coa && (
+                <div className="mt-6 rounded-xl border border-line bg-paper-2/60 p-4 shadow-d-1">
+                  <p className="font-mono text-label-sm uppercase text-muted">
+                    Batch {coa.batch} · Released {coa.releaseDate}
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-2">
+                    {selected.product.purity} by {coa.rows[0].method}. Identity confirmed by{" "}
+                    {coa.rows[1].method}. {analyteCount} analytes, all within specification.
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted">
+                    Analyzed by {coa.lab}.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setCoaOpen(true)}
+                    className="mt-3 inline-flex min-h-[44px] items-center gap-2 text-sm font-medium text-signal-ink transition-colors hover:text-brand"
+                  >
+                    <FileCheck2 className="h-4 w-4" strokeWidth={2} />
+                    View the certificate for this batch
+                  </button>
+                </div>
+              )}
+
+              {/* Price substitutes as one block so strength changes read as a
+                  single event rather than two numbers twitching separately. */}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={`${selected.sourceId}-${selected.product.price}`}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"
+                >
+                  <p className="font-sans text-2xl font-semibold tabular-nums text-ink">
+                    {priceLabel(selected.product)}
+                  </p>
+                  {perMg && <p className="font-mono text-xs tabular-nums text-muted">{perMg} per mg</p>}
+                </motion.div>
+              </AnimatePresence>
 
               {/* qty + add */}
               <div ref={buyRef} className="mt-4 flex flex-wrap items-center gap-3">
@@ -223,25 +276,47 @@ export function FamilyDetail({
                 )}
               </div>
 
-              {eligible && (
-                <p className="mt-2.5 text-xs text-muted">
-                  {site.freeShippingThreshold - selected.product.price * qty > 0
-                    ? `Free discreet shipping over ${money(site.freeShippingThreshold)} — ${money(
-                        site.freeShippingThreshold - selected.product.price * qty
-                      )} away.`
-                    : "Free discreet shipping included."}
+              <div className="mt-3 space-y-1.5 text-xs leading-relaxed text-muted">
+                <p>
+                  Dispatched within 24 hours, Monday to Friday, in discreet, unmarked packaging.
+                  {eligible &&
+                    (site.freeShippingThreshold - selected.product.price * qty > 0
+                      ? ` Free shipping over ${money(site.freeShippingThreshold)} — ${money(
+                          site.freeShippingThreshold - selected.product.price * qty
+                        )} away.`
+                      : " Free shipping included.")}
                 </p>
-              )}
-              <p className="mt-1.5 text-xs leading-relaxed text-muted">
-                COA match guarantee — if the vial you receive does not match the{" "}
-                <Link
-                  href={`/coas/${selected.product.batch}`}
-                  className="underline decoration-line-strong underline-offset-2 transition-colors hover:text-ink"
-                >
-                  certificate published for its batch
-                </Link>
-                , we replace or refund it.
-              </p>
+                <p>
+                  COA match guarantee — if the vial you receive does not match the{" "}
+                  <button
+                    type="button"
+                    onClick={() => setCoaOpen(true)}
+                    className="underline decoration-line-strong underline-offset-2 transition-colors hover:text-ink"
+                  >
+                    certificate published for its batch
+                  </button>
+                  , we replace or refund it. Unopened vials in original packaging can be returned
+                  within 14 days of delivery.
+                </p>
+                <p className="flex gap-2">
+                  <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-assay" strokeWidth={2} />
+                  <span>
+                    A batch that misses specification is not listed and is not shipped. We publish
+                    every result we commission, including the ones that send a batch back.
+                  </span>
+                </p>
+                <p>
+                  Chromatogram and mass-spectrometry data for batch {selected.product.batch} are{" "}
+                  <Link
+                    href="/contact"
+                    className="underline decoration-line-strong underline-offset-2 transition-colors hover:text-ink"
+                  >
+                    available on request
+                  </Link>
+                  .
+                </p>
+                <p className="pt-1 font-mono text-label-sm uppercase text-muted">{site.compliance}</p>
+              </div>
 
               {/* specification table */}
               <div className="mt-6 overflow-hidden rounded-xl border border-line bg-paper-2/40">
@@ -276,6 +351,8 @@ export function FamilyDetail({
         </div>
       </section>
 
+      <AnalyticalAuthority batch={selected.product.batch} context="product" />
+
       {/* Visible Q&A — the same source as the FAQPage JSON-LD on this route, so
           the structured data never describes content a visitor cannot see.
           Native <details> keeps it keyboard- and screen-reader-correct with no JS. */}
@@ -303,7 +380,7 @@ export function FamilyDetail({
 
       {related.length > 0 && (
         <section className="surface-warm on-light border-t" style={{ borderColor: "var(--line-warm-strong)" }}>
-          <div className="mx-auto max-w-[1360px] px-5 py-12 sm:px-8 lg:py-16">
+          <div className="container-page section">
             <div className="flex items-end justify-between gap-3">
               <div>
                 <p className="kicker-dark">Related Research Products</p>
@@ -325,10 +402,16 @@ export function FamilyDetail({
         </section>
       )}
 
+      <BatchCoaPreview
+        batch={selected.product.batch}
+        open={coaOpen}
+        onClose={() => setCoaOpen(false)}
+      />
+
       {/* mobile sticky buy bar — keeps the primary CTA reachable on small screens */}
       <div
         className={[
-          "fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-4 pt-3 backdrop-blur",
+          "glass-dark fixed inset-x-0 bottom-0 z-30 px-4 pt-3 shadow-d-4",
           "pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-220 ease-out-expo lg:hidden",
           showBuyBar ? "translate-y-0" : "translate-y-full",
         ].join(" ")}

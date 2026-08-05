@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const BATCH = "RV-BPC-2431";
+const BATCH = "RV-BTB-2418";
 
 test.describe("certificate of analysis", () => {
   test("server-rendered batch page exposes the analyte table", async ({ page }) => {
@@ -37,7 +37,7 @@ test.describe("certificate of analysis", () => {
   });
 
   test("product page links to its own batch certificate", async ({ page }) => {
-    await page.goto("/shop/bpc-157");
+    await page.goto("/shop/bpc-157-tb-500");
     const link = page.getByRole("link", { name: /certificate of analysis/i }).first();
     await expect(link).toHaveAttribute("href", /\/coas\/RV-/);
   });

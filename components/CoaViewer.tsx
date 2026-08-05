@@ -35,13 +35,13 @@ export function CoaViewer({ initialBatch }: { initialBatch?: string } = {}) {
   }
 
   return (
-    <section id="coa" className="scroll-mt-24 border-t border-line/70">
+    <section id="coa" className="scroll-mt-24">
       <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8 lg:py-24">
-        <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16">
+        <div className="seam-rule" />
+        <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16">
           {/* Left: copy + lookup */}
-          <div>
+          <div className="reveal">
             <span className="kicker inline-flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />
               Certificate of Analysis
             </span>
             <h2 className="mt-4 text-display-md text-ink">
@@ -111,7 +111,7 @@ export function CoaViewer({ initialBatch }: { initialBatch?: string } = {}) {
           <button
             onClick={() => lookup(sampleBatches[0])}
             aria-label="View a sample certificate"
-            className="group relative hidden overflow-hidden rounded-xl2 border border-line bg-gradient-to-br from-graphite to-paper p-8 text-left shadow-lift lg:block"
+            className="group relative hidden overflow-hidden rounded-xl2 bg-gradient-to-br from-graphite to-paper p-8 text-left shadow-d-3 lg:block"
           >
             <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(50%_50%_at_80%_10%,rgba(183,110,89,0.3),transparent_60%)]" />
             <div className="relative">
@@ -168,14 +168,14 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
           <motion.button
             aria-label="Close"
             onClick={onClose}
-            className="absolute inset-0 bg-white/55 backdrop-blur-[3px]"
+            className="absolute inset-0 bg-ink-dark/55 backdrop-blur-[3px]"
             variants={{ open: { opacity: 1 }, closed: { opacity: 0 } }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           />
 
           <motion.div
             ref={panelRef}
-            className="relative z-10 flex max-h-[calc(100dvh-0.75rem)] w-full max-w-2xl flex-col overflow-hidden rounded-t-xl2 border border-line bg-paper-2 shadow-lift sm:max-h-[92vh] sm:rounded-xl2"
+            className="relative z-10 flex max-h-[calc(100dvh-0.75rem)] w-full max-w-2xl flex-col overflow-hidden rounded-t-xl2 bg-paper-2 shadow-d-4 sm:max-h-[92vh] sm:rounded-xl2"
             variants={{
               open: { opacity: 1, scale: 1, y: 0 },
               closed: { opacity: 0, scale: 0.96, y: 24 },

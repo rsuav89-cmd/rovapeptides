@@ -8,9 +8,9 @@ import { site } from "@/lib/site";
 
 export const metadata = {
   alternates: { canonical: "/shop" },
-  title: "Research Catalog — Explore by Collection — RovaPeptides",
+  title: "Research Peptide Catalog — Filter by Category — RovaPeptides",
   description:
-    "Browse the RovaPeptides research catalog by collection, product family, strength, and format. For research use only.",
+    "Filter the full RovaPeptides research catalog by category, product family, strength and format. Every lot ships with a batch-specific Certificate of Analysis. For research use only.",
 };
 
 export default function ShopPage() {

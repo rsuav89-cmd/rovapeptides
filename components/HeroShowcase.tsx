@@ -28,7 +28,7 @@ export function HeroShowcase() {
     <div className="animate-fade-up [animation-delay:120ms]">
       <div
                 onClick={() => router.push(`/shop/${p.id}`)}
-        className="group relative aspect-[4/5] cursor-pointer overflow-hidden rounded-xl2 border border-line bg-gradient-to-br from-paper-2 to-black shadow-lift"
+        className="group relative aspect-[4/5] cursor-pointer overflow-hidden rounded-xl2 bg-gradient-to-br from-paper-2 to-black shadow-d-3"
       >
         <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(60%_50%_at_70%_20%,rgba(183,110,89,0.35),transparent_60%)]" />
 

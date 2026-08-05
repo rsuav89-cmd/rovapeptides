@@ -17,6 +17,8 @@ const FaqPreview = dynamic(() =>
   import("@/components/faq/FaqPreview").then((m) => m.FaqPreview)
 );
 import { Footer } from "@/components/Footer";
+import { AnalyticalAuthority } from "@/components/AnalyticalAuthority";
+import { sampleBatches } from "@/lib/coa";
 import { site } from "@/lib/site";
 import type { Metadata } from "next";
 
@@ -46,7 +48,6 @@ export default function Home() {
           <div className="relative mx-auto grid max-w-[1280px] items-end gap-10 px-5 pb-28 pt-10 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:pb-32 lg:pt-20">
             <div className="animate-fade-up">
               <span className="kicker inline-flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />
                 USA Third-Party Tested · Per-Batch COA
               </span>
               <h1 className="mt-5 text-display-xl text-ink">
@@ -91,7 +92,7 @@ export default function Home() {
           {/* tonal transition — dark hero resolves into the warm ivory catalog */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-ivory"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-bone"
           />
         </section>
 
@@ -103,6 +104,8 @@ export default function Home() {
         <TrustQuality />
 
         {/* COA VIEWER — M4 */}
+        <AnalyticalAuthority batch={sampleBatches[0]} />
+
         <CoaViewer />
 
         {/* FAQ PREVIEW */}

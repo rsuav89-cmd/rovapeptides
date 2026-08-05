@@ -58,15 +58,15 @@ export const collections: Collection[] = [
   {
     id: "weight-metabolic",
     slug: "weight-metabolic",
-    name: "Weight & Metabolic Research",
-    shortName: "Weight & Metabolic",
+    name: "Metabolic & Weight Research",
+    shortName: "Metabolic & Weight",
     eyebrow: "Research Collection",
     shortDescription:
       "Compounds studied in metabolic-regulation, appetite-signaling, and energy-balance research models.",
     longDescription:
       "This collection organizes research materials investigated in metabolic and energy-balance laboratory models, including incretin and amylin analogs and metabolic small molecules. Supplied for laboratory research use only.",
     displayOrder: 1,
-    seoTitle: "Weight & Metabolic Research Peptides — RovaPeptides",
+    seoTitle: "Metabolic & Weight Research Peptides — RovaPeptides",
     seoDescription:
       "Browse RovaPeptides research materials studied in metabolic and energy-balance models. For research use only.",
     motif: "rings",
@@ -81,15 +81,15 @@ export const collections: Collection[] = [
   {
     id: "recovery-repair",
     slug: "recovery-tissue-repair",
-    name: "Recovery & Tissue Repair",
-    shortName: "Recovery & Repair",
+    name: "Tissue & Recovery Research",
+    shortName: "Tissue & Recovery",
     eyebrow: "Research Collection",
     shortDescription:
       "Peptides investigated in tissue-, cellular-repair, and immune-signaling research models.",
     longDescription:
       "This collection organizes research materials studied in tissue- and cellular-repair laboratory models, including protection-compound peptides, repair blends, and immune-signaling peptides. Supplied for laboratory research use only.",
     displayOrder: 2,
-    seoTitle: "Recovery & Tissue Repair Research Peptides — RovaPeptides",
+    seoTitle: "Tissue & Recovery Research Peptides — RovaPeptides",
     seoDescription:
       "Browse RovaPeptides research materials studied in tissue- and cellular-repair models. For research use only.",
     motif: "waves",
@@ -104,15 +104,15 @@ export const collections: Collection[] = [
   {
     id: "mitochondrial-energy",
     slug: "mitochondrial-cellular-energy",
-    name: "Mitochondrial & Cellular Energy",
-    shortName: "Mitochondrial Energy",
+    name: "Cellular Energy Research",
+    shortName: "Cellular Energy",
     eyebrow: "Research Collection",
     shortDescription:
-      "Compounds studied in mitochondrial-function and cellular-energy research models.",
+      "Mitochondria-targeted peptides, cellular coenzymes and metabolic cofactors.",
     longDescription:
-      "This collection organizes research materials investigated in mitochondrial and cellular-energy laboratory models, including mitochondria-targeted peptides and cellular coenzymes. Supplied for laboratory research use only.",
+      "This collection organizes research materials investigated in mitochondrial and cellular-energy laboratory models, including mitochondria-targeted peptides, cellular coenzymes and bioactive vitamin cofactors. Supplied for laboratory research use only.",
     displayOrder: 3,
-    seoTitle: "Mitochondrial & Cellular Energy Research — RovaPeptides",
+    seoTitle: "Cellular Energy Research Peptides — RovaPeptides",
     seoDescription:
       "Browse RovaPeptides research materials studied in mitochondrial and cellular-energy models. For research use only.",
     motif: "grid-nodes",
@@ -127,15 +127,15 @@ export const collections: Collection[] = [
   {
     id: "brain-mood",
     slug: "brain-mood",
-    name: "Brain & Mood Research",
-    shortName: "Brain & Mood",
+    name: "Cognitive & Focus Research",
+    shortName: "Cognitive & Focus",
     eyebrow: "Research Collection",
     shortDescription:
       "Peptides investigated in neuropeptide, neuroprotective, and cognitive research models.",
     longDescription:
       "This collection organizes research materials studied in neuropeptide and cognitive laboratory models, including ACTH-fragment analogs and neurotrophic peptide complexes. Supplied for laboratory research use only.",
     displayOrder: 4,
-    seoTitle: "Brain & Mood Research Peptides — RovaPeptides",
+    seoTitle: "Cognitive & Focus Research Peptides — RovaPeptides",
     seoDescription:
       "Browse RovaPeptides research materials studied in neuropeptide and cognitive models. For research use only.",
     motif: "signal",
@@ -150,15 +150,15 @@ export const collections: Collection[] = [
   {
     id: "hormone-sexual-health",
     slug: "hormone-sexual-health",
-    name: "Hormone & Neuroendocrine Research",
-    shortName: "Hormone & Endocrine",
+    name: "Hormone & Growth Research",
+    shortName: "Hormone & Growth",
     eyebrow: "Research Collection",
     shortDescription:
       "Compounds studied in endocrine-, growth-hormone-axis, and neuroendocrine research models.",
     longDescription:
       "This collection organizes research materials investigated in endocrine and neuroendocrine laboratory models, including growth-hormone secretagogues and gonadotropin research material. Supplied for laboratory research use only.",
     displayOrder: 5,
-    seoTitle: "Hormone & Sexual Health Research Peptides — RovaPeptides",
+    seoTitle: "Hormone & Growth Research Peptides — RovaPeptides",
     seoDescription:
       "Browse RovaPeptides research materials studied in endocrine and neuroendocrine models. For research use only.",
     motif: "orbital",
@@ -173,7 +173,7 @@ export const collections: Collection[] = [
   {
     id: "longevity-aging",
     slug: "longevity-healthy-aging",
-    name: "Longevity & Healthy Aging Research",
+    name: "Longevity & Aging Research",
     shortName: "Longevity & Aging",
     eyebrow: "Research Collection",
     shortDescription:
@@ -181,7 +181,7 @@ export const collections: Collection[] = [
     longDescription:
       "This collection organizes research materials studied in cellular-aging and bioregulation laboratory models, including telomere-research peptides, senolytic peptides, and peptide bioregulators. Supplied for laboratory research use only.",
     displayOrder: 6,
-    seoTitle: "Longevity & Healthy Aging Research Peptides — RovaPeptides",
+    seoTitle: "Longevity & Aging Research Peptides — RovaPeptides",
     seoDescription:
       "Browse RovaPeptides research materials studied in cellular-aging and bioregulation models. For research use only.",
     motif: "time-rings",
@@ -196,15 +196,15 @@ export const collections: Collection[] = [
   {
     id: "skin-hair-antioxidant",
     slug: "skin-hair-antioxidant",
-    name: "Skin, Hair & Antioxidant Research",
-    shortName: "Skin & Antioxidant",
+    name: "Dermal & Antioxidant Research",
+    shortName: "Dermal & Antioxidants",
     eyebrow: "Research Collection",
     shortDescription:
       "Compounds studied in skin, collagen, pigmentation, and oxidative-balance research models.",
     longDescription:
       "This collection organizes research materials investigated in skin, collagen, and oxidative-balance laboratory models, including copper peptides, cosmetic peptides, and antioxidant tripeptides. Supplied for laboratory research use only.",
     displayOrder: 7,
-    seoTitle: "Skin, Hair & Antioxidant Research Peptides — RovaPeptides",
+    seoTitle: "Dermal & Antioxidant Research Peptides — RovaPeptides",
     seoDescription:
       "Browse RovaPeptides research materials studied in skin, collagen, and antioxidant models. For research use only.",
     motif: "surface",
@@ -219,17 +219,17 @@ export const collections: Collection[] = [
   {
     id: "vitamins-supplies",
     slug: "vitamins-preparation-supplies",
-    name: "Vitamins & Preparation Supplies",
-    shortName: "Vitamins & Supplies",
+    name: "Research Supplies",
+    shortName: "Supplies",
     eyebrow: "Research Collection",
     shortDescription:
-      "Research vitamins and laboratory reconstitution supplies.",
+      "Laboratory reconstitution supplies for lyophilized research materials.",
     longDescription:
-      "This collection organizes research vitamins and laboratory preparation supplies, including bioactive vitamin coenzymes and bacteriostatic water for reconstitution of lyophilized research materials. Supplied for laboratory research use only.",
+      "This collection organizes laboratory preparation supplies, including bacteriostatic water for reconstitution of lyophilized research materials. Supplied for laboratory research use only.",
     displayOrder: 8,
-    seoTitle: "Research Vitamins & Preparation Supplies — RovaPeptides",
+    seoTitle: "Research Supplies & Reconstitution — RovaPeptides",
     seoDescription:
-      "Browse RovaPeptides research vitamins and laboratory preparation supplies. For research use only.",
+      "Bacteriostatic water and laboratory preparation supplies for reconstituting lyophilized research materials. For research use only.",
     motif: "measure",
     tokens: {
       accent: "#8A8F98",

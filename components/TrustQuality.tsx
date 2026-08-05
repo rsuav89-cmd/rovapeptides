@@ -34,7 +34,6 @@ export function TrustQuality() {
         {/* Left: editorial statement (sticky on desktop for asymmetric rhythm) */}
         <div className="lg:sticky lg:top-28 lg:self-start">
           <span className="kicker-dark inline-flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />
             Quality &amp; Assurance
           </span>
           <h2 className="mt-4 text-display-md text-ink-dark">
@@ -76,7 +75,7 @@ export function TrustQuality() {
 
               <div>
                 <div className="flex items-baseline gap-3">
-                  <span className="font-display text-4xl font-semibold text-ink-dark sm:text-5xl">
+                  <span className="text-stat tabular-nums text-ink-dark">
                     {p.stat}
                   </span>
                   <span

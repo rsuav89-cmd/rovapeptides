@@ -68,15 +68,19 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* BODY */}
-      <div className="pointer-events-none relative z-[1] flex flex-1 flex-col p-4">
+      <div className="pointer-events-none relative z-[1] flex flex-1 flex-col p-5">
         <p className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-copper-muted">
           {product.categories[0]}
         </p>
 
-        <h3 className="mt-1 whitespace-normal break-words hyphens-auto font-display text-[1.05rem] font-semibold leading-tight text-ink-dark [overflow-wrap:anywhere] min-[520px]:text-[1.15rem]">
+        <h3 className="mt-1 whitespace-normal break-words hyphens-auto text-display-sm text-ink-dark [overflow-wrap:anywhere]">
           {product.name}
         </h3>
-        <p className="mt-0.5 break-words text-sm text-muted-dark [overflow-wrap:anywhere]">
+        <span
+          aria-hidden
+          className="mt-1.5 block h-px w-10 origin-left scale-x-0 bg-copper-muted transition-transform delay-[60ms] duration-240 ease-out-expo group-hover:scale-x-100"
+        />
+        <p className="mt-1.5 break-words text-sm text-muted-dark [overflow-wrap:anywhere]">
           {product.subtitle}
         </p>
 
@@ -86,7 +90,7 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="mt-2 flex items-center gap-1.5 font-mono text-[0.66rem] text-muted-dark">
-          <span className="h-1 w-1 rounded-full bg-brand-cta" />
+          <span className="h-1 w-1 rounded-full bg-muted-dark/60" />
           Batch {product.batch}
         </div>
 

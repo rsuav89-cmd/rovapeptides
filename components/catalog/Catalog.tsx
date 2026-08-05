@@ -48,14 +48,13 @@ export function Catalog({ limit }: { limit?: number } = {}) {
   return (
     <section
       id="catalog"
-      className="surface-warm on-light scroll-mt-24"
+      className="surface-bone on-light grain scroll-mt-24"
     >
-      <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8 lg:py-24">
+      <div className="container-page section">
         {/* Asymmetric section header: title left, filter tabs right */}
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div className="reveal flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-lg">
             <span className="kicker-dark inline-flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" />
               The Catalog
             </span>
             <h2 className="mt-4 text-display-md text-ink-dark">
@@ -117,7 +116,7 @@ export function Catalog({ limit }: { limit?: number } = {}) {
         {/* Grid — 4-up at xl to avoid the generic 3-col template; animated reflow on filter */}
         <motion.div
           layout
-          className="mt-6 grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
+          className="mt-8 grid grid-cols-1 gap-5 min-[520px]:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4"
         >
           <AnimatePresence mode="popLayout">
             {filtered.map((p) => (

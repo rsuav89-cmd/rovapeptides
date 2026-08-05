@@ -42,8 +42,17 @@
   /* Syncopate headings — uppercase, geometric, luxury */
   h1, h2, h3, h4 {
     @apply font-display text-ink;
+    /* Declared, not inherited: Preflight resets headings to `inherit`, so
+       `text-display-*` rendered 400 while `font-semibold` resolved to 700 —
+       two weights for the same rung depending on the file. */
+    font-weight: 400;
     text-transform: uppercase;
     text-wrap: balance;
+    font-synthesis-weight: none;
+  }
+
+  body {
+    text-wrap: pretty;
   }
 
   /* On warm-light surfaces, headings must read dark. Wrap a light section in
@@ -91,10 +100,26 @@
      Hover keeps the fill (constant contrast) and adds a copper glow. */
   .btn-primary,
   .btn-signal {
-    @apply relative inline-flex items-center justify-center gap-2 rounded-full bg-brand-cta px-6 py-3
-           font-sans font-semibold uppercase tracking-wide text-white
-           transition-[transform,box-shadow] duration-160 ease-out-expo
-           will-change-transform hover:shadow-copper active:scale-[0.97];
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full
+           bg-brand-cta px-6 py-3 font-sans font-semibold uppercase tracking-wide text-white
+           shadow-copper transition-[transform,box-shadow] duration-200 ease-spring-out
+           will-change-transform hover:-translate-y-px hover:shadow-copper-lg
+           active:translate-y-0 active:scale-[0.97] active:shadow-press-dark active:duration-120;
+  }
+  /* Signature sheen — fires on the primary CTA only, once per hover. */
+  .btn-primary::after,
+  .btn-signal::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 45%;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  .btn-primary:hover::after,
+  .btn-signal:hover::after {
+    @apply animate-sheen;
   }
 
   /* SECONDARY — outlined on black, copper on hover */
@@ -102,7 +127,8 @@
     @apply inline-flex items-center justify-center gap-2 rounded-full border border-line-strong
            bg-transparent px-6 py-3 font-sans font-semibold uppercase tracking-wide text-ink
            transition-[transform,border-color,background-color,color] duration-160 ease-out-expo
-           will-change-transform hover:border-brand hover:text-brand active:scale-[0.97];
+           will-change-transform hover:-translate-y-px hover:border-brand hover:text-brand
+           active:translate-y-0 active:scale-[0.97];
   }
 
   /* ── Mixed-surface visual system ─────────────────────────────────────────
@@ -133,13 +159,14 @@
 
   /* Light product / editorial card — clearly separated from any surface. */
   .card-light {
-    @apply relative flex flex-col overflow-hidden rounded-xl2 border bg-bone
-           shadow-card-light transition-[transform,border-color,box-shadow]
-           duration-280 ease-out-expo hover:-translate-y-1 hover:shadow-lift-light;
-    border-color: var(--line-warm-strong);
+    @apply relative flex flex-col overflow-hidden rounded-xl2 border bg-chalk
+           shadow-e-2 transition-[transform,border-color,box-shadow]
+           duration-320 ease-out-expo will-change-transform
+           hover:-translate-y-1.5 hover:shadow-e-3;
+    border-color: var(--line-warm);
   }
   .card-light:hover {
-    border-color: rgba(168, 105, 87, 0.5); /* copper-muted edge on hover */
+    border-color: rgba(142, 83, 66, 0.34);
   }
 
   /* Clean, warm product-image stage for light cards (no dark gradient). */
@@ -180,7 +207,13 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -232,4 +265,108 @@ html {
   html:has(body.has-buybar) {
     scroll-padding-bottom: 8rem;
   }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Rhythm, depth and motion utilities added in the design pass.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --section-y: 4rem;
+  --section-y-lg: 6rem;
+  --section-yt: 3rem;
+  --section-yt-lg: 4rem;
+  --stagger: 45ms;
+}
+
+/* One vertical rhythm and one container width for the whole site — sections
+   previously ran py-10/py-12/py-16 and containers 1280 vs 1360 side by side. */
+.section {
+  padding-block: var(--section-y);
+}
+.section-tight {
+  padding-block: var(--section-yt);
+}
+@media (min-width: 1024px) {
+  .section {
+    padding-block: var(--section-y-lg);
+  }
+  .section-tight {
+    padding-block: var(--section-yt-lg);
+  }
+}
+.container-page {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+@media (min-width: 640px) {
+  .container-page {
+    padding-inline: 2rem;
+  }
+}
+
+/* Glass — only on the two elements that genuinely overlay live content.
+   Opacity stays high enough that white text keeps its AA ratio over any
+   backdrop; the blur and saturation do the work, not transparency. */
+.glass-dark {
+  background: rgba(21, 21, 21, 0.82);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 1px 0 rgba(0, 0, 0, 0.55);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-dark {
+    background: rgba(21, 21, 21, 0.96);
+  }
+}
+
+/* Section seams — the hero already fades into the catalog; every other
+   surface change was a hard butt-joint. */
+.seam-to-warm {
+  @apply pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-ivory;
+}
+.seam-to-dark {
+  @apply pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-paper;
+}
+.seam-rule {
+  @apply h-px w-full bg-gradient-to-r from-transparent via-copper-muted/45 to-transparent;
+}
+
+/* Paper grain on the warm bands — richness with no new hue. */
+.grain {
+  position: relative;
+}
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.3;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.42'/></svg>");
+}
+
+/* Scroll reveal. Guarded by `scripting: enabled` so a no-JS render never
+   hides content; transform + opacity only. */
+@media (scripting: enabled) {
+  .reveal {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+    will-change: transform, opacity;
+  }
+}
+.reveal {
+  transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+/* Children inherit an index-scaled delay — the delay stacks, each element's
+   own motion still resolves in 300ms. */
+.stagger > * {
+  transition-delay: calc(var(--i, 0) * var(--stagger));
 }

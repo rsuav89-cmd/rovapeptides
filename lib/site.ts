@@ -26,25 +26,23 @@ export type NavItem = {
   external?: boolean;
 };
 
+// Four primary destinations. Secondary links (order tracking, wholesale,
+// shipping, contact) live in the footer.
 export const primaryNav: NavItem[] = [
-  { label: "Shop", href: "/shop" },
-  { label: "All Peptides", href: "/shop" },
-  { label: "Research Peptides", href: "/shop?category=Research+Peptides" },
-  { label: "Longevity", href: "/shop?category=Longevity" },
-  { label: "New Arrivals", href: "/shop?category=New+Arrivals", badge: "New" },
-  { label: "COA Lookup", href: "/coas" },
-  { label: "Order Tracking", href: "/track-order" },
+  { label: "Shop All", href: "/shop" },
+  { label: "COA Search", href: "/coas" },
+  { label: "Analytical Methods", href: "/methods" },
+  { label: "About", href: "/about" },
 ];
 
 export const utilityNav: NavItem[] = [
   { label: "Account / Login", href: WC_ACCOUNT_URL, external: true },
   { label: "Order Tracking", href: "/track-order" },
   { label: "Testing & COAs", href: "/coas" },
-  { label: "Quality", href: "/#quality" },
+  { label: "Analytical Methods", href: "/methods" },
   { label: "FAQ", href: "/faq" },
 ];
 
 export const headerUtilityLinks: NavItem[] = [
   { label: "Account", href: WC_ACCOUNT_URL, external: true },
-  { label: "Track Order", href: "/track-order" },
 ];

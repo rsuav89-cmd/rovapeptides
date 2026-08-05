@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Trash2, Lock, Check } from "lucide-react";
 import { paymentMethods, site } from "@/lib/site";
 import { money, getRecommended, isPurchasable } from "@/lib/products";
-import { cartHasIneligible, WC_STORE_BASE } from "@/lib/wc";
+import { cartHasIneligible, unmappedCartItems, WC_STORE_BASE } from "@/lib/wc";
 import { useCart } from "@/components/cart/CartContext";
 import { useModal } from "@/lib/useModal";
 import { ProductImage } from "@/components/ProductImage";
@@ -40,8 +40,11 @@ export function CartDrawer() {
     // JSON 400 — but this is a top-level form POST, so that JSON would replace
     // the page. Catch it here and keep the shopper in the drawer instead.
     if (cartHasIneligible(lines)) {
+      const blocked = unmappedCartItems(lines);
       setError(
-        "One or more items in your cart are not yet available for checkout. Remove them to continue."
+        blocked.length > 0
+          ? `${blocked.join(", ")} ${blocked.length === 1 ? "is" : "are"} not yet available for checkout. Remove ${blocked.length === 1 ? "it" : "them"} to continue.`
+          : "One or more items in your cart are not yet available for checkout. Remove them to continue."
       );
       return;
     }
@@ -86,7 +89,7 @@ export function CartDrawer() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="cart-title"
-            className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-line bg-graphite text-ink shadow-drawer"
+            className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-graphite text-ink shadow-drawer"
             variants={{ open: { x: 0 }, closed: { x: "100%" } }}
             transition={{ type: "spring", stiffness: 520, damping: 44, mass: 0.8 }}
           >
@@ -272,9 +275,13 @@ export function CartDrawer() {
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-muted">Shipping &amp; taxes calculated at checkout.</p>
-                <p className="mt-2 text-[0.7rem] leading-relaxed text-muted">
+                <p className="mt-2 text-[0.72rem] leading-relaxed text-muted">
+                  Dispatched within 24 hours, Monday to Friday, in discreet, unmarked packaging.
+                </p>
+                <p className="mt-1.5 text-[0.72rem] leading-relaxed text-muted">
                   COA match guarantee — if a vial does not match the certificate published for its
-                  batch, we replace or refund it.
+                  batch, we replace or refund it. Unopened vials in original packaging can be
+                  returned within 14 days of delivery.
                 </p>
 
                 {error && (
@@ -297,14 +304,14 @@ export function CartDrawer() {
 
                 {/* Destination + payment disclosure: the handoff leaves this domain,
                     and an unannounced domain change is a top abandonment driver. */}
-                <p className="mt-2.5 text-center text-[0.7rem] leading-relaxed text-muted">
+                <p className="mt-5 text-center text-[0.72rem] leading-relaxed text-muted">
                   Encrypted checkout on {WC_STORE_BASE.replace(/^https?:\/\//, "")}
                 </p>
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
                   {paymentMethods.map((pm) => (
                     <span
                       key={pm.label}
-                      className={`rounded px-1.5 py-0.5 text-[0.6rem] ${pm.className}`}
+                      className={`rounded px-2 py-1 text-[0.7rem] ${pm.className}`}
                     >
                       {pm.label}
                     </span>

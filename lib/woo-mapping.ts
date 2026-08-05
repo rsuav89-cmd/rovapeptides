@@ -29,30 +29,29 @@ export type WooRef = {
  * Only slugs present here are purchasable through the handoff.
  */
 export const WOO_MAPPING: Record<string, WooRef> = {
-  // ── Variable products (product + variation) ──────────────────────────────
-  "bpc-157-5mg": { productId: 33, variationId: 34 }, // BPC-157 → 5 mg
-  "tesamorelin-10mg": { productId: 42, variationId: 43 }, // Tesamorelin → 10 mg
-  "nad-plus-1000mg": { productId: 48, variationId: 50 }, // NAD+ → 1,000 mg
-  "ghk-cu-100mg": { productId: 36, variationId: 38 }, // GHK-Cu → 100 mg
+  // ── Realigned catalog (IDs supplied Aug 2026) ────────────────────────────
+  "glp-2-10mg": { productId: 1001 },
+  "glp-2-15mg": { productId: 1002 },
+  "glp-2-30mg": { productId: 1003 },
+  "glp-3-10mg": { productId: 1004 }, // supersedes legacy Woo #25 (Retatrutide 10 mg)
+  "glp-3-20mg": { productId: 1005 },
+  "glp-3-30mg": { productId: 1006 },
+  "bpc-157-tb-500-combo": { productId: 1007 }, // supplied as "bpc-157-tb-500-blend-10mg"
+  "nad-plus-500mg": { productId: 1008 }, // supersedes legacy Woo #48 / variation #49
+  "glutathione-200mg": { productId: 1009 },
+  "epithalon-10mg": { productId: 1010 },
+  "mots-c-10mg": { productId: 1011 },
+  "bac-water-30ml": { productId: 1012 }, // supplied as "bacteriostatic-water-30ml"
 
-  // ── Simple products ──────────────────────────────────────────────────────
+  // ── Carried over from the pre-realignment store ──────────────────────────
+  "tesamorelin-10mg": { productId: 42, variationId: 43 }, // Tesamorelin → 10 mg
+  "ghk-cu-100mg": { productId: 36, variationId: 38 }, // GHK-Cu → 100 mg
   "ss-31-10mg": { productId: 29 },
   "selank-10mg": { productId: 26 },
-  "cerebrolysin-60mg": { productId: 16 },
-  "epithalon-50mg": { productId: 18 },
-  "foxo4-dri-10mg": { productId: 19 },
-  "glutathione-1500mg": { productId: 32 },
-  "snap-8-10mg": { productId: 28 },
-  "vitamin-b12-10mg": { productId: 31 },
-  "bac-water-10ml": { productId: 65 },
-  "hcg-5000iu": { productId: 20 },
-  "pt-141-10mg": { productId: 24 },
-  "retatrutide-10mg": { productId: 25 },
   "semax-10mg": { productId: 27 },
-  "mots-c-20mg": { productId: 23 },
   "aod-9604-5mg": { productId: 14 },
-  "cardiogen-20mg": { productId: 15 },
   "5-amino-1mq-10mg": { productId: 30 },
+  "vitamin-b12-10mg": { productId: 31 },
 
   // ── Insurance / handling line items ──────────────────────────────────────
   "shipping-protection": { productId: 78 },
@@ -60,23 +59,27 @@ export const WOO_MAPPING: Record<string, WooRef> = {
 };
 
 /**
- * Woo products that exist on the store but have no matching purchasable frontend
- * slug yet (kept here for reference; not part of the active mapping):
- *   #12 TB-500 (5 mg)              #17 CJC-1295 no-DAC (5 mg)
- *   #21 IGF-1 LR3 (1 mg)          #22 Ipamorelin (5 mg)
- *   #39 KPV (5/10 mg)             + secondary variations:
- *     NAD+ 500 mg (#49), Tesamorelin 20 mg (#44),
- *     GHK-Cu 50 mg (#37), BPC-157 10 mg (#35)
+ * ACTIVE SKUS AWAITING A WOOCOMMERCE ID.
  *
- * Frontend slugs with NO Woo product yet (currently unpriced / non-purchasable,
- * so they never reach checkout): 5-amino-1mq-50mg, adamax-10mg, ara-290-10mg,
- * bpc-157-tb-500-combo, cagrilintide-10mg, cjc-1295-ipamorelin-combo, glow-70mg,
- * klow-80mg, mots-c-10mg, mt-1-10mg, mt-2-10mg, retatrutide-20mg,
- * retatrutide-30mg, selank-5mg, thymosin-alpha-1-10mg, tirzepatide-30mg,
- * tirzepatide-60mg, vip-5mg, bac-water-3ml.
+ * Two SKUs remain: no ID was supplied for either in the August 2026 mapping
+ * list. They stay declared rather than deleted, because an undeclared unmapped
+ * SKU is a hard QA failure by design — a priced product with no Woo ID would
+ * otherwise reach the cart and be dropped at handoff.
+ *
+ * Until each moves into WOO_MAPPING above:
+ *   • /api/checkout returns 409 naming the offending item
+ *   • the cart drawer blocks checkout before the shopper loses the cart
+ *   • `npm run qa` reports the count as a warning on every run
+ *
+ * Lead for KPV: Woo #39 exists (5/10 mg, variable — variation ID unknown).
+ * The CJC-1295 No-DAC / Ipamorelin 5 mg/5 mg blend has no Woo product; #17 and
+ * #22 are the two components sold separately, not the blend.
  */
+export const PENDING_WOO_IDS: readonly string[] = [
+  "cjc-1295-ipamorelin-combo",
+  "kpv-5mg",
+];
 
-/** Look up the Woo IDs for a frontend slug. Returns undefined if unmapped. */
 export function wooRef(slug: string): WooRef | undefined {
   return WOO_MAPPING[slug];
 }

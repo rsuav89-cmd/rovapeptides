@@ -7,19 +7,21 @@ const columns: { title: string; links: { label: string; href: string; external?:
   {
     title: "Shop",
     links: [
-      { label: "All Peptides", href: "/shop" },
-      { label: "Research Peptides", href: "/shop?category=Research+Peptides" },
-      { label: "Skin & Beauty", href: "/shop?category=Skin+%26+Beauty" },
-      { label: "Longevity", href: "/shop?category=Longevity" },
+      { label: "All Products", href: "/shop/all" },
+      { label: "Metabolic & Weight", href: "/shop?collection=weight-metabolic" },
+      { label: "Cellular Energy", href: "/shop?collection=mitochondrial-cellular-energy" },
+      { label: "Tissue & Recovery", href: "/shop?collection=recovery-tissue-repair" },
+      { label: "Longevity & Aging", href: "/shop?collection=longevity-healthy-aging" },
+      { label: "Dermal & Antioxidants", href: "/shop?collection=skin-hair-antioxidant" },
     ],
   },
   {
     title: "Testing",
     links: [
-      { label: "COA Lookup", href: "/coas" },
+      { label: "COA Search", href: "/coas" },
+      { label: "Analytical Methods", href: "/methods" },
       { label: "Quality & Assurance", href: "/#quality" },
-      { label: "Third-Party Labs", href: "/#quality" },
-      { label: "Purity Standards", href: "/#quality" },
+      { label: "Purity Standards", href: "/methods" },
     ],
   },
   {

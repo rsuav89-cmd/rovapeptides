@@ -120,6 +120,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Partial mapping is worse than none: the shopper would be handed a cart
+  // quietly missing items they chose. Refuse the whole handoff instead.
+  if (unmapped.length > 0) {
+    return NextResponse.json(
+      {
+        error:
+          "Some items are not yet available for checkout. Remove them and try again.",
+        unmapped,
+      },
+      { status: 409, headers: NO_STORE },
+    );
+  }
+
   // Sign the exact base64url payload string. `exp` lives inside the payload so it
   // is covered by the signature and cannot be tampered with.
   const exp = Math.floor(Date.now() / 1000) + TTL_SECONDS;

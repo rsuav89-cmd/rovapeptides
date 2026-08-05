@@ -9,17 +9,18 @@
 // server, so it can run in CI on every commit. Browser-level flows live in
 // tests/e2e/*.spec.ts and require `npm run test:e2e` against a running app.
 // ─────────────────────────────────────────────────────────────────────────────
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { products, isPurchasable } from "../lib/products.ts";
+import { products, isPurchasable, PENDING_PRODUCT_RENDERS } from "../lib/products.ts";
 import { FAMILIES } from "../lib/catalog-data.ts";
-import { families } from "../lib/catalog.ts";
+import { families, familiesInCollection } from "../lib/catalog.ts";
 import { collections } from "../lib/collections.ts";
 import { PRODUCT_DETAILS } from "../lib/product-details.ts";
 import { faqCategories } from "../lib/faq.ts";
-import { WOO_MAPPING } from "../lib/woo-mapping.ts";
+import { WOO_MAPPING, PENDING_WOO_IDS } from "../lib/woo-mapping.ts";
+import * as siteNav from "../lib/site.ts";
 import { getCoa } from "../lib/coa.ts";
 import { buildProductFaqs } from "../lib/product-faq.ts";
 import {
@@ -83,12 +84,41 @@ const rel = (f) => relative(ROOT, f);
 
 // ── 3. Commerce integrity ───────────────────────────────────────────────────
 {
+  const pending = new Set(PENDING_WOO_IDS);
   for (const p of products) {
     if (isPurchasable(p)) {
       check("purchasable SKU has a price", p.price > 0, `${p.id}`);
-      check("purchasable SKU is mapped to WooCommerce", Boolean(WOO_MAPPING[p.id]), `${p.id} would vanish at checkout`);
+      // A SKU may be unmapped only if it is DECLARED unmapped. An undeclared
+      // gap is a hard failure, because checkout would silently drop the line.
+      check(
+        "purchasable SKU is mapped to WooCommerce or declared pending",
+        Boolean(WOO_MAPPING[p.id]) || pending.has(p.id),
+        `${p.id} would vanish at checkout`
+      );
     }
   }
+  for (const slug of PENDING_WOO_IDS) {
+    check("pending SKU still exists in the catalog", products.some((p) => p.id === slug), slug);
+    check("pending SKU is not also mapped", !WOO_MAPPING[slug], slug);
+  }
+  const seenWooIds = new Map();
+  for (const [slug, ref] of Object.entries(WOO_MAPPING)) {
+    const key = `${ref.productId}:${ref.variationId ?? 0}`;
+    check(
+      "no two SKUs share a WooCommerce ID",
+      !seenWooIds.has(key),
+      `${slug} collides with ${seenWooIds.get(key)} on ${key}`
+    );
+    seenWooIds.set(key, slug);
+    check("Woo product ID is a positive integer", Number.isInteger(ref.productId) && ref.productId > 0, slug);
+  }
+
+  const blocked = products.filter((p) => isPurchasable(p) && pending.has(p.id));
+  warn(
+    "every active SKU can reach WooCommerce",
+    blocked.length === 0,
+    `${blocked.length} priced SKU(s) awaiting a Woo product ID: ${blocked.map((p) => p.id).join(", ")}`
+  );
   // Checkout add-ons exist in WooCommerce only — they are line items, not catalog SKUs.
   const WOO_ADDONS = new Set(["shipping-protection", "priority-handling"]);
   for (const slug of Object.keys(WOO_MAPPING))
@@ -98,7 +128,8 @@ const rel = (f) => relative(ROOT, f);
       `${slug}`
     );
   const unpriced = products.filter((p) => !isPurchasable(p)).length;
-  warn("catalog is fully priced", unpriced === 0, `${unpriced} of ${products.length} SKUs are unpriced`);
+  check("no active SKU shows a pricing placeholder", unpriced === 0, `${unpriced} of ${products.length} SKUs are unpriced or out of stock`);
+  for (const p of products) check("active SKU is flagged in stock", p.inStock === true, p.id);
 }
 
 // ── 4. Aggregate pricing used by ProductGroup schema ────────────────────────
@@ -249,6 +280,140 @@ for (const fam of families) {
   const twoUp = catalog.match(/min-\[(\d+)px\]:grid-cols-2/);
   check("catalog grid stays single-column on phone widths",
     Boolean(twoUp) && Number(twoUp[1]) >= 480, twoUp ? `${twoUp[1]}px` : "no breakpoint found");
+}
+
+// ── 9c. Active catalog shape (locked to the 18-product realignment) ───────
+{
+  const EXPECTED_FAMILIES = 18;
+  const EXPECTED_SKUS = 22;
+  check("family count matches the active catalog", families.length === EXPECTED_FAMILIES, `${families.length}`);
+  check("SKU count matches the active catalog", products.length === EXPECTED_SKUS, `${products.length}`);
+
+  const PURGED = ["bpc-157-5mg", "tb-500", "semaglutide", "cjc-1295-5mg", "ipamorelin-5mg", "sermorelin-5mg"];
+  for (const slug of PURGED)
+    check("purged SKU is absent", !products.some((p) => p.id === slug), slug);
+  for (const name of ["Tirzepatide", "Retatrutide", "Semaglutide", "Sermorelin"])
+    check("renamed/purged compound is not a product name", !products.some((p) => p.name === name), name);
+
+  const multi = families.find((f) => f.id === "glp-3");
+  check("GLP-3 exposes three strengths", multi?.variants.length === 3, `${multi?.variants.length}`);
+  check("GLP-3 strengths are 10/20/30 mg",
+    multi?.variants.map((v) => v.displayStrength).join(",") === "10 mg,20 mg,30 mg",
+    multi?.variants.map((v) => v.displayStrength).join(","));
+  check("GLP-3 prices are 148/228/298",
+    multi?.variants.map((v) => v.price).join(",") === "148,228,298",
+    multi?.variants.map((v) => v.price).join(","));
+
+  for (const col of collections)
+    check("no collection is left empty", familiesInCollection(col.id).length > 0, col.slug);
+}
+
+// ── 9d. Shop browse experience (collection mosaic replaced by a filter bar) ─
+{
+  const landing = read(join(ROOT, "components/catalog/CatalogLanding.tsx"));
+  check("shop landing renders the filter browser", landing.includes("<ShopBrowser"), "CatalogLanding.tsx");
+  check("shop landing no longer renders the card mosaic", !landing.includes("CollectionCard"), "CatalogLanding.tsx");
+
+  const browser = read(join(ROOT, "components/catalog/ShopBrowser.tsx"));
+  check("browser filters in place rather than routing away", browser.includes("familiesInCollection"), "ShopBrowser.tsx");
+  check("browser keeps a deep link to each collection route", browser.includes("/shop/collections/"), "ShopBrowser.tsx");
+  check("browser announces the filtered count", browser.includes('aria-live="polite"'), "ShopBrowser.tsx");
+
+  const bar = read(join(ROOT, "components/catalog/CollectionFilterBar.tsx"));
+  check("filter pills expose pressed state", bar.includes("aria-pressed"), "CollectionFilterBar.tsx");
+  check("filter pills show product counts", bar.includes("option.count"), "CollectionFilterBar.tsx");
+  check("filter bar is a labelled group", bar.includes('aria-label="Filter by research collection"'), "CollectionFilterBar.tsx");
+
+  // Category labels must stay short enough to sit on one line in a pill.
+  for (const c of collections) {
+    check("collection short name is at most three words",
+      c.shortName.replace(/&/g, "").split(/\s+/).filter(Boolean).length <= 3,
+      `${c.slug} → "${c.shortName}"`);
+    check("collection short name is concise", c.shortName.length <= 28, `${c.slug} → "${c.shortName}"`);
+  }
+}
+
+// ── 9e. Routes, navigation and assets (static half of the site audit) ──────
+{
+  // Build the real route table from the filesystem.
+  const routes = new Set(["/"]);
+  const dynamic = [];
+  for (const file of walk(join(ROOT, "app"))) {
+    const m = /app\/(.*)\/(page|route)\.tsx?$/.exec(file.replace(/\\/g, "/"));
+    if (!m) continue;
+    const path = "/" + m[1].replace(/\/\(.*?\)/g, "");
+    if (path.includes("[")) dynamic.push(new RegExp("^" + path.replace(/\[[^\]]+\]/g, "[^/]+") + "$"));
+    else routes.add(path === "/page" ? "/" : path);
+  }
+  const nextConfig = read(join(ROOT, "next.config.mjs"));
+  const redirected = [...nextConfig.matchAll(/source:\s*"([^"]+)"/g)].map((m) => m[1].split("/:")[0]);
+
+  const resolves = (href) => {
+    if (!href.startsWith("/")) return true; // external / mailto / anchors handled below
+    const path = href.split("#")[0].split("?")[0].replace(/\/$/, "") || "/";
+    return (
+      routes.has(path) ||
+      dynamic.some((re) => re.test(path)) ||
+      redirected.some((r) => path === r || path.startsWith(r + "/"))
+    );
+  };
+
+  const { primaryNav, utilityNav, headerUtilityLinks } = siteNav;
+  check("primary navigation is consolidated to four links", primaryNav.length === 4, `${primaryNav.length} links`);
+  check("primary navigation has no duplicate destinations",
+    new Set(primaryNav.map((n) => n.href)).size === primaryNav.length,
+    primaryNav.map((n) => n.href).join(", "));
+  for (const item of [...primaryNav, ...utilityNav, ...headerUtilityLinks])
+    check("nav link resolves to a real route", resolves(item.href), `${item.label} → ${item.href}`);
+
+  // Footer link table is a literal in the component; extract and verify it.
+  const footer = read(join(ROOT, "components/Footer.tsx"));
+  for (const href of [...footer.matchAll(/href:\s*"(\/[^"]*)"/g)].map((m) => m[1]))
+    check("footer link resolves to a real route", resolves(href), href);
+
+  // Any ?collection= link must name a collection that exists.
+  for (const href of [...footer.matchAll(/\/shop\?collection=([a-z0-9-]+)/g)].map((m) => m[1]))
+    check("footer collection filter targets a real collection",
+      collections.some((c) => c.slug === href), href);
+
+  // Product renders must exist on disk, or the card shows a broken image.
+  const pendingRenders = new Set(PENDING_PRODUCT_RENDERS);
+  const missingRenders = [];
+  for (const p of products) {
+    for (const src of new Set([p.image, p.photo])) {
+      const onDisk = existsSync(join(ROOT, "public", src));
+      if (!onDisk) missingRenders.push(`${p.id} → ${src}`);
+      check(
+        "product image exists or is declared pending",
+        onDisk || pendingRenders.has(p.id),
+        `${p.id} → ${src}`
+      );
+    }
+  }
+  warn("every product has a render", missingRenders.length === 0, missingRenders.join(", "));
+  for (const id of PENDING_PRODUCT_RENDERS)
+    check("pending render still refers to a live SKU", products.some((p) => p.id === id), id);
+
+  // useSearchParams outside a Suspense boundary de-opts the route to CSR and
+  // fails a production build.
+  for (const file of SOURCES.filter((x) => x.endsWith(".tsx"))) {
+    if (!read(file).includes("useSearchParams")) continue;
+    const name = file.split("/").pop().replace(".tsx", "");
+    const consumers = SOURCES.filter((x) => read(x).includes(`<${name}`) && x !== file);
+    check("useSearchParams consumer is wrapped in Suspense",
+      consumers.length === 0 || consumers.some((x) => read(x).includes("Suspense")),
+      rel(file));
+  }
+
+  // Every mapped JSX list needs a key or React logs a console error.
+  for (const file of SOURCES.filter((x) => x.endsWith(".tsx"))) {
+    const src = read(file);
+    const maps = [...src.matchAll(/\.map\(\([^)]*\)\s*=>\s*\(?\s*<([A-Za-z][\w.]*)/g)];
+    for (const m of maps) {
+      const tail = src.slice(m.index, m.index + 600);
+      check("mapped JSX element declares a key", /key=/.test(tail), `${rel(file)} → <${m[1]}>`);
+    }
+  }
 }
 
 // ── 10. Certificates resolve for every batch in the catalog ────────────────

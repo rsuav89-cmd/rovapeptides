@@ -9,3 +9,6 @@ npm-debug.log*
 !.env.example
 *.tsbuildinfo
 next-env.d.ts
+
+# Scratch dir for files this environment cannot unlink (stale git locks, build artifacts)
+_to_delete/

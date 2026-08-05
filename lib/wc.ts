@@ -1,4 +1,5 @@
 import { getPurchaseEligibility, type Product } from "./products";
+import { isMappedToWoo } from "./woo-mapping";
 
 const DEFAULT_STORE_URL = "https://shop.rovapeptides.com";
 
@@ -19,5 +20,15 @@ export const WC_ACCOUNT_URL = `${WC_STORE_BASE}/my-account/`;
 // FINAL GATE before checkout redirect: no ineligible (e.g. unpriced) SKU may
 // ever be handed off. Consulted by the cart drawer prior to redirecting.
 export function cartHasIneligible(lines: { product: Product }[]): boolean {
-  return lines.some((l) => !getPurchaseEligibility(l.product).purchasable);
+  return lines.some(
+    (l) =>
+      !getPurchaseEligibility(l.product).purchasable || !isMappedToWoo(l.product.id)
+  );
+}
+
+/** SKUs in the cart that cannot reach WooCommerce yet, for a precise message. */
+export function unmappedCartItems(lines: { product: Product }[]): string[] {
+  return lines
+    .filter((l) => !isMappedToWoo(l.product.id))
+    .map((l) => `${l.product.name} ${l.product.mass}`);
 }
