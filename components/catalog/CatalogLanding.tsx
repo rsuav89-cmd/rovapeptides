@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { ArrowRight, FlaskConical } from "lucide-react";
 import { site } from "@/lib/site";
 import { families } from "@/lib/catalog";
+import { FamilyGrid } from "@/components/catalog/FamilyGrid";
 import { ShopBrowser } from "@/components/catalog/ShopBrowser";
 
 export function CatalogLanding() {
@@ -38,11 +39,34 @@ export function CatalogLanding() {
       </section>
 
       {/* Category filter + live catalog grid (replaces the collection mosaic). */}
+      {/* ShopBrowser reads ?collection= via useSearchParams, which opts this
+          subtree into client rendering — so the FALLBACK is what ends up in the
+          static HTML that crawlers and no-JS visitors receive. An empty div
+          meant /shop shipped zero product content while /shop/all shipped all
+          22. The fallback now server-renders the complete grid; the client
+          swaps in the filtered view on hydration. */}
       <Suspense
         fallback={
-          <div className="surface-bone on-light grain">
-            <div className="container-page section" aria-hidden />
-          </div>
+          <section className="surface-bone on-light grain">
+            <div className="container-page section">
+              <div className="max-w-2xl">
+                <p className="kicker-dark">Filter by category</p>
+                <h2 className="mt-3 text-display-md text-ink-dark">
+                  The full research catalog
+                </h2>
+                <p className="mt-3 text-ink-dark-2">
+                  Choose a category to narrow the grid. Nothing reloads, and every product keeps
+                  its lot-specific Certificate of Analysis.
+                </p>
+              </div>
+              <p className="mt-8 text-sm text-muted-dark">
+                {families.length} products across every category
+              </p>
+              <div className="mt-8">
+                <FamilyGrid families={families} />
+              </div>
+            </div>
+          </section>
         }
       >
         <ShopBrowser />

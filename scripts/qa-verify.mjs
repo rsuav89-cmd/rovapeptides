@@ -318,6 +318,11 @@ for (const fam of families) {
   check("browser filters in place rather than routing away", browser.includes("familiesInCollection"), "ShopBrowser.tsx");
   check("browser keeps a deep link to each collection route", browser.includes("/shop/collections/"), "ShopBrowser.tsx");
   check("browser announces the filtered count", browser.includes('aria-live="polite"'), "ShopBrowser.tsx");
+  // The Suspense fallback IS the static HTML for /shop, because useSearchParams
+  // opts the subtree into client rendering. An empty fallback ships a catalog
+  // page with no products in it.
+  check("shop landing prerenders the full grid in its Suspense fallback",
+    /fallback=[\s\S]{0,900}<FamilyGrid families=\{families\}/.test(landing), "CatalogLanding.tsx");
 
   const bar = read(join(ROOT, "components/catalog/CollectionFilterBar.tsx"));
   check("filter pills expose pressed state", bar.includes("aria-pressed"), "CollectionFilterBar.tsx");
