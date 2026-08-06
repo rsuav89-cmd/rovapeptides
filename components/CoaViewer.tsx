@@ -3,18 +3,20 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, X, ShieldCheck, Download, FileCheck2, AlertCircle, Check } from "lucide-react";
-import { getCoa, sampleBatches, type Coa } from "@/lib/coa";
+import { getCOAByBatch, isActiveCoa, sampleBatches, type COARecord } from "@/lib/coa";
 import { useModal } from "@/lib/useModal";
 import { Logo } from "@/components/Logo";
 
 export function CoaViewer({ initialBatch }: { initialBatch?: string } = {}) {
   const [query, setQuery] = useState(initialBatch ?? "");
-  const [active, setActive] = useState<Coa | null>(null);
+  const [active, setActive] = useState<COARecord | null>(null);
   const [notFound, setNotFound] = useState(false);
 
   function lookup(batch: string) {
-    const c = getCoa(batch);
-    if (c) {
+    const c = getCOAByBatch(batch);
+    // A pending record is not a certificate: treat it as "not found yet" rather
+    // than opening an empty document.
+    if (isActiveCoa(c)) {
       setActive(c);
       setNotFound(false);
     } else {
@@ -148,7 +150,7 @@ export function CoaViewer({ initialBatch }: { initialBatch?: string } = {}) {
   );
 }
 
-function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
+function CoaModal({ coa, onClose }: { coa: COARecord | null; onClose: () => void }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   useModal(!!coa, onClose, panelRef, closeRef);
@@ -163,7 +165,7 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
           exit="closed"
           role="dialog"
           aria-modal="true"
-          aria-label={`Certificate of Analysis ${coa.batch}`}
+          aria-label={`Certificate of Analysis ${coa.batchNumber}`}
         >
           <motion.button
             aria-label="Close"
@@ -190,13 +192,13 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
                   Certificate of Analysis
                 </p>
                 <p className="font-mono text-[0.7rem] uppercase tracking-widest text-muted">
-                  {coa.productName} · {coa.mass}
+                  {coa.productName}
                 </p>
               </div>
               <div className="flex flex-col items-end gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-cta px-3 py-1 font-mono text-[0.7rem] font-bold uppercase tracking-widest text-white">
                   <Check className="h-3.5 w-3.5" strokeWidth={3} />
-                  {coa.overall}
+                  PASS
                 </span>
                 <button
                   ref={closeRef}
@@ -212,10 +214,14 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
 
             {/* meta grid */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-3 border-b border-line px-6 py-4 sm:grid-cols-4">
-              <Meta label="Batch / Lot" value={coa.batch} mono />
+              <Meta label="Batch / Lot" value={coa.batchNumber} mono />
               <Meta label="Test Date" value={coa.testDate} mono />
-              <Meta label="Purity" value={coa.purity} mono />
-              <Meta label="Appearance" value="Conforms" />
+              <Meta
+                label="Purity"
+                value={coa.purityPercentage !== null ? `${coa.purityPercentage}%` : "—"}
+                mono
+              />
+              <Meta label="Laboratory" value={coa.testingLab} />
             </div>
 
             {/* results table */}
@@ -231,11 +237,11 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {coa.rows.map((r) => (
+                    {coa.labResults.map((r) => (
                       <tr key={r.analyte} className="border-b border-line last:border-0">
                         <th scope="row" className="py-2.5 pr-2 text-left font-medium text-ink">{r.analyte}</th>
-                        <td className="px-2 py-2.5 text-ink-2">{r.method}</td>
-                        <td className="px-2 py-2.5 font-mono text-xs text-muted">{r.spec}</td>
+                        <td className="px-2 py-2.5 text-ink-2">{coa.testingLab}</td>
+                        <td className="px-2 py-2.5 font-mono text-xs text-muted">{r.specification}</td>
                         <td className="py-2.5 pl-2 text-right">
                           <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-signal-ink">
                             {r.result}
@@ -252,7 +258,7 @@ function CoaModal({ coa, onClose }: { coa: Coa | null; onClose: () => void }) {
             {/* footer */}
             <div className="border-t border-line bg-paper-2/40 px-6 py-4">
               <p className="text-xs leading-relaxed text-muted">
-                Independently analyzed by {coa.lab}. Released {coa.releaseDate}. This document
+                Independently analyzed by {coa.testingLab} on {coa.testDate}. This document
                 certifies the tested lot only.{" "}
                 <span className="font-medium text-ink-2">
                   For Research Use Only — Not for Human Consumption.

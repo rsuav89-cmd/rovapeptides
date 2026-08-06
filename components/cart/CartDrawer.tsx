@@ -28,12 +28,12 @@ export function CartDrawer() {
         ).filter(isPurchasable)
       : [];
 
-  // Hand the cart off to WooCommerce. We submit a top-level form POST to
-  // /api/checkout (NOT fetch) so the browser follows the route's 302 across to
-  // shop.rovapeptides.com/rova-handoff, which rebuilds the WooCommerce cart
-  // server-side (HMAC-verified) and redirects on to checkout. A top-level
-  // navigation means no CORS and a first-party WooCommerce session cookie.
-  function goToCheckout() {
+  // Ask the API to create a pending WooCommerce order and hand back that
+  // order's own payment URL. The order key in that URL authenticates the
+  // shopper, so no WooCommerce session cookie has to survive the hop from
+  // rovapeptides.com to shop.rovapeptides.com — which is precisely what was
+  // failing and dropping people onto an empty cart.
+  async function goToCheckout() {
     if (redirecting || lines.length === 0) return;
 
     // Pre-flight gate. The handoff route rejects unmapped/unpriced SKUs with a
@@ -52,20 +52,36 @@ export function CartDrawer() {
     setError(null);
     setRedirecting(true);
 
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = "/api/checkout";
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        body: JSON.stringify({
+          items: lines.map((l) => ({ id: l.product.id, qty: l.qty })),
+        }),
+      });
 
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = "items";
-    input.value = JSON.stringify(
-      lines.map((l) => ({ id: l.product.id, qty: l.qty })),
-    );
+      const data: { checkoutUrl?: string; error?: string } = await response
+        .json()
+        .catch(() => ({}));
 
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
+      if (!response.ok || !data.checkoutUrl) {
+        setError(
+          data.error ??
+            "We could not start checkout. Please try again, or contact support if it keeps happening."
+        );
+        setRedirecting(false);
+        return;
+      }
+
+      // Leave the cart intact: if payment is abandoned the shopper returns to a
+      // populated drawer rather than starting over.
+      window.location.href = data.checkoutUrl;
+    } catch {
+      setError("We could not reach checkout. Check your connection and try again.");
+      setRedirecting(false);
+    }
   }
 
   const asideRef = useRef<HTMLElement>(null);
@@ -299,7 +315,7 @@ export function CartDrawer() {
                   className="btn-signal mt-4 w-full disabled:opacity-70"
                 >
                   <Lock className="h-4 w-4" strokeWidth={2.2} />
-                  {redirecting ? "Redirecting…" : "Proceed to Checkout"}
+                  {redirecting ? "Preparing your order…" : "Proceed to Checkout"}
                 </button>
 
                 {/* Destination + payment disclosure: the handoff leaves this domain,

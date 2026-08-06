@@ -19,7 +19,7 @@ import { useCart } from "@/components/cart/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 import { FamilyCard } from "@/components/catalog/FamilyCard";
 import { BatchCoaPreview } from "@/components/catalog/BatchCoaPreview";
-import { getCoa } from "@/lib/coa";
+import { activeCoaForSlug } from "@/lib/coa";
 import { AnalyticalAuthority } from "@/components/AnalyticalAuthority";
 import { site } from "@/lib/site";
 import { buildProductFaqs } from "@/lib/product-faq";
@@ -72,10 +72,10 @@ export function FamilyDetail({
   const eligible = getPurchaseEligibility(selected.product).purchasable;
   // Unit economics, shown only when the strength is a clean mg figure. Purely
   // factual — it removes the arithmetic a buyer would otherwise do by hand.
-  const coa = getCoa(selected.product.batch);
+  const coa = activeCoaForSlug(selected.product.id);
   const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
   const analyteCount = coa
-    ? (NUMBER_WORDS[coa.rows.length] ?? String(coa.rows.length))
+    ? (NUMBER_WORDS[coa.labResults.length] ?? String(coa.labResults.length))
     : "";
   const perMg = (() => {
     const m = /^([\d.]+)\s*mg$/i.exec(selected.displayStrength.trim());
@@ -208,14 +208,17 @@ export function FamilyDetail({
               {coa && (
                 <div className="mt-6 rounded-xl border border-line bg-paper-2/60 p-4 shadow-d-1">
                   <p className="font-mono text-label-sm uppercase text-muted">
-                    Batch {coa.batch} · Released {coa.releaseDate}
+                    Batch {coa.batchNumber} · Tested {coa.testDate}
                   </p>
                   <p className="mt-2 text-sm leading-relaxed text-ink-2">
-                    {selected.product.purity} by {coa.rows[0].method}. Identity confirmed by{" "}
-                    {coa.rows[1].method}. {analyteCount} analytes, all within specification.
+                    {coa.purityPercentage !== null
+                      ? `${coa.purityPercentage}% measured. `
+                      : ""}
+                    {analyteCount} {coa.labResults.length === 1 ? "analyte" : "analytes"} tested,
+                    all within specification.
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-muted">
-                    Analyzed by {coa.lab}.
+                    Analyzed by {coa.testingLab}.
                   </p>
                   <button
                     type="button"
@@ -225,6 +228,25 @@ export function FamilyDetail({
                     <FileCheck2 className="h-4 w-4" strokeWidth={2} />
                     View the certificate for this batch
                   </button>
+                </div>
+              )}
+
+              {!coa && (
+                <div className="mt-6 rounded-xl border border-line bg-paper-2/60 p-4 shadow-d-1">
+                  <p className="font-mono text-label-sm uppercase text-muted">
+                    Certificate in queue
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-2">
+                    This lot is with our third-party laboratory. Its certificate will be published
+                    here and on the COA lookup as soon as testing completes.
+                  </p>
+                  <Link
+                    href="/methods"
+                    className="mt-3 inline-flex min-h-[44px] items-center gap-2 text-sm font-medium text-signal-ink transition-colors hover:text-brand"
+                  >
+                    <FileCheck2 className="h-4 w-4" strokeWidth={2} />
+                    How every batch is tested
+                  </Link>
                 </div>
               )}
 
@@ -288,13 +310,17 @@ export function FamilyDetail({
                 </p>
                 <p>
                   COA match guarantee — if the vial you receive does not match the{" "}
-                  <button
-                    type="button"
-                    onClick={() => setCoaOpen(true)}
-                    className="underline decoration-line-strong underline-offset-2 transition-colors hover:text-ink"
-                  >
-                    certificate published for its batch
-                  </button>
+                  {coa ? (
+                    <button
+                      type="button"
+                      onClick={() => setCoaOpen(true)}
+                      className="underline decoration-line-strong underline-offset-2 transition-colors hover:text-ink"
+                    >
+                      certificate published for its batch
+                    </button>
+                  ) : (
+                    "certificate published for its batch"
+                  )}
                   , we replace or refund it. Unopened vials in original packaging can be returned
                   within 14 days of delivery.
                 </p>
@@ -306,7 +332,8 @@ export function FamilyDetail({
                   </span>
                 </p>
                 <p>
-                  Chromatogram and mass-spectrometry data for batch {selected.product.batch} are{" "}
+                  Chromatogram and mass-spectrometry data for{" "}
+                  {coa ? `batch ${coa.batchNumber}` : "this compound"} are{" "}
                   <Link
                     href="/contact"
                     className="underline decoration-line-strong underline-offset-2 transition-colors hover:text-ink"
@@ -351,7 +378,7 @@ export function FamilyDetail({
         </div>
       </section>
 
-      <AnalyticalAuthority batch={selected.product.batch} context="product" />
+      <AnalyticalAuthority slug={selected.product.id} context="product" />
 
       {/* Visible Q&A — the same source as the FAQPage JSON-LD on this route, so
           the structured data never describes content a visitor cannot see.
@@ -403,7 +430,7 @@ export function FamilyDetail({
       )}
 
       <BatchCoaPreview
-        batch={selected.product.batch}
+        slug={selected.product.id}
         open={coaOpen}
         onClose={() => setCoaOpen(false)}
       />

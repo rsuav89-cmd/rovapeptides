@@ -23,7 +23,7 @@ export function FamilyCard({ family }: { family: CatalogProductFamily }) {
   const priceText = family.hasPricing
     ? family.minPrice === family.maxPrice
       ? money(family.minPrice as number)
-      : `From ${money(family.minPrice as number)}`
+      : `${money(family.minPrice as number)} – ${money(family.maxPrice as number)}`
     : "Pricing coming soon";
 
   function quickAdd(e: React.MouseEvent) {

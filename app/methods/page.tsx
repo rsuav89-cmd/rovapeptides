@@ -8,7 +8,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { AnalyticalAuthority } from "@/components/AnalyticalAuthority";
 import { FaqAccordion } from "@/components/faq/FaqAccordion";
 import { faqCategories } from "@/lib/faq";
-import { sampleBatches } from "@/lib/coa";
+
 import { breadcrumbJsonLd, faqPageJsonLd } from "@/lib/jsonld";
 import { site } from "@/lib/site";
 
@@ -72,7 +72,7 @@ export default function MethodsPage() {
           </div>
         </section>
 
-        <AnalyticalAuthority batch={sampleBatches[0]} />
+        <AnalyticalAuthority />
 
         {methods && (
           <section>

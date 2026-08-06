@@ -1,37 +1,42 @@
 import Link from "next/link";
 import { ArrowUpRight, FileCheck2 } from "lucide-react";
-import { getCoa } from "@/lib/coa";
+import { activeCoaForSlug, activeCoas } from "@/lib/coa";
 import { site } from "@/lib/site";
 
 // Turns the testing process into visible proof. Every date, method, figure and
 // specification below is read from the certificate for a real batch — nothing
 // here is decorative copy.
 export function AnalyticalAuthority({
-  batch,
+  slug,
   context = "home",
 }: {
-  batch: string;
+  /** SKU whose certificate anchors the dated steps. Falls back to any on file. */
+  slug?: string;
   context?: "home" | "product";
 }) {
-  const coa = getCoa(batch);
+  // The band's credibility rests on real dates and real results, so it renders
+  // against a certificate that exists — the SKU's own if it has one, otherwise
+  // the newest on file, labelled as an example lot.
+  const own = slug ? activeCoaForSlug(slug) : undefined;
+  const coa = own ?? activeCoas()[0];
   if (!coa) return null;
+  const isOwnLot = Boolean(own);
 
-  const purityRow = coa.rows.find((r) => r.analyte.startsWith("Purity"));
-  const identityRow = coa.rows.find((r) => r.analyte.startsWith("Identity"));
-  const sameDay = coa.testDate === coa.releaseDate;
+  const purityRow = coa.labResults.find((r) => /purity/i.test(r.analyte));
+  const identityRow = coa.labResults.find((r) => /mass|identity/i.test(r.analyte));
 
   const steps = [
     {
       n: "01",
       title: "Synthesis and fill",
       body: "Lyophilized to specification and sealed under controlled conditions, one lot at a time.",
-      meta: `Lot ${coa.batch}`,
+      meta: `Lot ${coa.batchNumber}`,
     },
     {
       n: "02",
       title: "Chromatographic purity",
       body: "RP-HPLC with UV detection at 220 nm — the peptide-bond absorbance, so every residue in the sequence contributes to the signal. Release specification ≥ 98.0%.",
-      meta: `Result ${purityRow?.result ?? coa.purity}`,
+      meta: purityRow ? `Result ${purityRow.result}` : "Reported per lot",
     },
     {
       n: "03",
@@ -43,9 +48,7 @@ export function AnalyticalAuthority({
       n: "04",
       title: "Release",
       body: "Purity, identity, appearance, peptide content, water, acetate and endotoxins all within specification. Released for sale.",
-      meta: sameDay
-        ? `Tested and released ${coa.releaseDate}`
-        : `Tested ${coa.testDate} · Released ${coa.releaseDate}`,
+      meta: `Tested ${coa.testDate}`,
     },
   ];
 
@@ -59,10 +62,12 @@ export function AnalyticalAuthority({
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-ink-dark-2">
             Every lot in this catalog clears the same sequence. The dates below belong to batch{" "}
-            {coa.batch} —{" "}
-            {context === "product"
-              ? "the lot currently being picked for this product."
-              : "one of the lots currently shipping."}
+            {coa.batchNumber} —{" "}
+            {isOwnLot
+              ? context === "product"
+                ? "the lot currently being picked for this product."
+                : "one of the lots currently shipping."
+              : "an example of a released lot. Certificates for other products are added as testing completes."}
           </p>
         </div>
 
@@ -96,18 +101,17 @@ export function AnalyticalAuthority({
         </div>
 
         <div className="reveal mt-10">
-          <h3 className="text-display-sm text-ink-dark">Seven analytes, on the record</h3>
+          <h3 className="text-display-sm text-ink-dark">Analytes on the record</h3>
           <ul className="mt-4 divide-y" style={{ borderColor: "var(--line-warm)" }}>
-            {coa.rows.map((row) => (
+            {coa.labResults.map((row) => (
               <li
                 key={row.analyte}
-                className="grid gap-1 border-t py-3 text-sm sm:grid-cols-[1.3fr_1fr_auto] sm:items-baseline sm:gap-4"
+                className="grid gap-1 border-t py-3 text-sm sm:grid-cols-[1.3fr_auto] sm:items-baseline sm:gap-4"
                 style={{ borderColor: "var(--line-warm)" }}
               >
                 <span className="font-medium text-ink-dark">{row.analyte}</span>
-                <span className="font-mono text-xs text-muted-dark">{row.method}</span>
                 <span className="font-mono text-xs text-ink-dark-2 sm:justify-self-end">
-                  {row.spec}
+                  {row.specification}
                 </span>
               </li>
             ))}
@@ -119,14 +123,15 @@ export function AnalyticalAuthority({
             and residual water — a normal lyophilized acetate salt, not a discrepancy.
           </p>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-ink-dark-2">
-            Analysis is performed by {coa.lab}, with no commercial interest in the result.
+            Analysis is performed by {coa.testingLab}, an independent laboratory with no
+            commercial interest in the result.
           </p>
         </div>
 
         <div className="reveal mt-8 flex flex-wrap items-center gap-3">
-          <Link href={`/coas/${coa.batch}`} className="btn-on-light">
+          <Link href={`/coas/${coa.batchNumber}`} className="btn-on-light">
             <FileCheck2 className="h-4 w-4" strokeWidth={2} />
-            {context === "product" ? `View the certificate for batch ${coa.batch}` : "Look up a batch"}
+            {isOwnLot ? `View the certificate for batch ${coa.batchNumber}` : "Look up a batch"}
           </Link>
           <Link href="/faq" className="btn-ghost-light inline-flex">
             Read the analytical method Q&amp;A

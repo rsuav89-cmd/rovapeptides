@@ -1,98 +1,132 @@
-// Certificate of Analysis data. COAs are derived from the catalog so every batch
-// number in the store resolves to a plausible, self-consistent certificate.
-// Replace `getCoa` with a real API/DB lookup when COAs are hosted.
+// ─────────────────────────────────────────────────────────────────────────────
+// Certificate of Analysis database.
+//
+// This file replaces the previous generated-certificate model. Nothing here is
+// derived or synthesised: a record exists only because a real document exists,
+// and every SKU without one is explicitly marked `isPending` rather than being
+// given plausible-looking numbers. That distinction is the whole point of the
+// file — a published certificate is a factual claim about a physical lot.
+// ─────────────────────────────────────────────────────────────────────────────
+import { products } from "@/lib/products";
 
-import { products, type Product } from "@/lib/products";
-
-export type CoaRow = {
+export interface LabResultItem {
   analyte: string;
-  method: string;
-  spec: string;
+  specification: string;
   result: string;
-  pass: boolean;
-};
-
-export type Coa = {
-  batch: string;
-  productName: string;
-  subtitle: string;
-  mass: string;
-  purity: string;
-  testDate: string;
-  releaseDate: string;
-  lab: string;
-  appearance: string;
-  overall: "PASS";
-  rows: CoaRow[];
-};
-
-// deterministic test dates keyed off batch (no Date.now — stable across renders/builds)
-const DATES = [
-  "2026-06-14",
-  "2026-06-02",
-  "2026-05-21",
-  "2026-06-19",
-  "2026-06-25",
-  "2026-05-30",
-  "2026-06-27",
-  "2026-06-09",
-  "2026-05-16",
-  "2026-06-28",
-];
-
-// Deterministic per-batch jitter. Values stay inside the published release
-// specification but differ per lot, because identical figures across every
-// certificate are the first thing a careful reader distrusts. Seeded off the
-// batch string so a given batch always renders the same numbers (SSR-safe).
-function seed(batch: string, salt: number): number {
-  let h = 2166136261 ^ salt;
-  for (let i = 0; i < batch.length; i += 1) {
-    h ^= batch.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return ((h >>> 0) % 1000) / 1000;
+  passed: boolean;
 }
-const span = (batch: string, salt: number, min: number, max: number, dp = 1) =>
-  (min + seed(batch, salt) * (max - min)).toFixed(dp);
 
-const ENDOTOXIN_LEVELS = ["< 0.10", "< 0.25", "< 0.50"];
+export interface COARecord {
+  batchNumber: string;
+  productSlug: string;
+  productName: string;
+  testingLab: string;
+  testDate: string;
+  purityPercentage: number | null;
+  pdfUrl: string | null;
+  isPending?: boolean;
+  labResults: LabResultItem[];
+}
 
-function buildCoa(p: Product, idx: number): Coa {
-  const testDate = DATES[idx % DATES.length];
-  const peptideContent = span(p.batch, 11, 81.5, 88.4);
-  const waterContent = span(p.batch, 23, 2.1, 5.8);
-  const acetateContent = span(p.batch, 37, 6.2, 12.4);
-  const endotoxin = ENDOTOXIN_LEVELS[Math.floor(seed(p.batch, 53) * ENDOTOXIN_LEVELS.length)];
+/** Placeholder for a SKU with no certificate yet. Never renders as evidence. */
+function pendingRecord(slug: string, productName: string): COARecord {
   return {
-    batch: p.batch,
-    productName: p.name,
-    subtitle: p.subtitle,
-    mass: p.mass,
-    purity: p.purity,
-    testDate,
-    releaseDate: testDate,
-    lab: "US Analytical Labs, Inc. — Independent Third-Party (USA)",
-    appearance: "White to off-white lyophilized powder",
-    overall: "PASS",
-    rows: [
-      { analyte: "Purity (Chromatographic)", method: "RP-HPLC, 220 nm", spec: "≥ 98.0%", result: p.purity, pass: true },
-      { analyte: "Identity / Molecular Mass", method: "LC-MS (ESI)", spec: "Conforms to reference", result: "Conforms", pass: true },
-      { analyte: "Appearance", method: "Visual", spec: "White to off-white powder", result: "Conforms", pass: true },
-      { analyte: "Peptide Content", method: "Nitrogen / AAA", spec: "≥ 80.0%", result: `${peptideContent}%`, pass: true },
-      { analyte: "Water Content", method: "Karl Fischer", spec: "≤ 8.0%", result: `${waterContent}%`, pass: true },
-      { analyte: "Acetate Content", method: "RP-HPLC", spec: "≤ 15.0%", result: `${acetateContent}%`, pass: true },
-      { analyte: "Bacterial Endotoxins", method: "LAL", spec: "< 10 EU/mg", result: `${endotoxin} EU/mg`, pass: true },
-    ],
+    batchNumber: `PENDING-${slug.toUpperCase()}`,
+    productSlug: slug,
+    productName,
+    testingLab: "Third-Party Certified Lab",
+    testDate: "In Queue",
+    purityPercentage: null,
+    pdfUrl: null,
+    isPending: true,
+    labResults: [],
   };
 }
 
-const BY_BATCH: Record<string, Coa> = Object.fromEntries(
-  products.map((p, i) => [p.batch.toUpperCase(), buildCoa(p, i)])
-);
+// ── Certificates on file ─────────────────────────────────────────────────────
+const ACTIVE: Record<string, COARecord[]> = {
+  "glp-3-10mg": [
+    {
+      batchNumber: "GLP3-10-2026-01",
+      productSlug: "glp-3-10mg",
+      productName: "GLP-3 (10mg)",
+      testingLab: "JanoShield Analytical",
+      testDate: "2026-07-28",
+      purityPercentage: 99.4,
+      pdfUrl: "/coas/pdfs/glp3-batch-001.pdf",
+      isPending: false,
+      labResults: [
+        { analyte: "HPLC Purity", specification: "≥ 98.0%", result: "99.4%", passed: true },
+        {
+          analyte: "Mass Spectrometry",
+          specification: "Matches Structure",
+          result: "Confirmed",
+          passed: true,
+        },
+      ],
+    },
+  ],
+  "bpc-157-tb-500-combo": [
+    {
+      batchNumber: "PENDING-BPC-TB",
+      productSlug: "bpc-157-tb-500-combo",
+      productName: "BPC-157 / TB-500 Blend 10mg",
+      testingLab: "Third-Party Certified Lab",
+      testDate: "In Queue",
+      purityPercentage: null,
+      pdfUrl: null,
+      isPending: true,
+      labResults: [],
+    },
+  ],
+};
 
-export const sampleBatches: string[] = products.slice(0, 5).map((p) => p.batch);
+/**
+ * Every SKU resolves to a record. Pending entries are generated from the live
+ * catalog rather than hand-listed, so a new SKU can never silently end up with
+ * no COA state at all — it starts as pending and stays that way until a real
+ * document replaces it above.
+ */
+export const COA_DATABASE: Record<string, COARecord[]> = (() => {
+  const db: Record<string, COARecord[]> = { ...ACTIVE };
+  for (const product of products) {
+    if (db[product.id]) continue;
+    db[product.id] = [pendingRecord(product.id, `${product.name} (${product.mass})`)];
+  }
+  return db;
+})();
 
-export function getCoa(batch: string): Coa | null {
-  const key = batch.trim().toUpperCase();
-  return BY_BATCH[key] ?? null;
+export function getCOAByBatch(batchNumber: string): COARecord | undefined {
+  const normalizedBatch = batchNumber.toUpperCase().trim();
+  for (const records of Object.values(COA_DATABASE)) {
+    const match = records.find((r) => r.batchNumber.toUpperCase() === normalizedBatch);
+    if (match) return match;
+  }
+  return undefined;
 }
+
+export function getCOAsBySlug(slug: string): COARecord[] {
+  return COA_DATABASE[slug] || [];
+}
+
+// ── Derived helpers used by the UI, schema and sitemap ───────────────────────
+
+/** True when a record represents an actual document with results on file. */
+export function isActiveCoa(record: COARecord | undefined): record is COARecord {
+  return Boolean(record && !record.isPending && record.labResults.length > 0);
+}
+
+/** The certificate to show for a SKU, or undefined when none is on file yet. */
+export function activeCoaForSlug(slug: string): COARecord | undefined {
+  return getCOAsBySlug(slug).find((r) => isActiveCoa(r));
+}
+
+/** Every certificate with results — the set that earns a public page. */
+export function activeCoas(): COARecord[] {
+  return Object.values(COA_DATABASE)
+    .flat()
+    .filter((r) => isActiveCoa(r));
+}
+
+/** Batch numbers offered as lookup examples. Only ever real certificates. */
+export const sampleBatches: string[] = activeCoas().map((r) => r.batchNumber);

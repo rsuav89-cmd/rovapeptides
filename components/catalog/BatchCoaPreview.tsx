@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, FileCheck2, X } from "lucide-react";
-import { getCoa, type CoaRow } from "@/lib/coa";
+import { activeCoaForSlug, type LabResultItem } from "@/lib/coa";
 import { useModal } from "@/lib/useModal";
 import { site } from "@/lib/site";
 import { Logo } from "@/components/Logo";
@@ -13,7 +13,9 @@ import { Logo } from "@/components/Logo";
 // and purity first, then the "was it made under control" question, then the
 // figures a researcher needs for their own calculations, then confirmation.
 const PREVIEW_ORDER = [
+  "HPLC Purity",
   "Purity (Chromatographic)",
+  "Mass Spectrometry",
   "Identity / Molecular Mass",
   "Bacterial Endotoxins",
   "Peptide Content",
@@ -22,9 +24,9 @@ const PREVIEW_ORDER = [
   "Appearance",
 ];
 
-function ordered(rows: CoaRow[]): CoaRow[] {
+function ordered(rows: LabResultItem[]): LabResultItem[] {
   const seen = new Set<string>();
-  const out: CoaRow[] = [];
+  const out: LabResultItem[] = [];
   for (const name of PREVIEW_ORDER) {
     const row = rows.find((r) => r.analyte === name);
     if (row) {
@@ -45,11 +47,12 @@ function ordered(rows: CoaRow[]): CoaRow[] {
  * away the selected strength, the quantity, and the scroll position.
  */
 export function BatchCoaPreview({
-  batch,
+  slug,
   open,
   onClose,
 }: {
-  batch: string;
+  /** SKU whose certificate to preview. Renders nothing when none is on file. */
+  slug: string;
   open: boolean;
   onClose: () => void;
 }) {
@@ -57,7 +60,7 @@ export function BatchCoaPreview({
   const closeRef = useRef<HTMLButtonElement>(null);
   useModal(open, onClose, panelRef, closeRef);
 
-  const coa = getCoa(batch);
+  const coa = activeCoaForSlug(slug);
 
   return (
     <AnimatePresence>
@@ -69,7 +72,7 @@ export function BatchCoaPreview({
           exit="closed"
           role="dialog"
           aria-modal="true"
-          aria-label={`Certificate of Analysis for batch ${coa.batch}`}
+          aria-label={`Certificate of Analysis for batch ${coa.batchNumber}`}
         >
           <motion.button
             aria-label="Close certificate"
@@ -92,14 +95,12 @@ export function BatchCoaPreview({
               <div>
                 <Logo />
                 <p className="mt-3 text-display-sm text-ink">Certificate of Analysis</p>
-                <p className="font-mono text-label-sm uppercase text-muted">
-                  {coa.productName} · {coa.mass}
-                </p>
+                <p className="font-mono text-label-sm uppercase text-muted">{coa.productName}</p>
               </div>
               <div className="flex flex-col items-end gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-assay-deep px-3 py-1 font-mono text-label-sm uppercase text-white">
                   <Check className="h-3.5 w-3.5" strokeWidth={3} />
-                  {coa.overall}
+                  PASS
                 </span>
                 <button
                   ref={closeRef}
@@ -116,10 +117,10 @@ export function BatchCoaPreview({
             <div className="overflow-y-auto px-4 py-5 sm:px-6">
               <dl className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-xl border border-line bg-paper-3/50 p-4 sm:grid-cols-4">
                 {[
-                  ["Batch / Lot", coa.batch],
+                  ["Batch / Lot", coa.batchNumber],
                   ["Tested", coa.testDate],
-                  ["Released", coa.releaseDate],
-                  ["Purity", coa.purity],
+                  ["Laboratory", coa.testingLab],
+                  ["Purity", coa.purityPercentage !== null ? `${coa.purityPercentage}%` : "—"],
                 ].map(([label, value]) => (
                   <div key={label}>
                     <dt className="font-mono text-label-sm uppercase text-muted">{label}</dt>
@@ -129,21 +130,19 @@ export function BatchCoaPreview({
               </dl>
 
               <p className="mt-3 text-xs leading-relaxed text-ink-2">
-                Independently analyzed by {coa.lab}.
+                Independently analyzed by {coa.testingLab}.
               </p>
 
               {/* Mobile: method and specification collapse under the analyte name
                   rather than forcing a horizontally scrolling table. */}
               <ul className="mt-5 divide-y divide-line border-y border-line">
-                {ordered(coa.rows).map((row) => (
+                {ordered(coa.labResults).map((row) => (
                   <li key={row.analyte} className="grid gap-1 py-3 sm:grid-cols-[1.4fr_1fr_auto] sm:items-baseline sm:gap-4">
                     <span className="text-sm font-medium text-ink">{row.analyte}</span>
-                    <span className="font-mono text-xs text-muted">
-                      {row.method} · {row.spec}
-                    </span>
+                    <span className="font-mono text-xs text-muted">{row.specification}</span>
                     <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-assay sm:justify-self-end">
                       {row.result}
-                      {row.pass && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                      {row.passed && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
                     </span>
                   </li>
                 ))}
@@ -160,7 +159,7 @@ export function BatchCoaPreview({
             <div className="border-t border-line bg-paper-3/40 px-4 py-4 sm:px-6">
               <p className="text-xs text-ink-2">This document certifies the tested lot only.</p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
-                <Link href={`/coas/${coa.batch}`} className="btn-ghost !px-4 !py-2 text-xs">
+                <Link href={`/coas/${coa.batchNumber}`} className="btn-ghost !px-4 !py-2 text-xs">
                   <FileCheck2 className="h-4 w-4" strokeWidth={2} />
                   Open the full certificate page
                 </Link>

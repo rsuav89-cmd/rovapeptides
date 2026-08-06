@@ -1,6 +1,6 @@
 import { isPurchasable, type Product } from "@/lib/products";
 import type { CatalogProductFamily, CatalogVariant } from "@/lib/catalog";
-import type { Coa } from "@/lib/coa";
+import type { COARecord } from "@/lib/coa";
 import { site } from "@/lib/site";
 
 export function productJsonLd(
@@ -184,22 +184,22 @@ export function productGroupJsonLd(
 // signal and was previously reachable only through a client-side search box —
 // invisible to crawlers and to AI answer engines.
 // ─────────────────────────────────────────────────────────────────────────────
-export function certificationJsonLd(coa: Coa, batchUrl: string) {
+export function certificationJsonLd(coa: COARecord, batchUrl: string) {
   return {
     "@type": "Certification",
     "@id": `${batchUrl}#coa`,
-    name: `Certificate of Analysis — ${coa.productName} batch ${coa.batch}`,
-    certificationIdentification: coa.batch,
+    name: `Certificate of Analysis — ${coa.productName} batch ${coa.batchNumber}`,
+    certificationIdentification: coa.batchNumber,
     certificationStatus: "https://schema.org/CertificationActive",
-    issuedBy: { "@type": "Organization", name: coa.lab },
+    issuedBy: { "@type": "Organization", name: coa.testingLab },
     auditDate: coa.testDate,
-    datePublished: coa.releaseDate,
+    datePublished: coa.testDate,
     url: batchUrl,
     about: { "@type": "Product", name: coa.productName },
   };
 }
 
-export function coaPageJsonLd(coa: Coa, batchUrl: string, productUrl: string) {
+export function coaPageJsonLd(coa: COARecord, batchUrl: string, productUrl: string) {
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -207,9 +207,9 @@ export function coaPageJsonLd(coa: Coa, batchUrl: string, productUrl: string) {
         "@type": "WebPage",
         "@id": batchUrl,
         url: batchUrl,
-        name: `Certificate of Analysis — ${coa.productName} (Batch ${coa.batch})`,
-        datePublished: coa.releaseDate,
-        dateModified: coa.releaseDate,
+        name: `Certificate of Analysis — ${coa.productName} (Batch ${coa.batchNumber})`,
+        datePublished: coa.testDate,
+        dateModified: coa.testDate,
         isPartOf: { "@id": `${site.siteUrl}#website` },
         publisher: { "@id": `${site.siteUrl}#organization` },
         mainEntity: { "@id": `${batchUrl}#coa` },
@@ -218,21 +218,28 @@ export function coaPageJsonLd(coa: Coa, batchUrl: string, productUrl: string) {
       {
         "@type": "Product",
         "@id": `${batchUrl}#batch`,
-        name: `${coa.productName} ${coa.mass} — Batch ${coa.batch}`,
+        name: `${coa.productName} — Batch ${coa.batchNumber}`,
         url: productUrl,
         brand: { "@type": "Brand", name: site.name },
         hasCertification: { "@id": `${batchUrl}#coa` },
         additionalProperty: [
-          { "@type": "PropertyValue", name: "Batch number", value: coa.batch },
-          { "@type": "PropertyValue", name: "Appearance", value: coa.appearance },
-          { "@type": "PropertyValue", name: "Testing laboratory", value: coa.lab },
+          { "@type": "PropertyValue", name: "Batch number", value: coa.batchNumber },
+          { "@type": "PropertyValue", name: "Testing laboratory", value: coa.testingLab },
           { "@type": "PropertyValue", name: "Test date", value: coa.testDate },
-          ...coa.rows.map((r) => ({
+          ...(coa.purityPercentage !== null
+            ? [
+                {
+                  "@type": "PropertyValue",
+                  name: "Purity",
+                  value: `${coa.purityPercentage}%`,
+                },
+              ]
+            : []),
+          ...coa.labResults.map((r) => ({
             "@type": "PropertyValue",
             name: r.analyte,
             value: r.result,
-            measurementTechnique: r.method,
-            description: `Specification: ${r.spec} — ${r.pass ? "PASS" : "FAIL"}`,
+            description: `Specification: ${r.specification} — ${r.passed ? "PASS" : "FAIL"}`,
           })),
         ],
       },

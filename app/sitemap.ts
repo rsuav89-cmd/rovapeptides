@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { families } from "@/lib/catalog";
 import { collections } from "@/lib/collections";
-import { products } from "@/lib/products";
+import { activeCoas } from "@/lib/coa";
 import { site } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -39,9 +39,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       priority: 0.85,
     })),
-    // Certificate-of-analysis pages — one per batch, server-rendered.
-    ...products.map((p) => ({
-      url: `${base}/coas/${p.batch}`,
+    // Certificate pages exist only for batches with a document on file.
+    ...activeCoas().map((coa) => ({
+      url: `${base}/coas/${coa.batchNumber}`,
       lastModified: now,
       changeFrequency: "yearly" as const,
       priority: 0.6,

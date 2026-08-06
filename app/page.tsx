@@ -18,7 +18,7 @@ const FaqPreview = dynamic(() =>
 );
 import { Footer } from "@/components/Footer";
 import { AnalyticalAuthority } from "@/components/AnalyticalAuthority";
-import { sampleBatches } from "@/lib/coa";
+
 import { site } from "@/lib/site";
 import type { Metadata } from "next";
 
@@ -104,7 +104,7 @@ export default function Home() {
         <TrustQuality />
 
         {/* COA VIEWER — M4 */}
-        <AnalyticalAuthority batch={sampleBatches[0]} />
+        <AnalyticalAuthority />
 
         <CoaViewer />
 

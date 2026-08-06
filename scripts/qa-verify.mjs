@@ -21,7 +21,7 @@ import { PRODUCT_DETAILS } from "../lib/product-details.ts";
 import { faqCategories } from "../lib/faq.ts";
 import { WOO_MAPPING, PENDING_WOO_IDS } from "../lib/woo-mapping.ts";
 import * as siteNav from "../lib/site.ts";
-import { getCoa } from "../lib/coa.ts";
+import { COA_DATABASE, activeCoas, activeCoaForSlug, getCOAByBatch, getCOAsBySlug, isActiveCoa } from "../lib/coa.ts";
 import { buildProductFaqs } from "../lib/product-faq.ts";
 import {
   productJsonLd,
@@ -416,18 +416,92 @@ for (const fam of families) {
   }
 }
 
-// ── 10. Certificates resolve for every batch in the catalog ────────────────
-for (const p of products) {
-  const coa = getCoa(p.batch);
-  check("COA resolves for batch", Boolean(coa), p.batch);
-  if (!coa) continue;
-  check("COA is case-insensitive", Boolean(getCoa(p.batch.toLowerCase())), p.batch);
-  check("COA reports a full analyte panel", coa.rows.length >= 7, `${p.batch} has ${coa.rows.length} rows`);
-  check("COA rows all pass on a released batch", coa.rows.every((r) => r.pass), p.batch);
-  check("COA names the testing laboratory", coa.lab.length > 0, p.batch);
-  check("COA carries a test date", /^\d{4}-\d{2}-\d{2}$/.test(coa.testDate), `${p.batch} → ${coa.testDate}`);
+// ── 9f. Checkout architecture (Order Pay migration) ────────────────────────
+{
+  const route = read(join(ROOT, "app/api/checkout/route.ts"));
+  const drawer = read(join(ROOT, "components/cart/CartDrawer.tsx"));
+
+  check("checkout creates a pending order", /status:\s*"pending"/.test(route), "route.ts");
+  check("checkout does not mark the order paid", /set_paid:\s*false/.test(route), "route.ts");
+  check("checkout returns the order payment URL", route.includes("payment_url") && route.includes("checkoutUrl"), "route.ts");
+  check("checkout posts to the WooCommerce orders endpoint", /\/orders/.test(route), "route.ts");
+
+  // Prices must come from WooCommerce, never from the browser.
+  check("checkout never accepts a client-supplied price",
+    !/\bprice\b|\btotal\b|subtotal/i.test(route.split("line_items")[0] ?? route), "route.ts");
+
+  // Credentials belong in the Authorization header, not in a logged URL.
+  check("basic auth is the default transport", route.includes("Authorization"), "route.ts");
+  check("query-string auth is opt-in only",
+    !route.includes("consumer_key") || route.includes("WC_AUTH_IN_QUERY"), "route.ts");
+
+  // POST /orders is not idempotent — a retry can create duplicate orders.
+  check("order creation is not retried", !/for\s*\(.*attempt|retries?\s*[<>]/i.test(route), "route.ts");
+  check("order creation has a timeout", route.includes("AbortController"), "route.ts");
+
+  // The store's raw error must not reach the browser.
+  check("store errors are not forwarded verbatim",
+    !/error:\s*payload\?\.message/.test(route), "route.ts");
+
+  // The drawer must consume JSON, not submit a cross-domain form.
+  check("drawer calls the checkout API with fetch", drawer.includes('fetch("/api/checkout"'), "CartDrawer.tsx");
+  check("drawer redirects to the returned URL", drawer.includes("window.location.href = data.checkoutUrl"), "CartDrawer.tsx");
+  check("drawer no longer builds a form POST",
+    !drawer.includes('document.createElement("form")'), "CartDrawer.tsx");
+  check("drawer surfaces checkout failures", drawer.includes("setRedirecting(false)"), "CartDrawer.tsx");
 }
-check("unknown batch returns null", getCoa("RV-NOPE-0000") === null);
+
+// ── 10. Certificate database integrity ─────────────────────────────────────
+{
+  // Every SKU must resolve to a record — active or explicitly pending. Silence
+  // is the failure mode this replaces.
+  for (const p of products) {
+    const records = getCOAsBySlug(p.id);
+    check("SKU has a COA record", records.length > 0, p.id);
+    for (const r of records) {
+      check("record points back at its SKU", r.productSlug === p.id, `${p.id} → ${r.productSlug}`);
+      check("record has a batch number", r.batchNumber.trim().length > 0, p.id);
+      check("record names a laboratory", r.testingLab.trim().length > 0, p.id);
+    }
+  }
+
+  const active = activeCoas();
+  for (const coa of active) {
+    check("active COA has results", coa.labResults.length > 0, coa.batchNumber);
+    check("active COA is not flagged pending", coa.isPending !== true, coa.batchNumber);
+    check("active COA has a real test date", /^\d{4}-\d{2}-\d{2}$/.test(coa.testDate), `${coa.batchNumber} → ${coa.testDate}`);
+    check("active COA reports a purity figure", typeof coa.purityPercentage === "number", coa.batchNumber);
+    check("active COA batch is URL-safe", /^[A-Za-z0-9._~-]+$/.test(coa.batchNumber), coa.batchNumber);
+    check("lookup by batch resolves", getCOAByBatch(coa.batchNumber)?.batchNumber === coa.batchNumber, coa.batchNumber);
+    check("lookup is case-insensitive", Boolean(getCOAByBatch(coa.batchNumber.toLowerCase())), coa.batchNumber);
+    for (const row of coa.labResults) {
+      check("result row is complete",
+        Boolean(row.analyte && row.specification && row.result), `${coa.batchNumber} → ${row.analyte}`);
+      check("published certificate has no failing analyte", row.passed === true, `${coa.batchNumber} → ${row.analyte}`);
+    }
+  }
+
+  // A pending record must never look like evidence.
+  for (const records of Object.values(COA_DATABASE)) {
+    for (const r of records) {
+      if (isActiveCoa(r)) continue;
+      check("pending record publishes no results", r.labResults.length === 0, r.batchNumber);
+      check("pending record publishes no purity figure", r.purityPercentage === null, r.batchNumber);
+      check("pending record publishes no PDF", r.pdfUrl === null, r.batchNumber);
+      check("pending record is flagged", r.isPending === true, r.batchNumber);
+      check("pending batch earns no certificate page",
+        !activeCoas().some((a) => a.batchNumber === r.batchNumber), r.batchNumber);
+    }
+  }
+
+  check("unknown batch returns undefined", getCOAByBatch("NOPE-0000") === undefined);
+  check("at least one certificate is on file", active.length > 0);
+  warn(
+    "every SKU has a certificate on file",
+    products.every((p) => activeCoaForSlug(p.id)),
+    `${products.filter((p) => !activeCoaForSlug(p.id)).length} of ${products.length} SKUs are awaiting a certificate`
+  );
+}
 
 // ── 11. Structured data builders produce valid graphs ──────────────────────
 {
@@ -449,7 +523,7 @@ check("unknown batch returns null", getCoa("RV-NOPE-0000") === null);
         check("no AggregateOffer without prices", ld.offers === undefined, fam.slug);
       }
       for (const v of ld.hasVariant)
-        check("variant links its certificate", Boolean(v.hasCertification?.["@id"]), `${fam.slug} → ${v.sku}`);
+        check("variant node is well formed", Boolean(v.sku && v.name), `${fam.slug} → ${v.sku}`);
     } else {
       const ld = productJsonLd(fam.variants[0].product, opts);
       check("Product sku is the stable id, not the batch",
@@ -460,14 +534,14 @@ check("unknown batch returns null", getCoa("RV-NOPE-0000") === null);
     }
   }
 
-  const coa = getCoa(products[0].batch);
-  const graph = coaPageJsonLd(coa, `https://rovapeptides.com/coas/${coa.batch}`, "https://rovapeptides.com/shop/x")["@graph"];
+  const coa = activeCoas()[0];
+  const graph = coaPageJsonLd(coa, `https://rovapeptides.com/coas/${coa.batchNumber}`, "https://rovapeptides.com/shop/x")["@graph"];
   check("COA page emits WebPage + Certification + Product", graph.length === 3);
   check("Certification is the page's main entity",
     graph[0].mainEntity["@id"] === graph[1]["@id"]);
-  check("Certification carries the batch id", graph[1].certificationIdentification === coa.batch);
+  check("Certification carries the batch id", graph[1].certificationIdentification === coa.batchNumber);
   check("every analyte is exposed as a PropertyValue",
-    graph[2].additionalProperty.length >= coa.rows.length + 4);
+    graph[2].additionalProperty.length >= coa.labResults.length + 3);
 
   const cp = collectionPageJsonLd({
     url: "https://rovapeptides.com/shop/all", name: "All", description: "d",
@@ -507,8 +581,13 @@ check("unknown batch returns null", getCoa("RV-NOPE-0000") === null);
     check("sitemap lists every family", urls.includes(`https://rovapeptides.com/shop/${fam.slug}`), fam.slug);
   for (const c of collections)
     check("sitemap lists every collection", urls.includes(`https://rovapeptides.com/shop/collections/${c.slug}`), c.slug);
-  for (const p of products)
-    check("sitemap lists every certificate", urls.includes(`https://rovapeptides.com/coas/${p.batch}`), p.batch);
+  for (const coa of activeCoas())
+    check("sitemap lists every certificate on file", urls.includes(`https://rovapeptides.com/coas/${coa.batchNumber}`), coa.batchNumber);
+  for (const records of Object.values(COA_DATABASE))
+    for (const r of records)
+      if (!isActiveCoa(r))
+        check("sitemap omits pending certificates",
+          !urls.some((u) => u.endsWith(`/coas/${r.batchNumber}`)), r.batchNumber);
   check("sitemap excludes noindex routes", !urls.some((u) => u.endsWith("/track-order")));
   check("all sitemap URLs are absolute", urls.every((u) => u.startsWith("https://")));
 }

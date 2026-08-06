@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Plus, Eye } from "lucide-react";
+import { Check, Plus, Eye, FileCheck2 } from "lucide-react";
 import { priceLabel, isPurchasable, showNewBadge, type Product } from "@/lib/products";
+import Link2 from "next/link";
+import { activeCoaForSlug } from "@/lib/coa";
 import { useCart } from "@/components/cart/CartContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +19,7 @@ export function ProductCard({ product }: { product: Product }) {
   const [added, setAdded] = useState(false);
 
   const purchasable = isPurchasable(product);
+  const coa = activeCoaForSlug(product.id);
 
   function quickAdd(e: React.MouseEvent) {
     e.stopPropagation();
@@ -43,7 +46,7 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="image-stage-light relative aspect-[4/5] overflow-hidden">
         <ProductImage
           product={product}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-280 ease-out-expo will-change-transform group-hover:scale-[1.05]"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[400ms] ease-out-expo will-change-transform group-hover:scale-[1.06]"
         />
 
         {showNewBadge(product) && (
@@ -86,53 +89,78 @@ export function ProductCard({ product }: { product: Product }) {
 
         <div className="mt-3 flex flex-wrap gap-1.5">
           <span className="data-tag-light">{product.mass}</span>
-          <span className="data-tag-light">{product.purity} pure</span>
+          <span className="data-tag-light">{product.purity}+ HPLC verified</span>
         </div>
 
-        <div className="mt-2 flex items-center gap-1.5 font-mono text-[0.66rem] text-muted-dark">
-          <span className="h-1 w-1 rounded-full bg-muted-dark/60" />
-          Batch {product.batch}
+        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.66rem] text-muted-dark">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-1 w-1 rounded-full bg-muted-dark/60" />
+            {coa ? `Batch ${coa.batchNumber}` : "COA in queue"}
+          </span>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-end justify-between gap-3 pt-1">
-          <div className="min-w-0">
-            <p className="font-mono text-[0.62rem] uppercase tracking-widest text-muted-dark">Price</p>
-            <p className="font-sans text-xl font-semibold text-ink-dark">{priceLabel(product)}</p>
+        {/* PRICE + DUAL ACTION — proof is a first-class action, not a footnote. */}
+        <div className="mt-4 pt-1">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="font-mono text-label-sm uppercase tracking-widest text-muted-dark">
+              Price
+            </p>
+            <p className="font-sans text-xl font-semibold tabular-nums text-ink-dark">
+              {priceLabel(product)}
+            </p>
           </div>
 
-          <button
-            onClick={quickAdd}
-            aria-label={purchasable ? `Add ${product.name} to cart` : `Details and pricing for ${product.name}`}
-            className={[
-              "group/btn pointer-events-auto relative z-10 inline-flex h-11 items-center overflow-hidden rounded-full px-3 font-semibold transition-[background-color,transform] duration-160 ease-out-expo will-change-transform active:scale-95",
-              !purchasable
-                ? "border bg-transparent text-ink-dark hover:border-copper-muted hover:text-copper-muted"
-                : added
-                  ? "bg-graphite text-white"
-                  : "bg-brand-cta text-white hover:shadow-copper",
-            ].join(" ")}
-            style={!purchasable ? { borderColor: "var(--line-warm-strong)" } : undefined}
-          >
-            {!purchasable ? (
-              <Eye className="h-5 w-5" strokeWidth={2.4} />
-            ) : added ? (
-              <Check className="h-5 w-5" strokeWidth={2.4} />
-            ) : (
-              <Plus className="h-5 w-5" strokeWidth={2.4} />
-            )}
-            <span
+          <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
+            <button
+              onClick={quickAdd}
+              aria-label={
+                purchasable
+                  ? `Add ${product.name} to cart`
+                  : `Details and pricing for ${product.name}`
+              }
               className={[
-                "max-w-0 overflow-hidden whitespace-nowrap text-sm transition-[max-width,margin] duration-220 ease-out-expo",
+                "pointer-events-auto relative z-10 inline-flex min-h-[44px] items-center justify-center gap-1.5",
+                "rounded-lg px-4 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.12em]",
+                "transition-[background-color,transform,box-shadow] duration-200 ease-spring-out",
+                "will-change-transform active:scale-[0.97]",
                 !purchasable
-                  ? "group-hover/btn:ml-1.5 group-hover/btn:max-w-[6rem]"
+                  ? "border bg-transparent text-ink-dark hover:border-copper-muted"
                   : added
-                    ? "ml-1.5 max-w-[5rem]"
-                    : "group-hover/btn:ml-1.5 group-hover/btn:max-w-[5rem]",
+                    ? "bg-graphite text-white"
+                    : "bg-brand-cta text-white shadow-copper hover:-translate-y-px hover:shadow-copper-lg",
               ].join(" ")}
+              style={!purchasable ? { borderColor: "var(--line-warm-strong)" } : undefined}
             >
+              {!purchasable ? (
+                <Eye className="h-4 w-4" strokeWidth={2.4} />
+              ) : added ? (
+                <Check className="h-4 w-4" strokeWidth={2.6} />
+              ) : (
+                <Plus className="h-4 w-4" strokeWidth={2.6} />
+              )}
               {!purchasable ? "Details" : added ? "Added" : "Add"}
-            </span>
-          </button>
+            </button>
+
+            {coa ? (
+              <Link2
+                href={`/coas/${coa.batchNumber}`}
+                onClick={(e) => e.stopPropagation()}
+                aria-label={`View the certificate of analysis for batch ${coa.batchNumber}`}
+                className="pointer-events-auto relative z-10 inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-lg border bg-transparent px-3.5 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-ink-dark transition-[border-color,background-color,transform] duration-200 ease-snap hover:bg-sand/40 active:scale-[0.97]"
+                style={{ borderColor: "var(--line-warm-strong)" }}
+              >
+                <FileCheck2 className="h-3.5 w-3.5" strokeWidth={2} />
+                COA
+              </Link2>
+            ) : (
+              <span
+                className="inline-flex min-h-[44px] items-center justify-center rounded-lg border px-3.5 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-muted-dark opacity-60"
+                style={{ borderColor: "var(--line-warm)" }}
+              >
+                Pending
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </article>
