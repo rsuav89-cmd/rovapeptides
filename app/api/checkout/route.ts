@@ -28,16 +28,37 @@ import { wooRef } from "@/lib/woo-mapping";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// ── Environment resolution ───────────────────────────────────────────────────
+// Both naming conventions are accepted so the same build works against a Vercel
+// project configured with either WC_* or WOOCOMMERCE_* variables. Nothing here
+// may be renamed without keeping the alias — a rename silently 500s production.
 const SHOP_BASE = (
   process.env.WC_SHOP_URL ||
+  process.env.NEXT_PUBLIC_WORDPRESS_URL ||
   process.env.NEXT_PUBLIC_WC_CHECKOUT_URL ||
   "https://shop.rovapeptides.com"
 )
   .replace(/\/+$/, "")
   .replace(/\/checkout$/i, "");
 
-/** Explicit override wins; otherwise derive the v3 base from the shop URL. */
-const WC_API_BASE = (process.env.WC_API_URL || `${SHOP_BASE}/wp-json/wc/v3`).replace(/\/+$/, "");
+/**
+ * Accepts either a full REST base (".../wp-json/wc/v3") or a bare site root
+ * ("https://shop.example.com") and always returns a full v3 base.
+ *
+ * This normalisation matters: WC_API_URL is conventionally a full endpoint
+ * while NEXT_PUBLIC_WORDPRESS_URL is a site root. Concatenating "/orders" onto
+ * an unnormalised root produces https://shop.../orders, which 404s and looks
+ * exactly like a credentials problem.
+ */
+function toRestBase(value: string): string {
+  const trimmed = value.replace(/\/+$/, "");
+  if (/\/wp-json\//.test(trimmed)) return trimmed;
+  return `${trimmed}/wp-json/wc/v3`;
+}
+
+const WC_API_BASE = toRestBase(
+  process.env.WC_API_URL || process.env.NEXT_PUBLIC_WORDPRESS_URL || SHOP_BASE
+);
 
 const CONSUMER_KEY =
   process.env.WC_CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || "";
@@ -99,7 +120,16 @@ function originAllowed(req: NextRequest): boolean {
 
 export async function POST(req: NextRequest) {
   if (!CONSUMER_KEY || !CONSUMER_SECRET) {
-    console.error("[CHECKOUT] WooCommerce REST credentials are not configured");
+    console.error(
+      "[CHECKOUT] WooCommerce REST credentials are not configured. Set either " +
+        "WC_CONSUMER_KEY/WC_CONSUMER_SECRET or WOOCOMMERCE_CONSUMER_KEY/" +
+        "WOOCOMMERCE_CONSUMER_SECRET in the deployment environment.",
+      {
+        hasKey: Boolean(CONSUMER_KEY),
+        hasSecret: Boolean(CONSUMER_SECRET),
+        apiBase: WC_API_BASE,
+      }
+    );
     return NextResponse.json(
       { error: "Checkout is not configured. Please contact support." },
       { status: 500, headers: NO_STORE }

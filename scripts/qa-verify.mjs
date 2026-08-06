@@ -432,6 +432,19 @@ for (const fam of families) {
 
   // Credentials belong in the Authorization header, not in a logged URL.
   check("basic auth is the default transport", route.includes("Authorization"), "route.ts");
+
+  // Production is configured with WOOCOMMERCE_* names. Dropping either alias
+  // silently 500s live checkout, so both are pinned by assertion.
+  for (const name of [
+    "WC_CONSUMER_KEY", "WOOCOMMERCE_CONSUMER_KEY",
+    "WC_CONSUMER_SECRET", "WOOCOMMERCE_CONSUMER_SECRET",
+    "WC_API_URL", "NEXT_PUBLIC_WORDPRESS_URL",
+  ]) {
+    check("checkout accepts env alias", route.includes(`process.env.${name}`), name);
+    check("env alias is documented", read(join(ROOT, ".env.example")).includes(name), name);
+  }
+  check("a bare site root is normalised to a REST base",
+    route.includes("wp-json/wc/v3") && route.includes("toRestBase"), "route.ts");
   check("query-string auth is opt-in only",
     !route.includes("consumer_key") || route.includes("WC_AUTH_IN_QUERY"), "route.ts");
 
