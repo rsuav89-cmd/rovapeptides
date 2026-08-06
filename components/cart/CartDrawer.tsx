@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Trash2, Lock, Check } from "lucide-react";
 import { paymentMethods, site } from "@/lib/site";
@@ -11,7 +11,7 @@ import { useModal } from "@/lib/useModal";
 import { ProductImage } from "@/components/ProductImage";
 
 export function CartDrawer() {
-  const { lines, subtotal, count, isOpen, close, setQty, remove, add } = useCart();
+  const { lines, subtotal, count, isOpen, close, setQty, remove, add, open: openCart } = useCart();
   const [redirecting, setRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,6 +83,33 @@ export function CartDrawer() {
       setRedirecting(false);
     }
   }
+
+  // Returning from the WooCommerce order-pay screen: /shop?openCart=true
+  // reopens the drawer so quantities can be changed before a new order is made.
+  //
+  // Deliberately reads window.location rather than useSearchParams(): this
+  // drawer is mounted globally in Providers, so useSearchParams() without a
+  // Suspense boundary would opt EVERY route into client-side rendering and fail
+  // the production build. The shopper arrives via a full cross-domain page
+  // load, so a mount-time read is the correct instrument.
+  const handledOpenParam = useRef(false);
+  useEffect(() => {
+    if (handledOpenParam.current) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("openCart") !== "true") return;
+
+    handledOpenParam.current = true;
+    openCart();
+
+    // Strip the flag so a refresh or back-navigation does not reopen it.
+    params.delete("openCart");
+    const query = params.toString();
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`
+    );
+  }, [openCart]);
 
   const asideRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);

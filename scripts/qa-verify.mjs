@@ -397,7 +397,7 @@ for (const fam of families) {
   // useSearchParams outside a Suspense boundary de-opts the route to CSR and
   // fails a production build.
   for (const file of SOURCES.filter((x) => x.endsWith(".tsx"))) {
-    if (!read(file).includes("useSearchParams")) continue;
+    if (!stripComments(read(file)).includes("useSearchParams")) continue;
     const name = file.split("/").pop().replace(".tsx", "");
     const consumers = SOURCES.filter((x) => read(x).includes(`<${name}`) && x !== file);
     check("useSearchParams consumer is wrapped in Suspense",
@@ -462,6 +462,14 @@ for (const fam of families) {
   check("drawer no longer builds a form POST",
     !drawer.includes('document.createElement("form")'), "CartDrawer.tsx");
   check("drawer surfaces checkout failures", drawer.includes("setRedirecting(false)"), "CartDrawer.tsx");
+
+  // Return loop from the WooCommerce order-pay screen.
+  check("drawer reopens on ?openCart=true", drawer.includes('params.get("openCart")'), "CartDrawer.tsx");
+  check("drawer strips the flag after opening", drawer.includes("window.history.replaceState"), "CartDrawer.tsx");
+  check("drawer guards against re-firing", drawer.includes("handledOpenParam"), "CartDrawer.tsx");
+  // useSearchParams in a globally-mounted component opts every route into CSR
+  // and fails the production build — this must stay a window.location read.
+  check("drawer does not use useSearchParams", !stripComments(drawer).includes("useSearchParams"), "CartDrawer.tsx");
 }
 
 // ── 10. Certificate database integrity ─────────────────────────────────────
