@@ -153,6 +153,100 @@ function rova_manual_payment_markup( $order, $for_email = false ) {
 	return ob_get_clean();
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Suppress the gateway's own placeholder instructions.
+ *
+ * The Zelle gateway ships default "Instructions" text still containing
+ * [YOUR-ZELLE-EMAIL-OR-PHONE-HERE] and #{order_number} — literal placeholders
+ * the gateway never substitutes. Left alone it renders directly above our own
+ * block, so the shopper sees a broken template and a correct one side by side
+ * and has no way to know which to trust.
+ *
+ * Three layers, because gateways differ in how they emit that text:
+ *   1. blank the public `instructions` property (BACS/COD and most forks)
+ *   2. strip placeholders from the checkout-page gateway description
+ *   3. an output buffer over the thank-you page as the catch-all, for gateways
+ *      that echo get_option('instructions') directly
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/** Literal tokens that mark unsubstituted template text. Extend as needed. */
+function rova_placeholder_tokens() {
+	return array(
+		'[YOUR-ZELLE-EMAIL-OR-PHONE-HERE]',
+		'[YOUR-CASHTAG-HERE]',
+		'#{order_number}',
+		'{order_number}',
+		'{{order_number}}',
+	);
+}
+
+function rova_contains_placeholder( $text ) {
+	if ( ! is_string( $text ) || '' === $text ) {
+		return false;
+	}
+	foreach ( rova_placeholder_tokens() as $token ) {
+		if ( false !== strpos( $text, $token ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/** Layer 1 — blank the property before any gateway renders it. */
+function rova_scrub_gateway_instructions() {
+	if ( ! function_exists( 'WC' ) || ! WC()->payment_gateways ) {
+		return;
+	}
+	foreach ( WC()->payment_gateways()->payment_gateways() as $gateway ) {
+		if ( isset( $gateway->instructions ) && rova_contains_placeholder( $gateway->instructions ) ) {
+			$gateway->instructions = '';
+		}
+	}
+}
+add_action( 'wp', 'rova_scrub_gateway_instructions', 5 );
+add_action( 'woocommerce_email_before_order_table', 'rova_scrub_gateway_instructions', 1 );
+
+/** Layer 2 — checkout page descriptions. */
+function rova_scrub_gateway_description( $description, $gateway_id = '' ) {
+	return rova_contains_placeholder( $description ) ? '' : $description;
+}
+add_filter( 'woocommerce_gateway_description', 'rova_scrub_gateway_description', 10, 2 );
+
+/**
+ * Layer 3 — catch-all on the order-received page.
+ *
+ * Buffers everything emitted between `woocommerce_before_thankyou` and our own
+ * renderer, drops any block still carrying a placeholder, then prints the rest.
+ * Priority 1 so it flushes before rova_thankyou_manual_payment() runs at 10.
+ */
+function rova_start_thankyou_buffer() {
+	ob_start();
+}
+add_action( 'woocommerce_before_thankyou', 'rova_start_thankyou_buffer', 0 );
+
+function rova_flush_thankyou_buffer() {
+	if ( ! ob_get_level() ) {
+		return;
+	}
+	$html = ob_get_clean();
+
+	// Drop whole paragraphs/divs that contain a placeholder; WooCommerce
+	// wpautop()s instruction text, so it arrives as <p> blocks.
+	$html = preg_replace_callback(
+		'#<(p|div)\b[^>]*>.*?</\1>#is',
+		function ( $matches ) {
+			return rova_contains_placeholder( $matches[0] ) ? '' : $matches[0];
+		},
+		$html
+	);
+
+	// Belt and braces: remove any bare token that survived outside a block.
+	$html = str_replace( rova_placeholder_tokens(), '', $html );
+
+	echo $html; // phpcs:ignore WordPress.Security.EscapeOutput -- passthrough of already-rendered markup.
+}
+add_action( 'woocommerce_thankyou', 'rova_flush_thankyou_buffer', 1 );
+
 /**
  * Order-received (thank-you) page.
  */

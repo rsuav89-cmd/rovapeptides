@@ -472,6 +472,38 @@ for (const fam of families) {
   check("drawer does not use useSearchParams", !stripComments(drawer).includes("useSearchParams"), "CartDrawer.tsx");
 }
 
+// ── 9g. WordPress mu-plugins (checkout return loop + manual payments) ──────
+{
+  const editCart = read(join(ROOT, "deploy/hostinger-mu-plugins/rova-edit-cart-button.php"));
+  const manualPay = read(join(ROOT, "deploy/hostinger-mu-plugins/rova-manual-payment-instructions.php"));
+
+  // Above the payment method list, not below it.
+  check("edit-cart renders before the payment methods",
+    editCart.includes("woocommerce_pay_order_before_payment"), "rova-edit-cart-button.php");
+  check("edit-cart no longer uses the submit hook",
+    !editCart.includes("add_action( 'woocommerce_pay_order_before_submit'"), "rova-edit-cart-button.php");
+  // Staging must never capture this redirect.
+  check("storefront URL is an absolute literal",
+    editCart.includes("'https://rovapeptides.com/shop?openCart=true'"), "rova-edit-cart-button.php");
+  check("storefront URL never derives from WordPress config",
+    !/site_url\(|home_url\(|WP_HOME/.test(stripComments(editCart)), "rova-edit-cart-button.php");
+  check("edit-cart styles stay on the pay page",
+    editCart.includes("is_checkout_pay_page()"), "rova-edit-cart-button.php");
+
+  check("manual payments publish the Zelle number",
+    manualPay.includes("321-482-6724"), "rova-manual-payment-instructions.php");
+  check("manual payments publish the Cashtag",
+    manualPay.includes("$JRandone"), "rova-manual-payment-instructions.php");
+  check("manual payments quote the order number",
+    manualPay.includes("get_order_number()"), "rova-manual-payment-instructions.php");
+  for (const token of ["[YOUR-ZELLE-EMAIL-OR-PHONE-HERE]", "#{order_number}"])
+    check("placeholder token is suppressed", manualPay.includes(token), token);
+  check("placeholder scrub covers the thank-you page",
+    manualPay.includes("woocommerce_before_thankyou"), "rova-manual-payment-instructions.php");
+  check("placeholder scrub covers gateway descriptions",
+    manualPay.includes("woocommerce_gateway_description"), "rova-manual-payment-instructions.php");
+}
+
 // ── 10. Certificate database integrity ─────────────────────────────────────
 {
   // Every SKU must resolve to a record — active or explicitly pending. Silence

@@ -15,14 +15,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/** Where the shopper returns to. `openCart=true` opens the storefront drawer. */
+/**
+ * Absolute storefront URL. HARDCODED ON PURPOSE.
+ *
+ * Never derive this from site_url(), home_url() or WP_HOME: this plugin runs on
+ * shop.rovapeptides.com, and on Hostinger staging those resolve to the staging
+ * hostname — which would send a live shopper to a staging cart that does not
+ * have their items. The headless storefront is a different origin and is not
+ * discoverable from WordPress config, so the literal is the correct source.
+ */
+if ( ! defined( 'ROVA_STOREFRONT_CART_URL' ) ) {
+	define( 'ROVA_STOREFRONT_CART_URL', 'https://rovapeptides.com/shop?openCart=true' );
+}
+
 function rova_storefront_cart_url() {
-	return 'https://rovapeptides.com/shop?openCart=true';
+	return ROVA_STOREFRONT_CART_URL;
 }
 
 /**
- * `woocommerce_pay_order_before_submit` fires inside the payment form on the
- * order-pay screen only, so this never appears on the regular checkout.
+ * `woocommerce_pay_order_before_payment` fires inside the order-pay form ABOVE
+ * the payment method list, so the escape hatch is visible before the shopper
+ * starts choosing between Crypto, Zelle and Cash App — not stranded underneath
+ * them where it reads as an afterthought. Order-pay screen only; this never
+ * appears on the regular checkout.
  */
 function rova_render_edit_cart_button() {
 	?>
@@ -37,7 +52,7 @@ function rova_render_edit_cart_button() {
 	</div>
 	<?php
 }
-add_action( 'woocommerce_pay_order_before_submit', 'rova_render_edit_cart_button' );
+add_action( 'woocommerce_pay_order_before_payment', 'rova_render_edit_cart_button' );
 
 /** Styles are gated to the order-pay screen so nothing leaks sitewide. */
 function rova_edit_cart_button_styles() {
